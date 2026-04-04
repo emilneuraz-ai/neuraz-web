@@ -1,0 +1,95 @@
+---
+// src/components/Hero.astro
+---
+
+<section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
+  <!-- Background gradient -->
+  <div class="absolute inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900"></div>
+  
+  <!-- Animated background elements -->
+  <div class="absolute inset-0 overflow-hidden">
+    <div class="absolute top-1/4 left-1/4 w-96 h-96 bg-primary-500/10 rounded-full blur-3xl animate-pulse-slow"></div>
+    <div class="absolute bottom-1/4 right-1/4 w-96 h-96 bg-accent-500/10 rounded-full blur-3xl animate-pulse-slow" style="animation-delay: 1.5s;"></div>
+  </div>
+
+  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
+    <!-- Badge -->
+    <div class="inline-flex items-center px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-8 animate-fade-in">
+      <span class="w-2 h-2 rounded-full bg-primary-400 mr-2 animate-pulse"></span>
+      <span class="text-primary-300 text-sm font-medium">Inteligencia Artificial Aplicada</span>
+    </div>
+
+    <!-- Main heading -->
+    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6 animate-slide-up">
+      <span class="bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent">
+        Diseñamos
+      </span>
+      <br />
+      <span class="bg-gradient-to-r from-primary-400 via-accent-400 to-primary-400 bg-clip-text text-transparent">
+        sistemas inteligentes
+      </span>
+    </h1>
+
+    <!-- Subtitle -->
+    <p class="text-xl sm:text-2xl text-gray-400 mb-8 animate-slide-up" style="animation-delay: 0.1s;">
+      <span class="text-primary-400 font-semibold">Crea</span>
+      <span class="mx-2 text-gray-600">/</span>
+      <span class="text-accent-400 font-semibold">Documenta</span>
+      <span class="mx-2 text-gray-600">/</span>
+      <span class="text-primary-400 font-semibold">Automatiza</span>
+    </p>
+
+    <!-- Description -->
+    <p class="max-w-2xl mx-auto text-gray-400 text-lg mb-12 animate-slide-up" style="animation-delay: 0.2s;">
+      No vendemos software genérico. Diseñamos, construimos e implementamos herramientas digitales 
+      a medida, pensadas para el contexto real de tu negocio.
+    </p>
+
+    <!-- CTA Buttons -->
+    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.3s;">
+      <a 
+        href="#contacto"
+        class="inline-flex items-center px-8 py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold text-lg transition-all transform hover:scale-105 shadow-lg shadow-primary-500/25"
+      >
+        Empezar proyecto
+        <svg class="w-5 h-5 ml-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
+        </svg>
+      </a>
+      
+      <a 
+        href="#servicios"
+        class="inline-flex items-center px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 text-white font-semibold text-lg transition-all"
+      >
+        Ver servicios
+      </a>
+    </div>
+
+    <!-- Stats -->
+    <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-8 animate-slide-up" style="animation-delay: 0.4s;">
+      <div class="text-center">
+        <div class="text-3xl sm:text-4xl font-bold text-white mb-1">9</div>
+        <div class="text-sm text-gray-500">Servicios</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl sm:text-4xl font-bold text-white mb-1">24/7</div>
+        <div class="text-sm text-gray-500">Operación</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl sm:text-4xl font-bold text-white mb-1">+35%</div>
+        <div class="text-sm text-gray-500">Ticket promedio</div>
+      </div>
+      <div class="text-center">
+        <div class="text-3xl sm:text-4xl font-bold text-white mb-1">IA</div>
+        <div class="text-sm text-gray-500">Nativa</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Scroll indicator -->
+  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2 animate-bounce">
+    <svg class="w-6 h-6 text-gray-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
+    </svg>
+  </div>
+</section>

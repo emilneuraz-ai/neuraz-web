@@ -1,0 +1,72 @@
+---
+// src/components/Team.astro
+---
+
+<section id="equipo" class="py-24 bg-dark-900">
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+    <!-- Section header -->
+    <div class="text-center mb-16">
+      <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-4">
+        Nuestro Equipo
+      </span>
+      <h2 class="text-4xl sm:text-5xl font-bold text-white mb-6">
+        Expertos en <span class="text-primary-400">IA aplicada</span>
+      </h2>
+      <p class="max-w-2xl mx-auto text-gray-400 text-lg">
+        Un equipo multidisciplinario con experiencia en inteligencia artificial, 
+        automatización y desarrollo de productos digitales.
+      </p>
+    </div>
+
+    <!-- Team grid placeholder -->
+    <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+      <!-- Team member 1 -->
+      <div class="group relative p-6 rounded-2xl bg-dark-800 border border-white/5 hover:border-primary-500/30 transition-all">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-primary-500 to-accent-500 mx-auto mb-4 flex items-center justify-center">
+          <span class="text-3xl font-bold text-white">E</span>
+        </div>
+        <h3 class="text-xl font-semibold text-white text-center mb-1">Emil González</h3>
+        <p class="text-primary-400 text-center text-sm mb-4">Fundador & CEO</p>
+        
+        <p class="text-gray-400 text-center text-sm">
+          Especialista en IA aplicada y automatización de procesos de negocio.
+        </p>
+      </div>
+
+      <!-- Team member 2 -->
+      <div class="group relative p-6 rounded-2xl bg-dark-800 border border-white/5 hover:border-primary-500/30 transition-all">
+        <div class="w-24 h-24 rounded-full bg-gradient-to-br from-accent-500 to-purple-500 mx-auto mb-4 flex items-center justify-center">
+          <span class="text-3xl font-bold text-white">N</span>
+        </div>
+        <h3 class="text-xl font-semibold text-white text-center mb-1">Neury</h3>
+        <p class="text-accent-400 text-center text-sm mb-4">Asistente Virtual</p>
+        
+        <p class="text-gray-400 text-center text-sm">
+          IA especializada en desarrollo de proyectos y gestión de técnicas.
+        </p>
+      </div>
+
+      <!-- Join us card -->
+      <div class="group relative p-6 rounded-2xl bg-gradient-to-br from-primary-500/10 to-accent-500/10 border border-primary-500/20 hover:border-primary-500/40 transition-all flex flex-col items-center justify-center">
+        <div class="w-24 h-24 rounded-full bg-dark-700 border-2 border-dashed border-primary-500/30 mx-auto mb-4 flex items-center justify-center group-hover:border-primary-500/60 transition-colors">
+          <svg class="w-10 h-10 text-primary-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+          </svg>
+        </div>
+        
+        <h3 class="text-xl font-semibold text-white text-center mb-2">¿Querés sumarte?</h3>
+        
+        <p class="text-gray-400 text-center text-sm mb-4">
+          Siempre estamos buscando talento apasionado por la IA.
+        </p>
+        
+        <a 
+          href="#contacto" 
+          class="inline-flex items-center px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
+        >
+          Contactanos
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
