@@ -1,10 +1,11 @@
 {
   "mcpServers": {
     "notion": {
-      "command": "npx",
-      "args": ["-y", "@notionhq/notion-mcp-server"],
+      "command": "node",
+      "args": [".agents/mcp/notion-mcp-wrapper.js"],
       "env": {
-        "NOTION_API_KEY": "${NOTION_API_KEY}"
+        "NOTION_API_KEY": "${NOTION_API_KEY}",
+        "NOTION_VERSION": "2022-06-28"
       }
     }
   }
