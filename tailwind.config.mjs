@@ -33,11 +33,11 @@ export default {
           950: '#4a044e',
         },
         dark: {
-          900: '#0a0a0f',
-          800: '#12121a',
-          700: '#1a1a25',
-          600: '#252535',
-          500: '#353545',
+          900: '#0d111a',  // Base dark - lighter than pure black
+          800: '#151a27',  // Card/section backgrounds - visible
+          700: '#1f2537',  // Elevated surfaces
+          600: '#2a3147',  // Interactive elements
+          500: '#374057',  // Hover states
         }
       },
       fontFamily: {
