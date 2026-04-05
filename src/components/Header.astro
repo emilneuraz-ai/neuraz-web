@@ -1,27 +1,27 @@
 ---
-// src/components/Header.astro - Minimalist version
+// src/components/Header.astro - Refined minimalist
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/90 backdrop-blur-sm">
-  <div class="max-w-6xl mx-auto px-6 sm:px-12 lg:px-24">
+<header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-md transition-all duration-300" id="header">
+  <div class="max-w-7xl mx-auto px-6 sm:px-12 lg:px-16">
     <div class="flex items-center justify-between h-20">
       <!-- Logo -->
-      <a href="/" class="text-title text-text-primary">
+      <a href="/" class="text-[15px] font-medium tracking-[-0.01em] text-white hover:opacity-70 transition-opacity duration-200">
         Neuraz
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center gap-8">
-        <a href="#servicios" class="text-small text-text-secondary hover:text-text-primary transition-colors">
+      <nav class="hidden md:flex items-center gap-10">
+        <a href="#servicios" class="text-[13px] font-normal tracking-[0.01em] text-white/60 hover:text-white transition-colors duration-200">
           Servicios
         </a>
-        <a href="#nosotros" class="text-small text-text-secondary hover:text-text-primary transition-colors">
+        <a href="#nosotros" class="text-[13px] font-normal tracking-[0.01em] text-white/60 hover:text-white transition-colors duration-200">
           Nosotros
         </a>
-        <a href="#equipo" class="text-small text-text-secondary hover:text-text-primary transition-colors">
+        <a href="#equipo" class="text-[13px] font-normal tracking-[0.01em] text-white/60 hover:text-white transition-colors duration-200">
           Equipo
         </a>
-        <a href="#contacto" class="text-small text-text-secondary hover:text-text-primary transition-colors">
+        <a href="#contacto" class="text-[13px] font-normal tracking-[0.01em] text-white/60 hover:text-white transition-colors duration-200">
           Contacto
         </a>
       </nav>
@@ -30,7 +30,7 @@
       <div class="hidden md:block">
         <a 
           href="#contacto" 
-          class="text-small text-text-primary hover:text-accent transition-colors"
+          class="text-[13px] font-medium tracking-[0.01em] text-white hover:text-blue-400 transition-colors duration-200"
         >
           Iniciar proyecto →
         </a>
@@ -39,34 +39,34 @@
       <!-- Mobile menu button -->
       <button 
         id="mobile-menu-btn"
-        class="md:hidden p-2 text-text-secondary hover:text-text-primary"
+        class="md:hidden p-2 text-white/60 hover:text-white transition-colors"
         aria-label="Abrir menú"
       >
-        <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <svg id="menu-icon" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
+        </svg>
+        <svg id="close-icon" class="w-5 h-5 hidden" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M6 18L18 6M6 6l12 12" />
         </svg>
       </button>
     </div>
 
     <!-- Mobile Navigation -->
-    <div id="mobile-menu" class="hidden md:hidden py-6 border-t border-white/5">
-      <nav class="flex flex-col gap-4">
-        <a href="#servicios" class="text-body text-text-secondary hover:text-text-primary transition-colors">
+    <div id="mobile-menu" class="hidden md:hidden py-8 border-t border-white/10">
+      <nav class="flex flex-col gap-6">
+        <a href="#servicios" class="text-[15px] font-normal text-white/60 hover:text-white transition-colors mobile-link">
           Servicios
         </a>
-        <a href="#nosotros" class="text-body text-text-secondary hover:text-text-primary transition-colors">
+        <a href="#nosotros" class="text-[15px] font-normal text-white/60 hover:text-white transition-colors mobile-link">
           Nosotros
         </a>
-        <a href="#equipo" class="text-body text-text-secondary hover:text-text-primary transition-colors">
+        <a href="#equipo" class="text-[15px] font-normal text-white/60 hover:text-white transition-colors mobile-link">
           Equipo
         </a>
-        <a href="#contacto" class="text-body text-text-secondary hover:text-text-primary transition-colors">
+        <a href="#contacto" class="text-[15px] font-normal text-white/60 hover:text-white transition-colors mobile-link">
           Contacto
         </a>
-        <a 
-          href="#contacto" 
-          class="text-body text-text-primary hover:text-accent transition-colors pt-4 border-t border-white/5"
-        >
+        <a href="#contacto" class="text-[15px] font-medium text-white hover:text-blue-400 transition-colors pt-6 border-t border-white/10 mobile-link">
           Iniciar proyecto →
         </a>
       </nav>
@@ -77,8 +77,61 @@
 <script>
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');
   const mobileMenu = document.getElementById('mobile-menu');
+  const menuIcon = document.getElementById('menu-icon');
+  const closeIcon = document.getElementById('close-icon');
+  const mobileLinks = document.querySelectorAll('.mobile-link');
+  const header = document.getElementById('header');
 
-  mobileMenuBtn?.addEventListener('click', () => {
-    mobileMenu?.classList.toggle('hidden');
+  function toggleMenu() {
+    const isOpen = !mobileMenu.classList.contains('hidden');
+    
+    if (isOpen) {
+      mobileMenu.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    } else {
+      mobileMenu.classList.remove('hidden');
+      menuIcon.classList.add('hidden');
+      closeIcon.classList.remove('hidden');
+    }
+  }
+
+  // Toggle on button click
+  mobileMenuBtn?.addEventListener('click', toggleMenu);
+
+  // Close on link click
+  mobileLinks.forEach(link => {
+    link.addEventListener('click', () => {
+      mobileMenu.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    });
+  });
+
+  // Close on click outside
+  document.addEventListener('click', (e) => {
+    if (!mobileMenu.classList.contains('hidden') && 
+        !mobileMenu.contains(e.target) && 
+        !mobileMenuBtn.contains(e.target)) {
+      mobileMenu.classList.add('hidden');
+      menuIcon.classList.remove('hidden');
+      closeIcon.classList.add('hidden');
+    }
+  });
+
+  // Header scroll effect
+  let lastScroll = 0;
+  window.addEventListener('scroll', () => {
+    const currentScroll = window.pageYOffset;
+    
+    if (currentScroll > 100) {
+      header.classList.add('bg-dark-900/95');
+      header.classList.remove('bg-dark-900/80');
+    } else {
+      header.classList.remove('bg-dark-900/95');
+      header.classList.add('bg-dark-900/80');
+    }
+    
+    lastScroll = currentScroll;
   });
 </script>

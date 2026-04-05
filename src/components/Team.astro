@@ -1,16 +1,16 @@
 ---
-// src/components/Team.astro - Minimalist version with Notion data
+// src/components/Team.astro - Refined with photos from Notion
 ---
 
-<section id="equipo" class="py-32 px-6 sm:px-12 lg:px-24 border-t border-white/5">
-  <div class="max-w-6xl">
+<section id="equipo" class="py-32 px-6 sm:px-12 lg:px-16 border-t border-white/5">
+  <div class="max-w-7xl">
     <!-- Section header -->
-    <div class="mb-16">
-      <p class="text-label text-text-tertiary mb-4">Equipo</p>
-      <h2 class="text-headline text-text-primary max-w-3xl mb-6">
+    <div class="max-w-2xl mb-20">
+      <p class="text-[11px] font-normal tracking-[0.15em] uppercase text-white/40 mb-4">Equipo</p>
+      <h2 class="text-[clamp(2rem,4vw,3rem)] font-light tracking-[-0.02em] leading-[1.15] text-white mb-6">
         Así trabajamos. Así somos.
       </h2>
-      <p class="text-body text-text-secondary max-w-2xl">
+      <p class="text-[15px] font-normal leading-[1.7] text-white/50">
         No somos un equipo grande, somos un equipo bueno. Combinamos formación técnica 
         sólida con una mirada creativa que pocas veces se encuentran juntas.
       </p>
@@ -19,64 +19,83 @@
     <!-- Team grid -->
     <div class="grid md:grid-cols-2 gap-px bg-white/10">
       <!-- Emil -->
-      <div class="bg-dark-900 p-8 sm:p-12">
-        <div class="mb-8">
-          <span class="text-display text-text-primary">E</span>
+      <div class="bg-dark-900 p-8 sm:p-12 group">
+        <div class="flex items-start justify-between mb-8">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white/5">
+            <img 
+              src="https://prod-files-secure.s3.us-west-2.amazonaws.com/72f790d5-5c51-8186-ad90-0003bbea63e4/afd022b8-b6a9-4c14-9346-556112d4fb2d/emil.webp" 
+              alt="Emil Richardo González"
+              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+              loading="lazy"
+            />
+          </div>
+          <span class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white/10 group-hover:text-white/20 transition-colors duration-300">E</span>
         </div>
         
-        <h3 class="text-title text-text-primary mb-1">Emil Richardo González</h3>
-        <p class="text-small text-accent mb-4">Diseñador y Desarrollador</p>
+        <h3 class="text-[18px] font-medium tracking-[-0.01em] text-white mb-1">Emil Richardo González</h3>
+        <p class="text-[13px] font-normal text-blue-400 mb-2">Diseñador y Desarrollador</p>
         
-        <p class="text-small text-text-secondary mb-6">Web Developer</p>
+        <p class="text-[13px] font-normal text-white/40 mb-6">Web Developer</p>
         
         <a 
           href="https://www.behance.net/emilgonzalez" 
           target="_blank"
           rel="noopener"
-          class="inline-flex items-center gap-2 text-small text-text-tertiary hover:text-text-primary transition-colors group"
+          class="inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.05em] uppercase text-white/30 hover:text-white transition-colors duration-200 group/link"
         >
           <span>Behance</span>
-          <span class="group-hover:translate-x-1 transition-transform">→</span>
+          <span class="transform group-hover/link:translate-x-1 transition-transform duration-200">→</span>
         </a>
       </div>
 
       <!-- Romina -->
-      <div class="bg-dark-900 p-8 sm:p-12">
-        <div class="mb-8">
-          <span class="text-display text-text-primary">R</span>
+      <div class="bg-dark-900 p-8 sm:p-12 group">
+        <div class="flex items-start justify-between mb-8">
+          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white/5">
+            <img 
+              src="https://prod-files-secure.s3.us-west-2.amazonaws.com/72f790d5-5c51-8186-ad90-0003bbea63e4/a7cd6011-7ee3-44bf-9af7-1d8cc34a9e99/romina.webp" 
+              alt="Romina Lescano"
+              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
+              loading="lazy"
+            />
+          </div>
+          <span class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white/10 group-hover:text-white/20 transition-colors duration-300">R</span>
         </div>
         
-        <h3 class="text-title text-text-primary mb-1">Romina Lescano</h3>
-        <p class="text-small text-accent mb-4">Desarrolladora Web</p>
+        <h3 class="text-[18px] font-medium tracking-[-0.01em] text-white mb-1">Romina Lescano</h3>
+        <p class="text-[13px] font-normal text-blue-400 mb-2">Desarrolladora Web</p>
         
-        <p class="text-small text-text-secondary mb-6">Licenciada en Sistemas</p>
+        <p class="text-[13px] font-normal text-white/40 mb-6">Licenciada en Sistemas</p>
         
         <a 
           href="https://www.linkedin.com/in/romina-lescano/" 
           target="_blank"
           rel="noopener"
-          class="inline-flex items-center gap-2 text-small text-text-tertiary hover:text-text-primary transition-colors group"
+          class="inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.05em] uppercase text-white/30 hover:text-white transition-colors duration-200 group/link"
         >
           <span>LinkedIn</span>
-          <span class="group-hover:translate-x-1 transition-transform">→</span>
+          <span class="transform group-hover/link:translate-x-1 transition-transform duration-200">→</span>
         </a>
       </div>
     </div>
 
     <!-- Join us -->
-    <div class="mt-16 pt-16 border-t border-white/5">
+    <div class="mt-20 pt-12 border-t border-white/10">
       <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div>
-          <h3 class="text-title text-text-primary mb-2">¿Querés sumarte?</h3>
-          <p class="text-small text-text-secondary">Siempre estamos buscando talento apasionado por la IA.</p>
+          <h3 class="text-[17px] font-medium tracking-[-0.01em] text-white mb-2">¿Querés sumarte?</h3>
+          <p class="text-[14px] font-normal text-white/50">Siempre estamos buscando talento apasionado por la IA.</p>
         </div>
         
         <a 
           href="#contacto" 
-          class="inline-flex items-center gap-2 text-small text-text-primary hover:text-accent transition-colors group"
+          class="inline-flex items-center gap-2 text-[13px] font-medium text-white hover:text-blue-400 transition-colors duration-200 group"
         >
-          <span>Contactar</span>
-          <span class="group-hover:translate-x-1 transition-transform">→</span>
+          <span class="relative">
+            Contactar
+            <span class="absolute bottom-0 left-0 w-full h-px bg-current"></span>
+          </span>
+          <span class="transform group-hover:translate-x-1 transition-transform duration-200">→</span>
         </a>
       </div>
     </div>
