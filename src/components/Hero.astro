@@ -1,36 +1,36 @@
 ---
-// src/components/Hero.astro - Refined minimalist with perfect typography
+// src/components/Hero.astro - Large 3-line title
 ---
 
 <section class="min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-16 pt-32 pb-20">
   <div class="max-w-7xl w-full">
     <!-- Eyebrow -->
-    <p class="text-[11px] font-normal tracking-[0.15em] uppercase text-white/40 mb-8 animate-fade-in">
+    <p class="text-[11px] font-normal tracking-[0.15em] uppercase text-white/40 mb-12 animate-fade-in">
       Inteligencia Artificial Aplicada
     </p>
 
-    <!-- Main headline with perfect typography -->
-    <div class="max-w-4xl mb-12">
-      <h1 class="text-[clamp(2.5rem,6vw,5rem)] font-light tracking-[-0.03em] leading-[1.1] text-white mb-6 animate-slide-up">
-        Diseñamos
-        <br />
-        <span class="text-white/50">sistemas inteligentes.</span>
+    <!-- Main headline - 3 lines, much larger -->
+    <div class="mb-16">
+      <h1 class="text-[clamp(3.5rem,12vw,10rem)] font-light tracking-[-0.04em] leading-[0.9] text-white animate-slide-up">
+        <span class="block">Diseñamos</span>
+        <span class="block text-white/30">sistemas</span>
+        <span class="block">inteligentes.</span>
       </h1>
     </div>
 
     <!-- Description -->
-    <div class="max-w-xl mb-16 animate-slide-up" style="animation-delay: 0.1s;">
-      <p class="text-[15px] font-normal leading-[1.7] text-white/60">
+    <div class="max-w-xl mb-20 animate-slide-up" style="animation-delay: 0.1s;">
+      <p class="text-[16px] font-normal leading-[1.7] text-white/50">
         No vendemos software genérico. Construimos herramientas digitales 
         a medida, pensadas para el contexto real de cada negocio.
       </p>
     </div>
 
     <!-- Actions -->
-    <div class="flex flex-wrap items-center gap-12 mb-24 animate-slide-up" style="animation-delay: 0.2s;">
+    <div class="flex flex-wrap items-center gap-16 mb-32 animate-slide-up" style="animation-delay: 0.2s;">
       <a 
         href="#contacto" 
-        class="group inline-flex items-center gap-3 text-[14px] font-medium tracking-[0.01em] text-white hover:text-blue-400 transition-colors duration-200"
+        class="group inline-flex items-center gap-3 text-[15px] font-medium tracking-[0.01em] text-white hover:text-blue-400 transition-colors duration-200"
       >
         <span class="relative">
           Iniciar proyecto
@@ -41,7 +41,7 @@
       
       <a 
         href="#servicios" 
-        class="text-[14px] font-normal text-white/40 hover:text-white transition-colors duration-200"
+        class="text-[15px] font-normal text-white/40 hover:text-white transition-colors duration-200"
       >
         Ver servicios
       </a>
@@ -50,17 +50,17 @@
     <!-- Stats row -->
     <div class="grid grid-cols-3 gap-8 max-w-2xl animate-slide-up" style="animation-delay: 0.3s;">
       <div class="group">
-        <p class="text-[32px] sm:text-[40px] font-light tracking-[-0.02em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">9</p>
+        <p class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">9</p>
         <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Servicios</p>
       </div>
       
       <div class="group">
-        <p class="text-[32px] sm:text-[40px] font-light tracking-[-0.02em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">24/7</p>
+        <p class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">24/7</p>
         <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Operación</p>
       </div>
       
       <div class="group">
-        <p class="text-[32px] sm:text-[40px] font-light tracking-[-0.02em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">+35%</p>
+        <p class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">+35%</p>
         <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Impacto</p>
       </div>
     </div>
@@ -84,7 +84,7 @@
   @keyframes slide-up {
     from {
       opacity: 0;
-      transform: translateY(20px);
+      transform: translateY(30px);
     }
     to {
       opacity: 1;
