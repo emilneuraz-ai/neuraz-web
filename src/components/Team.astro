@@ -1,58 +1,74 @@
 ---
-// src/components/Team.astro - Minimalist version
+// src/components/Team.astro - Minimalist version with Notion data
 ---
 
 <section id="equipo" class="py-32 px-6 sm:px-12 lg:px-24 border-t border-white/5">
   <div class="max-w-6xl">
     <!-- Section header -->
-    <div class="mb-24">
+    <div class="mb-16">
       <p class="text-label text-text-tertiary mb-4">Equipo</p>
-      <h2 class="text-headline text-text-primary max-w-3xl">
-        Expertos en IA aplicada.
+      <h2 class="text-headline text-text-primary max-w-3xl mb-6">
+        Así trabajamos. Así somos.
       </h2>
+      <p class="text-body text-text-secondary max-w-2xl">
+        No somos un equipo grande, somos un equipo bueno. Combinamos formación técnica 
+        sólida con una mirada creativa que pocas veces se encuentran juntas.
+      </p>
     </div>
 
     <!-- Team grid -->
-    <div class="grid md:grid-cols-3 gap-px bg-white/10">
-      <!-- Team member 1 -->
+    <div class="grid md:grid-cols-2 gap-px bg-white/10">
+      <!-- Emil -->
       <div class="bg-dark-900 p-8 sm:p-12">
         <div class="mb-8">
           <span class="text-display text-text-primary">E</span>
         </div>
-        <h3 class="text-title text-text-primary mb-2">Emil González</h3>
-        <p class="text-small text-accent mb-4">Fundador & CEO</p>
         
-        <p class="text-small text-text-secondary">
-          Especialista en IA aplicada y automatización de procesos de negocio.
-        </p>
+        <h3 class="text-title text-text-primary mb-1">Emil Richardo González</h3>
+        <p class="text-small text-accent mb-4">Diseñador y Desarrollador</p>
+        
+        <p class="text-small text-text-secondary mb-6">Web Developer</p>
+        
+        <a 
+          href="https://www.behance.net/emilgonzalez" 
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 text-small text-text-tertiary hover:text-text-primary transition-colors group"
+        >
+          <span>Behance</span>
+          <span class="group-hover:translate-x-1 transition-transform">→</span>
+        </a>
       </div>
 
-      <!-- Team member 2 -->
+      <!-- Romina -->
       <div class="bg-dark-900 p-8 sm:p-12">
         <div class="mb-8">
-          <span class="text-display text-text-primary">N</span>
+          <span class="text-display text-text-primary">R</span>
         </div>
         
-        <h3 class="text-title text-text-primary mb-2">Neury</h3>
-        <p class="text-small text-accent mb-4">Asistente Virtual</p>
+        <h3 class="text-title text-text-primary mb-1">Romina Lescano</h3>
+        <p class="text-small text-accent mb-4">Desarrolladora Web</p>
         
-        <p class="text-small text-text-secondary">
-          IA especializada en desarrollo de proyectos y gestión técnica.
-        </p>
+        <p class="text-small text-text-secondary mb-6">Licenciada en Sistemas</p>
+        
+        <a 
+          href="https://www.linkedin.com/in/romina-lescano/" 
+          target="_blank"
+          rel="noopener"
+          class="inline-flex items-center gap-2 text-small text-text-tertiary hover:text-text-primary transition-colors group"
+        >
+          <span>LinkedIn</span>
+          <span class="group-hover:translate-x-1 transition-transform">→</span>
+        </a>
       </div>
+    </div>
 
-      <!-- Join us -->
-      <div class="bg-dark-900 p-8 sm:p-12 flex flex-col justify-between">
+    <!-- Join us -->
+    <div class="mt-16 pt-16 border-t border-white/5">
+      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
         <div>
-          <div class="mb-8">
-            <span class="text-display text-text-tertiary">+</span>
-          </div>
-          
           <h3 class="text-title text-text-primary mb-2">¿Querés sumarte?</h3>
-          
-          <p class="text-small text-text-secondary mb-8">
-            Siempre estamos buscando talento apasionado por la IA.
-          </p>
+          <p class="text-small text-text-secondary">Siempre estamos buscando talento apasionado por la IA.</p>
         </div>
         
         <a 
@@ -60,7 +76,7 @@
           class="inline-flex items-center gap-2 text-small text-text-primary hover:text-accent transition-colors group"
         >
           <span>Contactar</span>
-          <span class="text-text-tertiary group-hover:translate-x-1 transition-transform">→</span>
+          <span class="group-hover:translate-x-1 transition-transform">→</span>
         </a>
       </div>
     </div>
