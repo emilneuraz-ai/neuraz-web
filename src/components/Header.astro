@@ -1,75 +1,73 @@
 ---
-// src/components/Header.astro
+// src/components/Header.astro - Minimalist version
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/80 backdrop-blur-md border-b border-white/5">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-    <div class="flex items-center justify-between h-16">
+<header class="fixed top-0 left-0 right-0 z-50 bg-dark-900/90 backdrop-blur-sm">
+  <div class="max-w-6xl mx-auto px-6 sm:px-12 lg:px-24">
+    <div class="flex items-center justify-between h-20">
       <!-- Logo -->
-      <a href="/" class="flex items-center space-x-2">
-        <span class="text-2xl font-bold bg-gradient-to-r from-primary-400 to-accent-400 bg-clip-text text-transparent">
-          NEURAZ
-        </span>
+      <a href="/" class="text-title text-text-primary">
+        Neuraz
       </a>
 
       <!-- Desktop Navigation -->
-      <nav class="hidden md:flex items-center space-x-8">
-        <a href="#servicios" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+      <nav class="hidden md:flex items-center gap-8">
+        <a href="#servicios" class="text-small text-text-secondary hover:text-text-primary transition-colors">
           Servicios
         </a>
-        <a href="#nosotros" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+        <a href="#nosotros" class="text-small text-text-secondary hover:text-text-primary transition-colors">
           Nosotros
         </a>
-        <a href="#equipo" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+        <a href="#equipo" class="text-small text-text-secondary hover:text-text-primary transition-colors">
           Equipo
         </a>
-        <a href="#contacto" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+        <a href="#contacto" class="text-small text-text-secondary hover:text-text-primary transition-colors">
           Contacto
         </a>
       </nav>
 
-      <!-- CTA Button -->
+      <!-- CTA -->
       <div class="hidden md:block">
         <a 
           href="#contacto" 
-          class="inline-flex items-center px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
+          class="text-small text-text-primary hover:text-accent transition-colors"
         >
-          Empezar proyecto
+          Iniciar proyecto →
         </a>
       </div>
 
       <!-- Mobile menu button -->
       <button 
         id="mobile-menu-btn"
-        class="md:hidden p-2 text-gray-300 hover:text-white"
+        class="md:hidden p-2 text-text-secondary hover:text-text-primary"
         aria-label="Abrir menú"
       >
         <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16" />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4 6h16M4 12h16M4 18h16" />
         </svg>
       </button>
     </div>
 
     <!-- Mobile Navigation -->
-    <div id="mobile-menu" class="hidden md:hidden py-4 border-t border-white/5">
-      <nav class="flex flex-col space-y-4">
-        <a href="#servicios" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+    <div id="mobile-menu" class="hidden md:hidden py-6 border-t border-white/5">
+      <nav class="flex flex-col gap-4">
+        <a href="#servicios" class="text-body text-text-secondary hover:text-text-primary transition-colors">
           Servicios
         </a>
-        <a href="#nosotros" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+        <a href="#nosotros" class="text-body text-text-secondary hover:text-text-primary transition-colors">
           Nosotros
         </a>
-        <a href="#equipo" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+        <a href="#equipo" class="text-body text-text-secondary hover:text-text-primary transition-colors">
           Equipo
         </a>
-        <a href="#contacto" class="text-gray-300 hover:text-white transition-colors text-sm font-medium">
+        <a href="#contacto" class="text-body text-text-secondary hover:text-text-primary transition-colors">
           Contacto
         </a>
         <a 
           href="#contacto" 
-          class="inline-flex items-center justify-center px-4 py-2 rounded-lg bg-primary-600 hover:bg-primary-500 text-white text-sm font-medium transition-colors"
+          class="text-body text-text-primary hover:text-accent transition-colors pt-4 border-t border-white/5"
         >
-          Empezar proyecto
+          Iniciar proyecto →
         </a>
       </nav>
     </div>

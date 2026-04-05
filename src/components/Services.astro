@@ -1,104 +1,70 @@
 ---
-// src/components/Services.astro
-import { services, categories, featuredServices } from '../data/services';
+// src/components/Services.astro - Minimalist version
+import { services, categories } from '../data/services';
 
-const categoryColors: Record<string, string> = {
-  'Automatización': 'from-orange-500 to-amber-500',
-  'Gamificación': 'from-purple-500 to-pink-500',
-  'Inteligencia Artificial': 'from-blue-500 to-cyan-500',
-  'Documentación': 'from-gray-500 to-slate-500',
-  'Análisis de datos': 'from-red-500 to-rose-500',
-};
-
-const categoryIcons: Record<string, string> = {
-  'Automatización': `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" /></svg>`,
-  'Gamificación': `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.752 11.168l-3.197-2.132A1 1 0 0010 9.87v4.263a1 1 0 001.555.832l3.197-2.132a1 1 0 000-1.664z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>`,
-  'Inteligencia Artificial': `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z" /></svg>`,
-  'Documentación': `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" /></svg>`,
-  'Análisis de datos': `<svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" /></svg>`,
+const categoryNumber: Record<string, string> = {
+  'Automatización': '01',
+  'Gamificación': '02',
+  'Inteligencia Artificial': '03',
+  'Documentación': '04',
+  'Análisis de datos': '05',
 };
 ---
 
-<section id="servicios" class="py-24 bg-dark-900">
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+<section id="servicios" class="py-32 px-6 sm:px-12 lg:px-24">
+  <div class="max-w-6xl">
     <!-- Section header -->
-    <div class="text-center mb-16 reveal-on-scroll">
-      <span class="inline-block px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 text-primary-400 text-sm font-medium mb-4">
-        Nuestros Servicios
-      </span>
-      <h2 class="text-4xl sm:text-5xl font-bold text-white mb-6">
-        Soluciones que <span class="text-primary-400">transforman</span> tu negocio
+    <div class="mb-24">
+      <p class="text-label text-text-tertiary mb-4">Servicios</p>
+      <h2 class="text-headline text-text-primary max-w-3xl">
+        Soluciones que transforman tu negocio.
       </h2>
-      <p class="max-w-2xl mx-auto text-gray-300 text-lg">
-        No somos una empresa de software genérico. Diseñamos herramientas digitales 
-        a medida, pensadas para el contexto real de cada cliente.
-      </p>
     </div>
 
-    <!-- Services by category -->
-    <div class="space-y-20">
-      {categories.map((category, index) => {
+    <!-- Services list -->
+    <div class="space-y-0">
+      {categories.map((category, catIndex) => {
         const categoryServices = services.filter(s => s.category === category);
         return (
-          <div class={`reveal-on-scroll ${index !== 0 ? 'border-t border-white/5 pt-16' : ''}`} style={`transition-delay: ${index * 100}ms`}>
+          <div class="border-t border-white/10">
             <!-- Category header -->
-            <div class="flex items-center mb-10">
-              <div class={`p-3 rounded-xl bg-gradient-to-br ${categoryColors[category]} mr-4 shadow-lg shadow-${categoryColors[category].split(' ')[1].replace('to-', '')}/20`}>
-                <div class="text-white" set:html={categoryIcons[category]} />
+            <div class="py-8 flex items-baseline justify-between">
+              <div class="flex items-baseline gap-6">
+                <span class="text-label text-text-tertiary">{categoryNumber[category]}</span>
+                <h3 class="text-title text-text-primary">{category}</h3>
               </div>
-              <div>
-                <h3 class="text-2xl font-bold text-white">{category}</h3>
-                <p class="text-gray-400 text-sm mt-1">{categoryServices.length} servicio{categoryServices.length > 1 ? 's' : ''}</p>
-              </div>
+              <span class="text-small text-text-tertiary">{categoryServices.length} servicios</span>
             </div>
 
-            <!-- Services grid -->
-            <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {categoryServices.map((service, serviceIndex) => (
-                <div 
-                  class={`group relative p-6 rounded-2xl border transition-all duration-500 hover:scale-[1.02] hover:-translate-y-1 hover:shadow-xl hover:shadow-primary-500/10 ${
-                    service.featured 
-                      ? 'bg-gradient-to-br from-primary-500/10 to-accent-500/10 border-primary-500/30' 
-                      : 'bg-dark-800 border-white/5 hover:border-white/20'
-                  }`}
-                  style={`transition-delay: ${serviceIndex * 50}ms`}
-                >
-                  <!-- Featured badge -->
-                  {service.featured && (
-                    <div class="absolute -top-3 -right-3">
-                      <span class="inline-flex items-center px-3 py-1 rounded-full bg-accent-500 text-white text-xs font-semibold shadow-lg shadow-accent-500/30">
-                        Destacado
-                      </span>
+            <!-- Services in category -->
+            <div class="pb-12 space-y-6">
+              {categoryServices.map(service => (
+                <div class="group py-6 border-t border-white/5 first:border-t-0">
+                  <div class="flex items-start justify-between gap-8">
+                    <div class="flex-1">
+                      <div class="flex items-center gap-4 mb-3">
+                        <h4 class="text-title text-text-primary group-hover:text-accent transition-colors">
+                          {service.name}
+                        </h4>
+                        {service.featured && (
+                          <span class="text-label text-accent">Destacado</span>
+                        )}
+                      </div>
+                      
+                      <p class="text-body text-text-secondary max-w-2xl mb-4">
+                        {service.description}
+                      </p>
+                      
+                      <p class="text-small text-text-tertiary">
+                        {service.benefit}
+                      </p>
                     </div>
-                  )}
-
-                  <h4 class="text-lg font-semibold text-white mb-3 group-hover:text-primary-300 transition-colors">
-                    {service.name}
-                  </h4>
-                  
-                  <p class="text-gray-300 text-sm mb-4 line-clamp-3 leading-relaxed">
-                    {service.description}
-                  </p>
-                  
-                  <div class="p-3 rounded-lg bg-dark-900/50 border border-white/5 group-hover:border-primary-500/20 transition-colors">
-                    <p class="text-primary-400 text-sm font-medium flex items-start gap-2">
-                      <span class="text-accent-400 mt-0.5">✓</span>
-                      <span>{service.benefit}</span>
-                    </p>
-                  </div>
-
-                  <!-- Industries -->
-                  <div class="mt-4 flex flex-wrap gap-2">
-                    {service.industries.slice(0, 3).map(industry => (
-                      <span class="px-2.5 py-1 rounded-md bg-white/5 text-gray-400 text-xs border border-white/5 hover:border-white/10 transition-colors">
-                        {industry}
-                      </span>
-                    ))}
-                    {service.industries.length > 3 && (
-                      <span class="px-2.5 py-1 rounded-md bg-white/5 text-gray-400 text-xs border border-white/5">
-                        +{service.industries.length - 3}
-                      </span>
-                    )}
+                    
+                    <div class="hidden sm:flex flex-wrap gap-2 justify-end max-w-xs">
+                      {service.industries.slice(0, 3).map(industry => (
+                        <span class="text-small text-text-tertiary">{industry}</span>
+                      ))}
+                    </div>
                   </div>
                 </div>
               ))}
@@ -109,38 +75,3 @@ const categoryIcons: Record<string, string> = {
     </div>
   </div>
 </section>
-
-<script>
-  // Intersection Observer for scroll reveal animations
-  const observerOptions = {
-    root: null,
-    rootMargin: '0px',
-    threshold: 0.1
-  };
-
-  const observer = new IntersectionObserver((entries) => {
-    entries.forEach(entry => {
-      if (entry.isIntersecting) {
-        entry.target.classList.add('revealed');
-        observer.unobserve(entry.target);
-      }
-    });
-  }, observerOptions);
-
-  document.querySelectorAll('.reveal-on-scroll').forEach(el => {
-    observer.observe(el);
-  });
-</script>
-
-<style>
-  .reveal-on-scroll {
-    opacity: 0;
-    transform: translateY(30px);
-    transition: opacity 0.6s ease-out, transform 0.6s ease-out;
-  }
-  
-  .reveal-on-scroll.revealed {
-    opacity: 1;
-    transform: translateY(0);
-  }
-</style>

@@ -1,138 +1,73 @@
 ---
-// src/components/Hero.astro
+// src/components/Hero.astro - Minimalist version
 ---
 
-<section class="relative min-h-screen flex items-center justify-center overflow-hidden pt-16">
-  <!-- Background gradient with mesh effect -->
-  <div class="absolute inset-0 bg-gradient-to-br from-dark-900 via-dark-800 to-dark-900"></div>
-  
-  <!-- Animated mesh gradient -->
-  <div class="absolute inset-0 overflow-hidden">
-    <div class="absolute top-0 left-1/4 w-[600px] h-[600px] bg-primary-500/10 rounded-full blur-[120px] animate-float-slow"></div>
-    <div class="absolute bottom-0 right-1/4 w-[500px] h-[500px] bg-accent-500/10 rounded-full blur-[100px] animate-float-slow" style="animation-delay: -3s;"></div>
-    <div class="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-primary-600/5 rounded-full blur-[150px] animate-pulse-slow"></div>
-  </div>
-
-  <div class="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-20 text-center">
-    <!-- Badge -->
-    <div class="inline-flex items-center px-4 py-2 rounded-full bg-primary-500/10 border border-primary-500/20 mb-8 animate-fade-in hover:bg-primary-500/20 transition-colors cursor-default">
-      <span class="w-2 h-2 rounded-full bg-primary-400 mr-2 animate-pulse"></span>
-      <span class="text-primary-300 text-sm font-medium">Inteligencia Artificial Aplicada</span>
-    </div>
-
-    <!-- Main heading with staggered animation -->
-    <h1 class="text-5xl sm:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
-      <span class="block bg-gradient-to-r from-white via-gray-200 to-gray-400 bg-clip-text text-transparent animate-slide-up">
-        Diseñamos
-      </span>
-      <span class="block bg-gradient-to-r from-primary-400 via-accent-400 to-primary-400 bg-clip-text text-transparent animate-slide-up mt-2" style="animation-delay: 0.15s;">
-        sistemas inteligentes
-      </span>
-    </h1>
-
-    <!-- Subtitle with better spacing -->
-    <div class="flex items-center justify-center gap-4 sm:gap-6 text-xl sm:text-2xl mb-8 animate-slide-up" style="animation-delay: 0.3s;">
-      <span class="text-primary-400 font-semibold hover:text-primary-300 transition-colors">Crea</span>
-      <span class="text-gray-600">•</span>
-      <span class="text-accent-400 font-semibold hover:text-accent-300 transition-colors">Documenta</span>
-      <span class="text-gray-600">•</span>
-      <span class="text-primary-400 font-semibold hover:text-primary-300 transition-colors">Automatiza</span>
-    </div>
-
-    <!-- Description with better readability -->
-    <p class="max-w-2xl mx-auto text-gray-300 text-lg sm:text-xl leading-relaxed mb-12 animate-slide-up" style="animation-delay: 0.45s;">
-      No vendemos software genérico. <span class="text-white font-medium">Diseñamos, construimos e implementamos</span> herramientas digitales 
-      a medida, pensadas para el contexto real de tu negocio.
+<section class="min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-24 py-24">
+  <div class="max-w-5xl">
+    <!-- Label -->
+    <p class="text-label text-text-tertiary mb-8">
+      Neuraz — Inteligencia Artificial Aplicada
     </p>
 
-    <!-- CTA Buttons with enhanced hover effects -->
-    <div class="flex flex-col sm:flex-row items-center justify-center gap-4 animate-slide-up" style="animation-delay: 0.6s;">
+    <!-- Main headline -->
+    <h1 class="text-display text-text-primary mb-8">
+      Diseñamos sistemas
+      <br />
+      <span class="text-text-secondary">inteligentes.</span>
+    </h1>
+
+    <!-- Description -->
+    <p class="text-body text-text-secondary max-w-2xl mb-12">
+      No vendemos software genérico. Construimos herramientas digitales 
+      a medida, pensadas para el contexto real de cada negocio.
+    </p>
+
+    <!-- Actions -->
+    <div class="flex flex-wrap items-center gap-8">
       <a 
-        href="#contacto"
-        class="group inline-flex items-center px-8 py-4 rounded-xl bg-gradient-to-r from-primary-600 to-primary-500 hover:from-primary-500 hover:to-primary-400 text-white font-semibold text-lg transition-all duration-300 transform hover:scale-105 hover:shadow-xl hover:shadow-primary-500/30"
+        href="#contacto" 
+        class="group inline-flex items-center gap-3 text-title text-text-primary hover:text-accent transition-colors"
       >
-        Empezar proyecto
-        <svg class="w-5 h-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 8l4 4m0 0l-4 4m4-4H3" />
-        </svg>
+        <span>Iniciar proyecto</span>
+        <span class="text-text-tertiary group-hover:translate-x-1 transition-transform">→</span>
       </a>
       
       <a 
-        href="#servicios"
-        class="group inline-flex items-center px-8 py-4 rounded-xl bg-white/5 hover:bg-white/10 border border-white/10 hover:border-white/20 text-white font-semibold text-lg transition-all duration-300 hover:shadow-lg"
+        href="#servicios" 
+        class="text-small text-text-tertiary hover:text-text-secondary transition-colors"
       >
         Ver servicios
-        <svg class="w-5 h-5 ml-2 opacity-70 group-hover:opacity-100 transform group-hover:translate-y-0.5 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-        </svg>
       </a>
     </div>
+  </div>
 
-    <!-- Stats with enhanced cards -->
-    <div class="mt-20 grid grid-cols-2 md:grid-cols-4 gap-6 animate-slide-up" style="animation-delay: 0.75s;">
-      <div class="group p-6 rounded-2xl bg-dark-800/50 border border-white/5 hover:border-primary-500/30 hover:bg-dark-800 transition-all duration-300">
-        <div class="text-3xl sm:text-4xl font-bold text-white mb-1 group-hover:text-primary-400 transition-colors">9</div>
-        <div class="text-sm text-gray-400">Servicios</div>
+  <!-- Bottom info -->
+  <div class="absolute bottom-12 left-6 sm:left-12 lg:left-24 right-6 sm:right-12 lg:right-24">
+    <div class="divider-left mb-8"></div>
+    
+    <div class="flex flex-wrap justify-between items-end gap-8">
+      <div class="flex gap-12">
+        <div>
+          <p class="text-label text-text-tertiary mb-2">Servicios</p>
+          <p class="text-title text-text-primary">9</p>
+        </div>
+        
+        <div>
+          <p class="text-label text-text-tertiary mb-2">Operación</p>
+          <p class="text-title text-text-primary">24/7</p>
+        </div>
+        
+        <div>
+          <p class="text-label text-text-tertiary mb-2">Impacto</p>
+          <p class="text-title text-text-primary">+35%</p>
+        </div>
       </div>
       
-      <div class="group p-6 rounded-2xl bg-dark-800/50 border border-white/5 hover:border-accent-500/30 hover:bg-dark-800 transition-all duration-300">
-        <div class="text-3xl sm:text-4xl font-bold text-white mb-1 group-hover:text-accent-400 transition-colors">24/7</div>
-        <div class="text-sm text-gray-400">Operación</div>
-      </div>
-      
-      <div class="group p-6 rounded-2xl bg-dark-800/50 border border-white/5 hover:border-primary-500/30 hover:bg-dark-800 transition-all duration-300">
-        <div class="text-3xl sm:text-4xl font-bold text-white mb-1 group-hover:text-primary-400 transition-colors">+35%</div>
-        <div class="text-sm text-gray-400">Ticket promedio</div>
-      </div>
-      
-      <div class="group p-6 rounded-2xl bg-dark-800/50 border border-white/5 hover:border-accent-500/30 hover:bg-dark-800 transition-all duration-300">
-        <div class="text-3xl sm:text-4xl font-bold text-white mb-1 group-hover:text-accent-400 transition-colors">IA</div>
-        <div class="text-sm text-gray-400">Nativa</div>
+      <div class="text-right">
+        <p class="text-small text-text-tertiary">
+          Latinoamérica — Remoto
+        </p>
       </div>
     </div>
   </div>
-
-  <!-- Scroll indicator with enhanced animation -->
-  <div class="absolute bottom-8 left-1/2 transform -translate-x-1/2">
-    <a href="#servicios" class="group flex flex-col items-center gap-2 text-gray-400 hover:text-primary-400 transition-colors">
-      <span class="text-xs font-medium opacity-0 group-hover:opacity-100 transition-opacity">Scroll</span>
-      <svg class="w-6 h-6 animate-bounce" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 14l-7 7m0 0l-7-7m7 7V3" />
-      </svg>
-    </a>
-  </div>
 </section>
-
-<style>
-  @keyframes float-slow {
-    0%, 100% {
-      transform: translate(0, 0) scale(1);
-    }
-    25% {
-      transform: translate(30px, -30px) scale(1.05);
-    }
-    50% {
-      transform: translate(-20px, 20px) scale(0.95);
-    }
-    75% {
-      transform: translate(20px, 10px) scale(1.02);
-    }
-  }
-  
-  .animate-float-slow {
-    animation: float-slow 20s ease-in-out infinite;
-  }
-  
-  .animate-pulse-slow {
-    animation: pulse 8s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-  }
-  
-  @keyframes pulse {
-    0%, 100% {
-      opacity: 0.5;
-    }
-    50% {
-      opacity: 0.8;
-    }
-  }
-</style>
