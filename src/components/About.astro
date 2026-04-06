@@ -1,98 +1,73 @@
 ---
-// src/components/About.astro - Refined minimalist
+// src/components/About.astro - Bauhaus minimal
 ---
 
-<section id="nosotros" class="py-32 px-6 sm:px-12 lg:px-16 border-t border-white/5">
-  <div class="max-w-7xl">
-    <div class="grid lg:grid-cols-2 gap-20 lg:gap-32">
-      <!-- Content -->
-      <div>
-        <p class="text-[11px] font-normal tracking-[0.15em] uppercase text-white/40 mb-4">Sobre Nosotros</p>
-        
-        <h2 class="text-[clamp(2rem,4vw,3rem)] font-light tracking-[-0.02em] leading-[1.15] text-white mb-8">
-          Facilitamos herramientas tecnológicas y educamos sobre su uso responsable.
+<section id="nosotros" class="py-24 px-6 sm:px-8 bg-[#fafafa]">
+  <div class="max-w-7xl mx-auto">
+    
+    <div class="grid lg:grid-cols-12 gap-12">
+      <!-- Left column -->
+      <div class="lg:col-span-5">
+        <div class="mb-6">
+          <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">Nosotros</span>
+        </div>
+
+        <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold leading-[1.15] tracking-[-0.04em] text-black mb-12">
+          Facilitamos herramientas tecnológicas
         </h2>
 
-        <p class="text-[15px] font-normal leading-[1.7] text-white/50 mb-16">
-          No somos una empresa de software genérico ni vendemos soluciones enlatadas. 
-          Diseñamos, construimos e implementamos herramientas digitales a medida, 
-          pensadas para el contexto real de cada cliente.
-        </p>
+        <div class="space-y-6">
+          <p class="text-base text-black/60 leading-relaxed">
+            No somos una empresa de software genérico ni vendemos soluciones enlatadas. 
+            Diseñamos, construimos e implementamos herramientas digitales a medida.
+          </p>
 
-        <!-- Values -->
-        <div class="space-y-10">
-          <div class="group flex gap-6">
-            <span class="text-[11px] font-normal tracking-[0.1em] text-blue-400/60 pt-1">01</span>
-            <div>
-              <h3 class="text-[16px] font-medium tracking-[-0.01em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-200">Negocios reales</h3>
-              <p class="text-[14px] font-normal leading-[1.6] text-white/40">Trabajamos con negocios reales, no con casos de laboratorio.</p>
-            </div>
-          </div>
-
-          <div class="group flex gap-6">
-            <span class="text-[11px] font-normal tracking-[0.1em] text-blue-400/60 pt-1">02</span>
-            <div>
-              <h3 class="text-[16px] font-medium tracking-[-0.01em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-200">Lenguaje simple</h3>
-              <p class="text-[14px] font-normal leading-[1.6] text-white/40">Explicamos todo en lenguaje simple, sin tecnicismos innecesarios.</p>
-            </div>
-          </div>
-
-          <div class="group flex gap-6">
-            <span class="text-[11px] font-normal tracking-[0.1em] text-blue-400/60 pt-1">03</span>
-            <div>
-              <h3 class="text-[16px] font-medium tracking-[-0.01em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-200">Soluciones duraderas</h3>
-              <p class="text-[14px] font-normal leading-[1.6] text-white/40">Construimos cosas que duran y que el equipo puede usar sin depender de nosotros.</p>
-            </div>
-          </div>
-
-          <div class="group flex gap-6">
-            <span class="text-[11px] font-normal tracking-[0.1em] text-blue-400/60 pt-1">04</span>
-            <div>
-              <h3 class="text-[16px] font-medium tracking-[-0.01em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-200">Impacto real</h3>
-              <p class="text-[14px] font-normal leading-[1.6] text-white/40">Nos importa el impacto real en el negocio, no solo entregar código.</p>
-            </div>
-          </div>
+          <p class="text-base text-black/60 leading-relaxed">
+            Trabajamos con negocios reales, explicamos en lenguaje simple, 
+            y construimos cosas que duran.
+          </p>
         </div>
       </div>
 
-      <!-- Stats -->
-      <div class="lg:pt-16">
-        <div class="grid grid-cols-2 gap-px bg-white/10">
-          <div class="bg-dark-900 p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-300">
-            <p class="text-[40px] sm:text-[48px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">6</p>
-            <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Áreas de especialización</p>
-          </div>
-
-          <div class="bg-dark-900 p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-300">
-            <p class="text-[40px] sm:text-[48px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">9</p>
-            <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Servicios activos</p>
-          </div>
-
-          <div class="bg-dark-900 p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-300">
-            <p class="text-[40px] sm:text-[48px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">24/7</p>
-            <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Operación automática</p>
-          </div>
-
-          <div class="bg-dark-900 p-8 sm:p-10 group hover:bg-white/[0.02] transition-colors duration-300">
-            <p class="text-[40px] sm:text-[48px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">+35%</p>
-            <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Aumento ticket promedio</p>
-          </div>
-        </div>
-
-        <!-- Specializations list -->
-        <div class="mt-12 pt-12 border-t border-white/10">
-          <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/30 mb-6">Áreas de Especialización</p>
+      <!-- Right column - Values -->
+      <div class="lg:col-span-6 lg:col-start-7">
+        <div class="grid gap-px bg-black/10">
           
-          <div class="space-y-3">
-            <p class="text-[14px] font-normal text-white/50 hover:text-white transition-colors duration-200 cursor-default">Sistemas de fidelización</p>
-            <p class="text-[14px] font-normal text-white/50 hover:text-white transition-colors duration-200 cursor-default">Automatización de procesos</p>
-            <p class="text-[14px] font-normal text-white/50 hover:text-white transition-colors duration-200 cursor-default">Asistentes inteligentes</p>
-            <p class="text-[14px] font-normal text-white/50 hover:text-white transition-colors duration-200 cursor-default">Gestión de documentos</p>
-            <p class="text-[14px] font-normal text-white/50 hover:text-white transition-colors duration-200 cursor-default">Paneles de estadísticas</p>
-            <p class="text-[14px] font-normal text-white/50 hover:text-white transition-colors duration-200 cursor-default">Generación de contenido</p>
+          <div class="bg-white p-6 flex items-start gap-6">
+            <span class="text-3xl font-light text-[#e63946]">01</span>
+            <div>
+              <h3 class="text-base font-medium text-black mb-1">Negocios reales</h3>
+              <p class="text-sm text-black/50">Trabajamos con casos reales, no de laboratorio.</p>
+            </div>
+          </div>
+
+          <div class="bg-[#fafafa] p-6 flex items-start gap-6">
+            <span class="text-3xl font-light text-black">02</span>
+            <div>
+              <h3 class="text-base font-medium text-black mb-1">Lenguaje simple</h3>
+              <p class="text-sm text-black/50">Sin tecnicismos innecesarios.</p>
+            </div>
+          </div>
+
+          <div class="bg-white p-6 flex items-start gap-6">
+            <span class="text-3xl font-light text-black">03</span>
+            <div>
+              <h3 class="text-base font-medium text-black mb-1">Soluciones duraderas</h3>
+              <p class="text-sm text-black/50">Cosas que el equipo puede usar sin depender de nosotros.</p>
+            </div>
+          </div>
+
+          <div class="bg-[#fafafa] p-6 flex items-start gap-6">
+            <span class="text-3xl font-light text-[#e63946]">04</span>
+            <div>
+              <h3 class="text-base font-medium text-black mb-1">Impacto real</h3>
+              <p class="text-sm text-black/50">Nos importa el resultado, no solo entregar código.</p>
+            </div>
           </div>
         </div>
       </div>
     </div>
+
+
   </div>
 </section>

@@ -1,103 +1,84 @@
 ---
-// src/components/Team.astro - Refined with photos from Notion
+// src/components/Team.astro - Bauhaus minimal (fixed layout)
 ---
 
-<section id="equipo" class="py-32 px-6 sm:px-12 lg:px-16 border-t border-white/5">
-  <div class="max-w-7xl">
+<section id="equipo" class="py-24 px-6 sm:px-8 bg-white">
+  <div class="max-w-7xl mx-auto">
+    
     <!-- Section header -->
-    <div class="max-w-2xl mb-20">
-      <p class="text-[11px] font-normal tracking-[0.15em] uppercase text-white/40 mb-4">Equipo</p>
-      <h2 class="text-[clamp(2rem,4vw,3rem)] font-light tracking-[-0.02em] leading-[1.15] text-white mb-6">
-        Así trabajamos. Así somos.
+    <div class="mb-16">
+      <div class="mb-6">
+        <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">Equipo</span>
+      </div>
+
+      <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-light leading-[1.15] tracking-tight text-black mb-4">
+        Así trabajamos.
+        <span class="font-medium">Así somos.</span>
       </h2>
-      <p class="text-[15px] font-normal leading-[1.7] text-white/50">
-        No somos un equipo grande, somos un equipo bueno. Combinamos formación técnica 
-        sólida con una mirada creativa que pocas veces se encuentran juntas.
+      
+      <p class="text-base text-black/60 leading-relaxed max-w-lg">
+        No somos un equipo grande, somos un equipo bueno. Combinamos formación 
+        técnica sólida con una mirada creativa.
       </p>
     </div>
 
     <!-- Team grid -->
-    <div class="grid md:grid-cols-2 gap-px bg-white/10">
+    <div class="grid md:grid-cols-2 gap-8 lg:gap-12">
       <!-- Emil -->
-      <div class="bg-dark-900 p-8 sm:p-12 group">
-        <div class="flex items-start justify-between mb-8">
-          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white/5">
-            <img 
-              src="/images/team/emil.jpg" 
-              alt="Emil Richardo González"
-              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-              loading="lazy"
-            />
-          </div>
-          <span class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white/10 group-hover:text-white/20 transition-colors duration-300">E</span>
+      <div class="flex gap-6">
+        <div class="w-20 h-20 lg:w-24 lg:h-24 flex-shrink-0 overflow-hidden bg-black/5">
+          <img 
+            src="/images/team/emil.jpg" 
+            alt="Emil Richardo González"
+            class="w-full h-full object-cover grayscale"
+            loading="lazy"
+          />
         </div>
         
-        <h3 class="text-[18px] font-medium tracking-[-0.01em] text-white mb-1">Emil Richardo González</h3>
-        <p class="text-[13px] font-normal text-blue-400 mb-2">Diseñador y Desarrollador</p>
-        
-        <p class="text-[13px] font-normal text-white/40 mb-6">Web Developer</p>
-        
-        <a 
-          href="https://www.behance.net/emilgonzalez" 
-          target="_blank"
-          rel="noopener"
-          class="inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.05em] uppercase text-white/30 hover:text-white transition-colors duration-200 group/link"
-        >
-          <span>Behance</span>
-          <span class="transform group-hover/link:translate-x-1 transition-transform duration-200">→</span>
-        </a>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-base lg:text-lg font-medium text-black mb-1">Emil R. González</h3>
+          <p class="text-sm text-black mb-0.5">Diseñador y Desarrollador</p>
+          <p class="text-xs text-black/40 mb-3">Web Developer</p>
+          
+          <a 
+            href="https://www.behance.net/emilgonzalez" 
+            target="_blank"
+            rel="noopener"
+            class="text-[11px] font-medium tracking-[0.1em] text-black/40 hover:text-black transition-colors uppercase"
+          >
+            Behance →
+          </a>
+        </div>
       </div>
 
       <!-- Romina -->
-      <div class="bg-dark-900 p-8 sm:p-12 group">
-        <div class="flex items-start justify-between mb-8">
-          <div class="w-20 h-20 sm:w-24 sm:h-24 rounded-full overflow-hidden bg-white/5">
-            <img 
-              src="/images/team/romina.jpg" 
-              alt="Romina Lescano"
-              class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all duration-500"
-              loading="lazy"
-            />
-          </div>
-          <span class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white/10 group-hover:text-white/20 transition-colors duration-300">R</span>
+      <div class="flex gap-6">
+        <div class="w-20 h-20 lg:w-24 lg:h-24 flex-shrink-0 overflow-hidden bg-black/5">
+          <img 
+            src="/images/team/romina.jpg" 
+            alt="Romina Lescano"
+            class="w-full h-full object-cover grayscale"
+            loading="lazy"
+          />
         </div>
         
-        <h3 class="text-[18px] font-medium tracking-[-0.01em] text-white mb-1">Romina Lescano</h3>
-        <p class="text-[13px] font-normal text-blue-400 mb-2">Desarrolladora Web</p>
-        
-        <p class="text-[13px] font-normal text-white/40 mb-6">Licenciada en Sistemas</p>
-        
-        <a 
-          href="https://www.linkedin.com/in/romina-lescano/" 
-          target="_blank"
-          rel="noopener"
-          class="inline-flex items-center gap-2 text-[12px] font-medium tracking-[0.05em] uppercase text-white/30 hover:text-white transition-colors duration-200 group/link"
-        >
-          <span>LinkedIn</span>
-          <span class="transform group-hover/link:translate-x-1 transition-transform duration-200">→</span>
-        </a>
+        <div class="flex-1 min-w-0">
+          <h3 class="text-base lg:text-lg font-medium text-black mb-1">Romina Lescano</h3>
+          <p class="text-sm text-black mb-0.5">Desarrolladora Web</p>
+          <p class="text-xs text-black/40 mb-3">Lic. en Sistemas</p>
+          
+          <a 
+            href="https://www.linkedin.com/in/romina-lescano/" 
+            target="_blank"
+            rel="noopener"
+            class="text-[11px] font-medium tracking-[0.1em] text-black/40 hover:text-black transition-colors uppercase"
+          >
+            LinkedIn →
+          </a>
+        </div>
       </div>
     </div>
 
-    <!-- Join us -->
-    <div class="mt-20 pt-12 border-t border-white/10">
-      <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-6">
-        <div>
-          <h3 class="text-[17px] font-medium tracking-[-0.01em] text-white mb-2">¿Querés sumarte?</h3>
-          <p class="text-[14px] font-normal text-white/50">Siempre estamos buscando talento apasionado por la IA.</p>
-        </div>
-        
-        <a 
-          href="#contacto" 
-          class="inline-flex items-center gap-2 text-[13px] font-medium text-white hover:text-blue-400 transition-colors duration-200 group"
-        >
-          <span class="relative">
-            Contactar
-            <span class="absolute bottom-0 left-0 w-full h-px bg-current"></span>
-          </span>
-          <span class="transform group-hover:translate-x-1 transition-transform duration-200">→</span>
-        </a>
-      </div>
-    </div>
+
   </div>
 </section>

@@ -1,103 +1,48 @@
 ---
-// src/components/Hero.astro - Large 3-line title
+// src/components/Hero.astro - Bauhaus minimal with 3D Brain
+import Brain3D from './Brain3D.astro';
 ---
 
-<section class="min-h-screen flex flex-col justify-center px-6 sm:px-12 lg:px-16 pt-32 pb-20">
-  <div class="max-w-7xl w-full">
-    <!-- Eyebrow -->
-    <p class="text-[11px] font-normal tracking-[0.15em] uppercase text-white/40 mb-12 animate-fade-in">
-      Inteligencia Artificial Aplicada
-    </p>
-
-    <!-- Main headline - 3 lines, much larger -->
-    <div class="mb-16">
-      <h1 class="text-[clamp(3.5rem,12vw,10rem)] font-light tracking-[-0.04em] leading-[0.9] text-white animate-slide-up">
-        <span class="block">Diseñamos</span>
-        <span class="block text-white/30">sistemas</span>
-        <span class="block">inteligentes.</span>
-      </h1>
-    </div>
-
-    <!-- Description -->
-    <div class="max-w-xl mb-20 animate-slide-up" style="animation-delay: 0.1s;">
-      <p class="text-[16px] font-normal leading-[1.7] text-white/50">
-        No vendemos software genérico. Construimos herramientas digitales 
-        a medida, pensadas para el contexto real de cada negocio.
-      </p>
-    </div>
-
-    <!-- Actions -->
-    <div class="flex flex-wrap items-center gap-16 mb-32 animate-slide-up" style="animation-delay: 0.2s;">
-      <a 
-        href="#contacto" 
-        class="group inline-flex items-center gap-3 text-[15px] font-medium tracking-[0.01em] text-white hover:text-blue-400 transition-colors duration-200"
-      >
-        <span class="relative">
-          Iniciar proyecto
-          <span class="absolute bottom-0 left-0 w-0 h-px bg-current group-hover:w-full transition-all duration-300"></span>
-        </span>
-        <span class="transform group-hover:translate-x-1 transition-transform duration-200">→</span>
-      </a>
+<section class="min-h-screen bg-[#fafafa] pt-32 pb-20 px-6 sm:px-8 relative">
+  <div class="max-w-7xl mx-auto">
+    <div class="grid lg:grid-cols-12 gap-8 lg:gap-12">
       
-      <a 
-        href="#servicios" 
-        class="text-[15px] font-normal text-white/40 hover:text-white transition-colors duration-200"
-      >
-        Ver servicios
-      </a>
-    </div>
+      <!-- Left column - Title -->
+      <div class="lg:col-span-7">
+        <!-- Eyebrow -->
+        <div class="mb-12">
+          <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">
+            Inteligencia Artificial
+          </span>
+        </div>
 
-    <!-- Stats row -->
-    <div class="grid grid-cols-3 gap-8 max-w-2xl animate-slide-up" style="animation-delay: 0.3s;">
-      <div class="group">
-        <p class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">9</p>
-        <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Servicios</p>
+        <!-- Main headline - larger -->
+        <h1 class="text-[clamp(3.5rem,10vw,8rem)] font-bold leading-[0.95] tracking-[-0.04em] text-black mb-16">
+          Diseñamos sistemas inteligentes
+        </h1>
+
+        <p class="text-lg font-normal text-black/50 leading-relaxed max-w-lg mb-16">
+          No vendemos software genérico. Construimos herramientas digitales 
+          a medida, pensadas para el contexto real de cada negocio.
+        </p>
+
+        <div class="flex items-center gap-8">
+          <a 
+            href="#servicios" 
+            class="inline-flex items-center gap-4 text-sm font-medium text-black group"
+          >
+            <span class="w-12 h-12 bg-black rounded-full flex items-center justify-center text-white group-hover:bg-[#e63946] transition-colors">
+              ↓
+            </span>
+            <span class="tracking-wide">Ver servicios</span>
+          </a>
+        </div>
       </div>
-      
-      <div class="group">
-        <p class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">24/7</p>
-        <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Operación</p>
-      </div>
-      
-      <div class="group">
-        <p class="text-[48px] sm:text-[64px] font-light tracking-[-0.03em] text-white mb-2 group-hover:text-blue-400 transition-colors duration-300">+35%</p>
-        <p class="text-[11px] font-normal tracking-[0.1em] uppercase text-white/40">Impacto</p>
-      </div>
+
+      <!-- Right column - Empty for visual balance -->
+      <div class="lg:col-span-5"></div>
     </div>
   </div>
 
-  <!-- Scroll indicator -->
-  <div class="absolute bottom-12 left-6 sm:left-12 lg:left-16">
-    <a href="#servicios" class="group flex flex-col items-center gap-3 text-white/30 hover:text-white/60 transition-colors duration-300">
-      <span class="text-[10px] font-medium tracking-[0.15em] uppercase opacity-0 group-hover:opacity-100 transition-opacity duration-300">Scroll</span>
-      <div class="w-px h-12 bg-current animate-pulse"></div>
-    </a>
-  </div>
+
 </section>
-
-<style>
-  @keyframes fade-in {
-    from { opacity: 0; }
-    to { opacity: 1; }
-  }
-  
-  @keyframes slide-up {
-    from {
-      opacity: 0;
-      transform: translateY(30px);
-    }
-    to {
-      opacity: 1;
-      transform: translateY(0);
-    }
-  }
-  
-  .animate-fade-in {
-    animation: fade-in 0.8s ease-out forwards;
-  }
-  
-  .animate-slide-up {
-    opacity: 0;
-    animation: slide-up 0.8s ease-out forwards;
-  }
-</style>

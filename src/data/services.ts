@@ -9,6 +9,7 @@ export interface Service {
   category: string;
   featured: boolean;
   industries: string[];
+  slug: string;
 }
 
 export const services: Service[] = [
@@ -19,7 +20,8 @@ export const services: Service[] = [
     benefit: "Tu negocio trabaja aunque vos no estés. Operación 24/7.",
     category: "Automatización",
     featured: true,
-    industries: ["Gastronomía", "Retail", "Finanzas", "Legal", "Institucional", "Automotriz"]
+    industries: ["Gastronomía", "Retail", "Finanzas", "Legal", "Institucional", "Automotriz"],
+    slug: "automatizacion-de-flujos-de-negocio"
   },
   {
     id: "crm-automatico",
@@ -28,7 +30,8 @@ export const services: Service[] = [
     benefit: "Gestión de clientes centralizada con respuestas en tiempo real sin intervención manual.",
     category: "Automatización",
     featured: false,
-    industries: ["Automotriz", "Finanzas", "Retail"]
+    industries: ["Automotriz", "Finanzas", "Retail"],
+    slug: "crm-con-atencion-automatica"
   },
   {
     id: "fidelizacion",
@@ -37,7 +40,8 @@ export const services: Service[] = [
     benefit: "Tus clientes vuelven solos. Aumento del ticket promedio en +35%.",
     category: "Gamificación",
     featured: true,
-    industries: ["Gastronomía", "Retail", "Energía", "Eventos"]
+    industries: ["Gastronomía", "Retail", "Energía", "Eventos"],
+    slug: "sistema-de-puntos-y-fidelizacion"
   },
   {
     id: "juegos-marca",
@@ -46,7 +50,8 @@ export const services: Service[] = [
     benefit: "Viralización orgánica y captación masiva de base de datos.",
     category: "Gamificación",
     featured: true,
-    industries: ["Gastronomía", "Retail", "Eventos"]
+    industries: ["Gastronomía", "Retail", "Eventos"],
+    slug: "juegos-y-experiencias-de-marca"
   },
   {
     id: "contenido-ia",
@@ -55,7 +60,8 @@ export const services: Service[] = [
     benefit: "Contenido fresco y personalizado generado sin intervención humana.",
     category: "Inteligencia Artificial",
     featured: false,
-    industries: ["Media", "Eventos", "Institucional"]
+    industries: ["Media", "Eventos", "Institucional"],
+    slug: "generacion-automatica-de-contenido-con-ia"
   },
   {
     id: "agentes-ia",
@@ -64,7 +70,8 @@ export const services: Service[] = [
     benefit: "El sistema aprende y mejora solo. Cuanto más se usa, mejor funciona.",
     category: "Inteligencia Artificial",
     featured: true,
-    industries: ["Gastronomía", "Retail", "Salud & Fitness", "Educación"]
+    industries: ["Gastronomía", "Retail", "Salud & Fitness", "Educación"],
+    slug: "agentes-de-ia"
   },
   {
     id: "documentacion",
@@ -73,7 +80,8 @@ export const services: Service[] = [
     benefit: "Digitalización y organización de documentos legales, vehiculares e institucionales en segundos.",
     category: "Documentación",
     featured: true,
-    industries: ["Legal", "Automotriz", "Institucional", "Finanzas"]
+    industries: ["Legal", "Automotriz", "Institucional", "Finanzas"],
+    slug: "documentacion-inteligente"
   },
   {
     id: "capacitaciones",
@@ -82,7 +90,8 @@ export const services: Service[] = [
     benefit: "Equipos capacitados para implementar y aprovechar la tecnología en su día a día.",
     category: "Inteligencia Artificial",
     featured: false,
-    industries: ["Educación", "Institucional", "Finanzas", "Salud & Fitness"]
+    industries: ["Educación", "Institucional", "Finanzas", "Salud & Fitness"],
+    slug: "capacitaciones-en-ia-y-automatizacion"
   },
   {
     id: "dashboards",
@@ -91,7 +100,8 @@ export const services: Service[] = [
     benefit: "Tus métricas siempre activas, sin depender de un desarrollador para actualizar un solo número.",
     category: "Análisis de datos",
     featured: true,
-    industries: ["Retail", "Energía", "Finanzas", "Legal", "Institucional", "Media"]
+    industries: ["Retail", "Energía", "Finanzas", "Legal", "Institucional", "Media"],
+    slug: "dashboards"
   }
 ];
 

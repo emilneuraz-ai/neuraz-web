@@ -1,0 +1,112 @@
+---
+// src/layouts/ServiceModalLayout.astro - Layout for service pages displayed as modals
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  category: string;
+}
+
+const { title, description = "Neuraz - Inteligencia Artificial Aplicada", category } = Astro.props;
+---
+
+<!DOCTYPE html>
+<html lang="es" class="scroll-smooth">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content={description} />
+    <meta name="generator" content={Astro.generator} />
+    <link rel="icon" type="image/svg+xml" href="/images/isotipo.svg" />
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <title>{title}</title>
+  </head>
+  <body class="bg-black/95 font-sans antialiased">
+    <!-- Modal container - fullscreen -->
+    <div id="service-modal" class="fixed inset-0 z-50 flex">
+      <!-- Backdrop -->
+      <div id="modal-backdrop" class="absolute inset-0 bg-black"></div>
+      
+      <!-- Modal content - fullscreen -->
+      <div class="relative w-full h-full bg-black overflow-hidden">
+        <!-- Scrollable content -->
+        <div class="h-full w-full overflow-y-auto overflow-x-hidden">
+          <!-- Close button -->
+          <div class="sticky top-0 z-10 flex items-center justify-between px-8 py-6 bg-black/95 backdrop-blur-sm border-b border-white/10">
+            <div class="flex items-center gap-3">
+              <img src="/images/isotipo.svg" alt="Neuraz" class="w-5 h-5" />
+              <span class="text-[10px] font-medium tracking-[0.2em] text-white/40 uppercase">{category}</span>
+            </div>
+            
+            <a 
+              href="/#servicios" 
+              id="close-modal"
+              class="flex items-center gap-2 text-xs font-medium tracking-[0.15em] text-white/60 hover:text-white transition-colors"
+            >
+              CERRAR
+              <svg class="w-4 h-4" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M18 6L6 18M6 6l12 12" stroke-linecap="square" stroke-linejoin="miter"/>
+              </svg>
+            </a>
+          </div>
+          
+          <!-- Page content -->
+          <div class="px-8 pb-12">
+            <slot />
+          </div>
+        </div>
+      </div>
+    </div>
+    
+    <script>
+      // Handle escape key to close modal
+      document.addEventListener('keydown', (e) => {
+        if (e.key === 'Escape') {
+          window.location.href = '/#servicios';
+        }
+      });
+      
+      // Handle backdrop click to close
+      document.getElementById('modal-backdrop')?.addEventListener('click', () => {
+        window.location.href = '/#servicios';
+      });
+      
+      // Store the service ID in sessionStorage to reopen the accordion
+      const serviceSlug = window.location.pathname.split('/').pop();
+      if (serviceSlug) {
+        sessionStorage.setItem('lastOpenedService', serviceSlug);
+      }
+    </script>
+  </body>
+</html>
+
+<style is:global>
+  html {
+    scroll-behavior: smooth;
+  }
+  
+  body {
+    font-feature-settings: "cv02", "cv03", "cv04", "cv11";
+  }
+  
+  /* Custom scrollbar for modal */
+  .overflow-y-auto::-webkit-scrollbar {
+    width: 8px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb {
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 4px;
+  }
+  
+  .overflow-y-auto::-webkit-scrollbar-thumb:hover {
+    background: rgba(255, 255, 255, 0.3);
+  }
+</style>
