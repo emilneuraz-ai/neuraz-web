@@ -1,8 +1,8 @@
 ---
-// Componente CanvasAnimado - Fondo interactivo con anillos y esferas
+// Componente CanvasAnimado - Fondo interactivo con anillos y esferas (todo negro)
 ---
 
-<canvas id="hero-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+<canvas id="hero-canvas" class="absolute inset-0 w-full h-full pointer-events-none bg-black"></canvas>
 
 <script is:inline>
 (function() {
@@ -12,15 +12,29 @@
   const cx = cv.getContext('2d');
   const CO = 7, RO = 7, CL = 80, RR = 28, TH = 2.8, RB = 9, GAP_A = Math.PI * .48, MXS = 22;
   let W, H, ox, oy, mX = -9e3, mY = -9e3, mA = false, fr = 0;
+  let isMobile = window.innerWidth < 768;
 
   function resize() {
     const dp = devicePixelRatio || 1;
     const rect = cv.parentElement.getBoundingClientRect();
-    W = rect.width;
+    isMobile = window.innerWidth < 768;
+    
+    // En mobile, el canvas ocupa solo el 25% del ancho (a la derecha)
+    if (isMobile) {
+      W = rect.width * 0.25;
+      cv.style.width = '25%';
+      cv.style.left = '75%';
+      cv.style.right = '0';
+    } else {
+      W = rect.width;
+      cv.style.width = '100%';
+      cv.style.left = '0';
+      cv.style.right = 'auto';
+    }
+    
     H = rect.height;
     cv.width = W * dp;
     cv.height = H * dp;
-    cv.style.width = W + 'px';
     cv.style.height = H + 'px';
     cx.setTransform(dp, 0, 0, dp, 0, 0);
     ox = W / 2 - ((CO - 1) * CL) / 2;
@@ -223,8 +237,12 @@
   }
 
   function draw() {
-    cx.clearRect(0, 0, W, H);
-    const col = '#e5e5e5';
+    // Fondo negro
+    cx.fillStyle = '#000000';
+    cx.fillRect(0, 0, W, H);
+    
+    // Anillos en blanco/gris claro
+    const col = '#ffffff';
 
     for (const rr of rings) {
       const p = cp(rr.c, rr.r);
@@ -232,6 +250,7 @@
       cx.strokeStyle = col; cx.lineWidth = TH; cx.lineCap = 'round'; cx.stroke();
     }
 
+    // Esferas en blanco
     for (const s of sph) {
       if (s.dead) continue;
       const speed = Math.hypot(s.vx, s.vy);
@@ -244,7 +263,7 @@
           const alpha = .12 * (1 - frac);
           const rad = RB * (1 - frac * .3);
           cx.beginPath(); cx.arc(tx, ty, rad, 0, Math.PI * 2);
-          cx.fillStyle = `rgba(0,0,0,${alpha})`; cx.fill();
+          cx.fillStyle = `rgba(255,255,255,${alpha})`; cx.fill();
         }
       }
       cx.save();
@@ -258,14 +277,14 @@
         cx.translate(s.x, s.y);
         cx.beginPath(); cx.arc(0, 0, RB, 0, Math.PI * 2);
       }
-      cx.fillStyle = '#000'; cx.fill();
+      cx.fillStyle = '#ffffff'; cx.fill();
       cx.restore();
     }
 
     if (mA) {
       cx.save();
       cx.beginPath(); cx.arc(mX, mY, 28, 0, Math.PI * 2);
-      cx.strokeStyle = 'rgba(0,0,0,.12)'; cx.lineWidth = 1.5;
+      cx.strokeStyle = 'rgba(255,255,255,.2)'; cx.lineWidth = 1.5;
       cx.setLineDash([5, 5]); cx.stroke(); cx.setLineDash([]);
       cx.restore();
     }
