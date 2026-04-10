@@ -1,0 +1,278 @@
+---
+// Componente CanvasAnimado - Fondo interactivo con anillos y esferas
+---
+
+<canvas id="hero-canvas" class="absolute inset-0 w-full h-full pointer-events-none"></canvas>
+
+<script is:inline>
+(function() {
+  const cv = document.getElementById('hero-canvas');
+  if (!cv) return;
+  
+  const cx = cv.getContext('2d');
+  const CO = 7, RO = 7, CL = 80, RR = 28, TH = 2.8, RB = 9, GAP_A = Math.PI * .48, MXS = 22;
+  let W, H, ox, oy, mX = -9e3, mY = -9e3, mA = false, fr = 0;
+
+  function resize() {
+    const dp = devicePixelRatio || 1;
+    const rect = cv.parentElement.getBoundingClientRect();
+    W = rect.width;
+    H = rect.height;
+    cv.width = W * dp;
+    cv.height = H * dp;
+    cv.style.width = W + 'px';
+    cv.style.height = H + 'px';
+    cx.setTransform(dp, 0, 0, dp, 0, 0);
+    ox = W / 2 - ((CO - 1) * CL) / 2;
+    oy = H / 2 - ((RO - 1) * CL) / 2;
+  }
+  
+  resize();
+  window.addEventListener('resize', resize);
+  
+  function toC(e) {
+    const r = cv.getBoundingClientRect();
+    const s = W / r.width;
+    return [(e.clientX - r.left) * s, (e.clientY - r.top) * s];
+  }
+  
+  cv.parentElement.addEventListener('mousemove', e => { [mX, mY] = toC(e); mA = true; });
+  cv.parentElement.addEventListener('mouseleave', () => { mA = false; });
+
+  const cp = (c, r) => ({ x: ox + c * CL, y: oy + r * CL });
+  const nm = a => ((a % (Math.PI * 2)) + Math.PI * 2) % (Math.PI * 2);
+  const ad = (a, b) => { let d = nm(b - a); return d > Math.PI ? d - Math.PI * 2 : d; };
+  const lr = (a, b, t) => a + (b - a) * t;
+  const da = (dc, dr) => Math.atan2(dr, dc);
+
+  function bounceEase(t) {
+    if (t < 0.4) return 2.5 * t * t;
+    if (t < 0.7) { const p = t - 0.55; return 1 + 4.5 * p * p * (-1) + .08; }
+    if (t < 0.88) { const p = t - 0.79; return 1 + 2 * p * p * (-1); }
+    const p = t - 0.94; return 1 + p * p * (-1);
+  }
+  function easeOut(t) { return 1 - (1 - t) * (1 - t); }
+
+  const rings = [];
+  for (let r = 0; r < RO; r++) for (let c = 0; c < CO; c++)
+    rings.push({ c, r, a: Math.random() * Math.PI * 2, sp: .4 + Math.random() * .5, tg: null });
+  const rg = (c, r) => rings[r * CO + c];
+  const setG = (c, r, a) => { if (c >= 0 && c < CO && r >= 0 && r < RO) rg(c, r).tg = nm(a); };
+  const gOk = (rr, n) => Math.abs(ad(rr.a, nm(n))) < .18;
+
+  const sph = [];
+
+  function occ(c, r, sk) {
+    for (const s of sph) { if (s === sk || s.dead) continue;
+      if (s.c === c && s.r === r && s.st !== 'leave') return true;
+      if (s.st === 'move' && s.nc === c && s.nr === r) return true;
+    }
+    return false;
+  }
+
+  function mkLine(sc, sr, dc, dr) {
+    const p = [{ c: sc, r: sr }]; let c = sc, r = sr;
+    for (let i = 0; i < 14; i++) { c += dc; r += dr;
+      if (c < 0 || c >= CO || r < 0 || r >= RO) { p.push({ c, r, ex: true }); return p; }
+      p.push({ c, r });
+    }
+    p.push({ c: c + dc, r: r + dr, ex: true }); return p;
+  }
+  function mkZig(sc, sr, dc, dr) {
+    const p = [{ c: sc, r: sr }]; let c = sc, r = sr, h = Math.random() > .5;
+    for (let i = 0; i < 20; i++) {
+      let nc = c, nr = r; if (h) nc += dc; else nr += dr; h = !h;
+      if (nc < 0 || nc >= CO || nr < 0 || nr >= RO) { p.push({ c: nc, r: nr, ex: true }); return p; }
+      p.push({ c: nc, r: nr }); c = nc; r = nr;
+    }
+    p.push({ c: c + dc, r: r + dr, ex: true }); return p;
+  }
+
+  function spawn() {
+    const E = [];
+    for (let i = 0; i < CO; i++) { E.push({ ec: i, er: -1, dc: 0, dr: 1, t: 'v' }); E.push({ ec: i, er: RO, dc: 0, dr: -1, t: 'v' }); }
+    for (let i = 0; i < RO; i++) { E.push({ ec: -1, er: i, dc: 1, dr: 0, t: 'h' }); E.push({ ec: CO, er: i, dc: -1, dr: 0, t: 'h' }); }
+    for (let i = 0; i < CO; i++) { E.push({ ec: i, er: -1, dc: i < CO / 2 ? 1 : -1, dr: 1, t: 'd' }); E.push({ ec: i, er: RO, dc: i < CO / 2 ? 1 : -1, dr: -1, t: 'd' }); }
+    for (let i = 0; i < RO; i++) { E.push({ ec: -1, er: i, dc: 1, dr: i < RO / 2 ? 1 : -1, t: 'd' }); E.push({ ec: CO, er: i, dc: -1, dr: i < RO / 2 ? 1 : -1, t: 'd' }); }
+    E.sort(() => Math.random() - .5);
+    for (const e of E) {
+      const tc = e.ec + e.dc, tr = e.er + e.dr;
+      if (tc < 0 || tc >= CO || tr < 0 || tr >= RO) continue;
+      if (occ(tc, tr, null)) continue;
+      let path = e.t === 'd' ? mkZig(tc, tr, e.dc, e.dr) : mkLine(tc, tr, e.dc, e.dr);
+      if (path.length < 3) continue;
+      const from = cp(e.ec, e.er);
+      sph.push({ st: 'enter', t: 0, dead: false, c: tc, r: tr, nc: tc, nr: tr, dc: e.dc, dr: e.dr,
+        fx: from.x, fy: from.y, path, pi: 0, w: 0, hf: 0,
+        x: from.x, y: from.y, px: from.x, py: from.y, vx: 0, vy: 0, blur: 0 });
+      return;
+    }
+  }
+  
+  function mCell() {
+    if (!mA) return null;
+    let bc = 0, br = 0, bd = 1e9;
+    for (let r = 0; r < RO; r++) for (let c = 0; c < CO; c++) {
+      const p = cp(c, r); const d = Math.hypot(mX - p.x, mY - p.y);
+      if (d < bd) { bd = d; bc = c; br = r; }
+    }
+    return { c: bc, r: br };
+  }
+
+  function reroute() {
+    const tgt = mCell(); if (!tgt) return;
+    for (const s of sph) {
+      if (s.dead || s.st === 'enter' || s.st === 'leave' || s.st === 'move' || s.st === 'align') continue;
+      const dx = tgt.c - s.c, dy = tgt.r - s.r;
+      if (dx === 0 && dy === 0) continue;
+      const np = [{ c: s.c, r: s.r }]; let c = s.c, r = s.r, alt = Math.random() > .5;
+      for (let i = 0; i < 14; i++) {
+        const tdx = tgt.c - c, tdy = tgt.r - r;
+        if (tdx === 0 && tdy === 0) break;
+        let nc = c, nr = r;
+        if (tdx !== 0 && tdy !== 0) { if (alt) nc += Math.sign(tdx); else nr += Math.sign(tdy); alt = !alt; }
+        else if (tdx !== 0) nc += Math.sign(tdx); else nr += Math.sign(tdy);
+        if (nc < 0 || nc >= CO || nr < 0 || nr >= RO) { np.push({ c: nc, r: nr, ex: true }); break; }
+        np.push({ c: nc, r: nr }); c = nc; r = nr;
+      }
+      if (!np[np.length - 1].ex) {
+        const ds = [{ dc: 0, dr: -1, d: r }, { dc: 0, dr: 1, d: RO - 1 - r }, { dc: -1, dr: 0, d: c }, { dc: 1, dr: 0, d: CO - 1 - c }];
+        ds.sort((a, b) => a.d - b.d); const ed = ds[0];
+        for (let i = 0; i < 14; i++) { c += ed.dc; r += ed.dr;
+          if (c < 0 || c >= CO || r < 0 || r >= RO) { np.push({ c, r, ex: true }); break; }
+          np.push({ c, r }); }
+      }
+      if (np.length > 1 && np[np.length - 1].ex) { s.path = np; s.pi = 0; s.st = 'sit'; s.w = 40; }
+    }
+  }
+
+  function update() {
+    fr++;
+    const alive = sph.filter(s => !s.dead).length;
+    if (fr % 16 === 0 && alive < MXS) spawn();
+    if (fr % 8 === 0 && alive < 8) spawn();
+    if (mA && fr % 20 === 0) reroute();
+
+    for (const rr of rings) {
+      if (rr.tg !== null) { const d = ad(rr.a, rr.tg);
+        if (Math.abs(d) < .02) { rr.a = rr.tg; rr.tg = null; } else rr.a += d * .28;
+      } else rr.a += rr.sp * .016;
+      rr.a = nm(rr.a);
+    }
+
+    for (let i = sph.length - 1; i >= 0; i--) {
+      const s = sph[i]; if (s.dead) continue;
+      s.px = s.x; s.py = s.y; if (s.st === 'enter') {
+        const g = da(-s.dc, -s.dr); setG(s.c, s.r, g);
+        if (gOk(rg(s.c, s.r), g)) s.t += .06;
+        const to = cp(s.c, s.r); const et = easeOut(Math.min(s.t, 1));
+        s.x = lr(s.fx, to.x, et); s.y = lr(s.fy, to.y, et);
+        s.blur = Math.min(s.t < .8 ? 12 : 0, 12);
+        if (s.t >= 1) { s.x = to.x; s.y = to.y; s.st = 'sit'; s.t = 0; s.w = 0; s.blur = 0; rg(s.c, s.r).tg = null; }
+      }
+      else if (s.st === 'sit') {
+        const p = cp(s.c, s.r); s.x = p.x; s.y = p.y; s.blur = 0;
+        s.w++; if (s.w < 45) continue;
+        s.pi++; if (s.pi >= s.path.length) { s.dead = true; continue; }
+        const nx = s.path[s.pi];
+        if (nx.ex) { s.nc = nx.c; s.nr = nx.r; s.dc = nx.c - s.c; s.dr = nx.r - s.r; s.st = 'leave'; s.t = 0; }
+        else { if (occ(nx.c, nx.r, s)) { s.pi--; s.st = 'wait'; s.w = 0; continue; }
+          s.nc = nx.c; s.nr = nx.r; s.dc = nx.c - s.c; s.dr = nx.r - s.r;
+          s.st = 'align'; s.t = 0; s.hf = 0;
+          setG(s.c, s.r, da(s.dc, s.dr)); setG(s.nc, s.nr, da(-s.dc, -s.dr)); }
+      }
+      else if (s.st === 'wait') {
+        const p = cp(s.c, s.r); s.x = p.x; s.y = p.y; s.blur = 0; s.w++;
+        if (s.w > 15) { s.w = 0; const nx = s.path[s.pi + 1];
+          if (nx && (nx.ex || !occ(nx.c, nx.r, s))) { s.st = 'sit'; s.w = 45; } }
+      }
+      else if (s.st === 'align') {
+        const p = cp(s.c, s.r); s.x = p.x; s.y = p.y; s.blur = 0;
+        const eg = da(s.dc, s.dr), ng = da(-s.dc, -s.dr);
+        const rE = rg(s.c, s.r), rN = (s.nc >= 0 && s.nc < CO && s.nr >= 0 && s.nr < RO) ? rg(s.nc, s.nr) : null;
+        if (gOk(rE, eg) && (!rN || gOk(rN, ng))) {
+          s.hf++; rE.tg = nm(eg); if (rN) rN.tg = nm(ng);
+          if (s.hf >= 40) { s.st = 'move'; s.t = 0; } }
+      }
+      else if (s.st === 'move') {
+        const rE = rg(s.c, s.r), rN = (s.nc >= 0 && s.nc < CO && s.nr >= 0 && s.nr < RO) ? rg(s.nc, s.nr) : null;
+        rE.tg = nm(da(s.dc, s.dr)); if (rN) rN.tg = nm(da(-s.dc, -s.dr));
+        s.t += .055;
+        const from = cp(s.c, s.r), to = cp(s.nc, s.nr);
+        const et = bounceEase(Math.min(s.t, 1));
+        s.x = lr(from.x, to.x, et); s.y = lr(from.y, to.y, et);
+        const mid = 1 - Math.abs(s.t - .45) / .45;
+        s.blur = mid * 16;
+        if (s.t >= 1) {
+          rE.tg = null; if (rN) rN.tg = null;
+          s.c = s.nc; s.r = s.nr;
+          const p2 = cp(s.c, s.r); s.x = p2.x; s.y = p2.y;
+          s.st = 'sit'; s.t = 0; s.w = 0; s.blur = 0; }
+      }
+      else if (s.st === 'leave') {
+        const g = da(s.dc, s.dr), rE = rg(s.c, s.r);
+        setG(s.c, s.r, g); if (gOk(rE, g)) { rE.tg = nm(g); s.t += .06; }
+        const from = cp(s.c, s.r); const et = easeOut(Math.min(s.t, 1));
+        s.x = lr(from.x, from.x + s.dc * CL, et); s.y = lr(from.y, from.y + s.dr * CL, et);
+        s.blur = Math.min(s.t < .8 ? 12 : 0, 12);
+        if (s.t >= 1) { rE.tg = null; s.dead = true; }
+      }
+      s.vx = s.x - s.px; s.vy = s.y - s.py;
+    }
+    for (let i = sph.length - 1; i >= 0; i--) if (sph[i].dead) sph.splice(i, 1);
+  }
+
+  function draw() {
+    cx.clearRect(0, 0, W, H);
+    const col = '#e5e5e5';
+
+    for (const rr of rings) {
+      const p = cp(rr.c, rr.r);
+      cx.beginPath(); cx.arc(p.x, p.y, RR, rr.a + GAP_A / 2, rr.a + Math.PI * 2 - GAP_A / 2, false);
+      cx.strokeStyle = col; cx.lineWidth = TH; cx.lineCap = 'round'; cx.stroke();
+    }
+
+    for (const s of sph) {
+      if (s.dead) continue;
+      const speed = Math.hypot(s.vx, s.vy);
+      if (speed > 1.5) {
+        const steps = Math.min(Math.floor(speed * 1.8), 8);
+        for (let j = steps; j >= 1; j--) {
+          const frac = j / steps;
+          const tx = s.x - s.vx * frac * 2.5;
+          const ty = s.y - s.vy * frac * 2.5;
+          const alpha = .12 * (1 - frac);
+          const rad = RB * (1 - frac * .3);
+          cx.beginPath(); cx.arc(tx, ty, rad, 0, Math.PI * 2);
+          cx.fillStyle = `rgba(0,0,0,${alpha})`; cx.fill();
+        }
+      }
+      cx.save();
+      if (speed > 2) {
+        const angle = Math.atan2(s.vy, s.vx);
+        const stretch = 1 + speed * .04;
+        cx.translate(s.x, s.y); cx.rotate(angle);
+        cx.scale(stretch, 1 / Math.sqrt(stretch));
+        cx.beginPath(); cx.arc(0, 0, RB, 0, Math.PI * 2);
+      } else {
+        cx.translate(s.x, s.y);
+        cx.beginPath(); cx.arc(0, 0, RB, 0, Math.PI * 2);
+      }
+      cx.fillStyle = '#000'; cx.fill();
+      cx.restore();
+    }
+
+    if (mA) {
+      cx.save();
+      cx.beginPath(); cx.arc(mX, mY, 28, 0, Math.PI * 2);
+      cx.strokeStyle = 'rgba(0,0,0,.12)'; cx.lineWidth = 1.5;
+      cx.setLineDash([5, 5]); cx.stroke(); cx.setLineDash([]);
+      cx.restore();
+    }
+  }
+
+  function loop() { update(); draw(); requestAnimationFrame(loop); }
+  for (let i = 0; i < 10; i++) spawn();
+  loop();
+})();
+</script>
