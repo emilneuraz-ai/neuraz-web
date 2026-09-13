@@ -21,6 +21,7 @@ export function initHeroLogo(root: HTMLElement): () => void {
   const { signal } = lifetime;
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const mobile = window.matchMedia('(max-width: 767px)');
+  const host = root.closest<HTMLElement>('[data-shared-logo-host]');
   const status = root.querySelector<HTMLElement>('[data-hero-logo-status]');
   let active: HTMLButtonElement | undefined;
   let sticky = false;
@@ -37,10 +38,12 @@ export function initHeroLogo(root: HTMLElement): () => void {
   let bubbleHeight = 0;
   let copyRight = 0;
   let badgeWidth = 180;
+  let badgeDiameter = 32;
   let badgeDirection: 'left' | 'right' = 'right';
 
   const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), Math.max(minimum, maximum));
   const cancelClose = () => { clearTimeout(closeTimer); closeTimer = undefined; };
+  const isAvailable = (pin: HTMLButtonElement) => host?.dataset.destination !== 'services' || pin.dataset.active === 'true';
 
   function restorePinFocus(pin?: HTMLButtonElement) {
     if (!pin) return;
@@ -80,6 +83,7 @@ export function initHeroLogo(root: HTMLElement): () => void {
     if (selectedId) root.dataset.activeService = selectedId;
     else delete root.dataset.activeService;
     for (const pin of pins) pin.dataset.active = String(pin.dataset.heroLogoService === selectedId);
+    syncPins();
     root.dispatchEvent(new CustomEvent('hero-logo:change', { detail: { id: selectedId, open, source } }));
   }
 
@@ -88,7 +92,6 @@ export function initHeroLogo(root: HTMLElement): () => void {
     width = rect.width;
     height = rect.height;
     copyRight = 0;
-    const host = root.closest<HTMLElement>('[data-shared-logo-host]');
     const copy = host?.dataset.destination === 'services' ? null : document.querySelector<HTMLElement>('.hero .hero-copy');
     if (copy && window.matchMedia('(min-width: 1024px)').matches) {
       const copyRect = copy.getBoundingClientRect();
@@ -108,28 +111,31 @@ export function initHeroLogo(root: HTMLElement): () => void {
     if (!active || !width) return;
     const x = Number(active.dataset.screenX);
     if (!Number.isFinite(x)) return;
-    const rightSpace = width - 12 - (x - 22);
-    const leftSpace = x + 22 - 12;
+    badgeDiameter = active.offsetWidth;
+    const radius = badgeDiameter / 2;
+    const rightSpace = width - 12 - (x - radius);
+    const leftSpace = x + radius - 12;
     // The integrated icon stays at the projected pin; only its label grows.
-    const desiredWidth = Math.min(238, Math.max(110, label!.getBoundingClientRect().width + 69));
+    const desiredWidth = Math.min(238, Math.max(110, label!.getBoundingClientRect().width + badgeDiameter + 25));
     badgeDirection = rightSpace >= desiredWidth || rightSpace >= leftSpace ? 'right' : 'left';
-    badgeWidth = Math.max(44, Math.min(desiredWidth, badgeDirection === 'right' ? rightSpace : leftSpace));
+    badgeWidth = Math.max(badgeDiameter, Math.min(desiredWidth, badgeDirection === 'right' ? rightSpace : leftSpace));
     bubble!.dataset.direction = badgeDirection;
     bubble!.style.setProperty('--badge-width', `${badgeWidth.toFixed(1)}px`);
   }
 
   function placeBubble() {
     if (!active || bubble!.hidden || !width || !height) return;
-    if (active.dataset.visible === 'false') { close(); return; }
+    if (active.dataset.visible === 'false' || !isAvailable(active)) { close(false, true); return; }
     const x = Number(active.dataset.screenX);
     const y = Number(active.dataset.screenY);
     if (!Number.isFinite(x) || !Number.isFinite(y)) return;
     if (mobile.matches) {
-      const available = badgeDirection === 'right' ? width - 12 - (x - 22) : x + 22 - 12;
-      const currentWidth = Math.max(44, Math.min(badgeWidth, available));
+      const radius = badgeDiameter / 2;
+      const available = badgeDirection === 'right' ? width - 12 - (x - radius) : x + radius - 12;
+      const currentWidth = Math.max(badgeDiameter, Math.min(badgeWidth, available));
       bubble!.style.setProperty('--badge-width', `${currentWidth.toFixed(1)}px`);
-      bubble!.style.left = `${(badgeDirection === 'right' ? x - 22 : x + 22).toFixed(1)}px`;
-      bubble!.style.top = `${clamp(y, 24, height - 24).toFixed(1)}px`;
+      bubble!.style.left = `${(badgeDirection === 'right' ? x - radius : x + radius).toFixed(1)}px`;
+      bubble!.style.top = `${clamp(y, radius + 2, height - radius - 2).toFixed(1)}px`;
       return;
     }
     const padding = 12;
@@ -144,7 +150,7 @@ export function initHeroLogo(root: HTMLElement): () => void {
   }
 
   function show(pin: HTMLButtonElement, persist = false, announce = false) {
-    if (!ready || pin.dataset.visible === 'false') return;
+    if (!ready || pin.dataset.visible === 'false' || !isAvailable(pin)) return;
     cancelClose();
     const newlyOpened = active !== pin || bubble!.hidden || closing;
     if (active && active !== pin) close(false, true);
@@ -164,13 +170,13 @@ export function initHeroLogo(root: HTMLElement): () => void {
     if (mobile.matches) pin.dataset.badgeOrigin = 'true';
     else delete pin.dataset.badgeOrigin;
     if (announce && status) status.textContent = pin.dataset.label || '';
-    if (root.closest<HTMLElement>('[data-shared-logo-host]')?.dataset.destination !== 'services') {
+    if (host?.dataset.destination !== 'services') {
       selectService(pin.dataset.heroLogoService || null, 'interaction', true);
     }
     measure();
     if (mobile.matches && newlyOpened && !motion.matches) {
       bubble!.dataset.open = 'false';
-      // Measure the original 44px circle before expanding its actual outline.
+      // Measure the collapsed circle before expanding its actual outline.
       void bubble!.offsetWidth;
       if (expandFrame !== undefined) cancelAnimationFrame(expandFrame);
       expandFrame = requestAnimationFrame(() => { bubble!.dataset.open = 'true'; });
@@ -189,7 +195,16 @@ export function initHeroLogo(root: HTMLElement): () => void {
 
   function syncPins() {
     for (const pin of pins) {
-      const tabIndex = ready && pin.dataset.visible !== 'false' && !(mobile.matches && active === pin) ? 0 : -1;
+      const available = isAvailable(pin);
+      const availableValue = String(available);
+      if (pin.dataset.available !== availableValue) pin.dataset.available = availableValue;
+      // Keep the selection gate authoritative for slotted, projected buttons.
+      const visibility = available ? '' : 'hidden';
+      const pointerEvents = available ? '' : 'none';
+      if (pin.style.visibility !== visibility) pin.style.visibility = visibility;
+      if (pin.style.pointerEvents !== pointerEvents) pin.style.pointerEvents = pointerEvents;
+      if (pin.inert !== !available) pin.inert = !available;
+      const tabIndex = ready && available && pin.dataset.visible !== 'false' && !(mobile.matches && active === pin) ? 0 : -1;
       if (pin.tabIndex !== tabIndex) pin.tabIndex = tabIndex;
     }
     placeBubble();
@@ -206,7 +221,7 @@ export function initHeroLogo(root: HTMLElement): () => void {
 
   for (const [index, pin] of pins.entries()) {
     pin.addEventListener('pointerenter', event => {
-      if (event.pointerType === 'mouse' && !sticky && root.closest<HTMLElement>('[data-shared-logo-host]')?.dataset.destination !== 'services') show(pin);
+      if (event.pointerType === 'mouse' && !sticky && host?.dataset.destination !== 'services') show(pin);
     }, { signal });
     pin.addEventListener('pointerleave', scheduleClose, { signal });
     pin.addEventListener('focus', () => {
@@ -236,7 +251,7 @@ export function initHeroLogo(root: HTMLElement): () => void {
       const direction = ['ArrowLeft', 'ArrowUp', 'End'].includes(event.key) ? -1 : 1;
       for (let count = 0; count < pins.length; count++) {
         const candidate = pins[(next + count * direction + pins.length) % pins.length];
-        if (candidate.dataset.visible !== 'false') { candidate.focus({ preventScroll: true }); break; }
+        if (candidate.dataset.visible !== 'false' && isAvailable(candidate)) { candidate.focus({ preventScroll: true }); break; }
       }
     }, { signal });
   }
@@ -281,6 +296,8 @@ export function initHeroLogo(root: HTMLElement): () => void {
     selectService(requested, 'external', false);
   });
   selectionAttributes.observe(root, { attributes: true, attributeFilter: ['data-active-service'] });
+  const destinationAttributes = new MutationObserver(() => { syncPins(); measure(); });
+  if (host) destinationAttributes.observe(host, { attributes: true, attributeFilter: ['data-destination'] });
   const resize = new ResizeObserver(measure);
   resize.observe(stage);
   syncReady();
@@ -291,6 +308,7 @@ export function initHeroLogo(root: HTMLElement): () => void {
     lifetime.abort();
     attributes.disconnect();
     selectionAttributes.disconnect();
+    destinationAttributes.disconnect();
     resize.disconnect();
     root.dataset.ready = 'false';
     fallback.hidden = false;

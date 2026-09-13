@@ -1,15 +1,15 @@
 ---
 // src/components/Services.astro - Auto-expand on scroll
-import { services, categories } from '../data/services';
+import { services } from '../data/services';
 import SectionAtmosphere from './SectionAtmosphere.astro';
 ---
 
 <section id="servicios" class="ambient-section py-24 px-6 sm:px-8 bg-white">
   <SectionAtmosphere variant="grid" />
-  <div class="max-w-7xl mx-auto">
+  <div class="services-inner max-w-7xl mx-auto">
     
     <!-- Section header -->
-    <div class="grid lg:grid-cols-12 gap-8 mb-12">
+    <div class="services-heading grid lg:grid-cols-12 gap-8 mb-12">
       <div class="lg:col-span-4">
         <div class="mb-4">
           <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">Servicios</span>
@@ -53,7 +53,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
             <!-- Expandable content -->
             <div class="service-content overflow-hidden transition-all duration-1000 ease-out"
             >
-              <div class="service-detail py-8 pl-6">
+              <div class="service-detail pl-6">
                 <div class="service-copy">
                 <p class="text-sm text-black/60 leading-relaxed mb-3 max-w-2xl">{service.description}</p>
                 
@@ -85,30 +85,42 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
       })}
 
     </div>
+    <div class="services-logo-anchor" data-desktop-service-logo-slot aria-hidden="true"></div>
   </div>
 </section>
 
 <style>
   .services-title-line { display: block; }
   .services-title-keep { white-space: nowrap; }
+  .services-inner { position: relative; }
   .services-list { position: relative; overflow-anchor: none; }
+  .service-detail { padding-block: 0.5rem 1.75rem; }
   .service-copy { min-width: 0; }
   .service-logo-slot { width: min(100%, 320px); aspect-ratio: 1; margin: 12px auto 0; flex: none; }
+  .services-logo-anchor { display: none; }
 
   @media (min-width: 1024px) {
-    .service-detail {
-      display: flex;
-      align-items: center;
-      min-height: clamp(280px, 24vw, 336px);
+    .services-list { width: 57%; }
+    .service-copy { position: relative; z-index: 3; }
+    .service-logo-slot { display: none; }
+    .services-logo-anchor {
+      display: block;
+      position: absolute;
+      top: 0;
+      right: -1.5rem;
+      width: min(44%, 560px, 70vh);
+      aspect-ratio: 1;
+      pointer-events: none;
     }
-    .service-copy { position: relative; z-index: 3; width: min(55%, 640px); }
     .service-header { position: relative; }
     .service-header > div,
     .service-arrow { position: relative; z-index: 3; }
-    .service-logo-slot { width: 43%; max-width: 490px; margin: 0 0 0 auto; }
   }
   @media (max-width: 479px) {
     .services-title { font-size: 1.9375rem; line-height: 1.12; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .service-content { transition: none; }
   }
 </style>
 

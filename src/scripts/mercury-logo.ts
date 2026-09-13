@@ -526,6 +526,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const interactive = root.dataset.interactive !== 'false';
   const isometric = root.dataset.view === 'isometric';
+  const heroFront = !isometric && !!root.closest('[data-hero-logo]');
   const maxDpr = numberOption(root.dataset.maxDpr, 1.75, 1, 1.75);
   const framing = numberOption(root.dataset.framing, 1.05, 1, 2);
   const pins = Array.from(root.querySelectorAll<HTMLElement>('[data-mercury-pin]')).map(element => ({
@@ -621,6 +622,9 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     const camera = new THREE.PerspectiveCamera(isometric ? 48 : 40, 1, 0.05, 100);
     if (isometric) camera.up.set(0, 0, 1);
     const pivot = new THREE.Group();
+    // Match the upright reference: the native surface is 30 degrees clockwise.
+    const restRotationZ = heroFront ? -Math.PI / 6 : 0;
+    pivot.rotation.z = restRotationZ;
     const centered = new THREE.Group();
     centered.add(gltf.scene);
     const bounds = new THREE.Box3().setFromObject(centered);
@@ -737,10 +741,11 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       const dampingDelta = lastTime ? Math.min(delta, 0.05) : 1 / 60;
       lastTime = time;
       if (autoMotion()) elapsed += delta;
-      const phase = reducedMotion ? 0 : elapsed;
+      // Keep the hero's chosen angle stable while the material keeps flowing.
+      const phase = reducedMotion || heroFront ? 0 : elapsed;
       const targetX = manual.x - hover.y * 0.075 + Math.sin(phase * 0.53) * 0.018;
       const targetY = manual.y + hover.x * 0.11 + Math.sin(phase * 0.37) * 0.035;
-      const targetZ = Math.sin(phase * 0.29) * 0.007;
+      const targetZ = restRotationZ + Math.sin(phase * 0.29) * 0.007;
       const damping = reducedMotion ? 1 : 1 - Math.exp(-dampingDelta * 10);
       pivot.rotation.x = THREE.MathUtils.lerp(pivot.rotation.x, targetX, damping);
       pivot.rotation.y = THREE.MathUtils.lerp(pivot.rotation.y, targetY, damping);
@@ -784,7 +789,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       const distance = (Math.max(2, 2 / camera.aspect) / Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * framing + size.z * scale * 0.5) * 1.03;
       // Rx(-PI/2) lays the native XY logo on XZ. Instead of rotating its data,
       // rotate the maze's original camera/up back into native coordinates.
-      camera.position.set(...(isometric ? [10, -13, 13] as const : [0.35, 0.25, 1] as const)).normalize().multiplyScalar(distance);
+      camera.position.set(...(isometric ? [10, -13, 13] as const : heroFront ? [0, 0, 1] as const : [0.35, 0.25, 1] as const)).normalize().multiplyScalar(distance);
       camera.far = distance + 30;
       camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();

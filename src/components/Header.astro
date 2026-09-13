@@ -3,7 +3,7 @@
 import NavbarBrand from './NavbarBrand.astro';
 ---
 
-<header class="fixed top-0 left-0 right-0 z-50 bg-[#fafafa]">
+<header class="site-header">
   <div class="header-inner">
     <div class="flex items-center justify-between h-20">
       <!-- Logo -->
@@ -20,9 +20,12 @@ import NavbarBrand from './NavbarBrand.astro';
 
       <!-- Mobile menu button -->
       <button
+        type="button"
         id="mobile-menu-btn"
         class="md:hidden p-2"
         aria-label="Abrir menú"
+        aria-expanded="false"
+        aria-controls="mobile-menu"
       >
         <span id="menu-icon">
           <div class="w-6 h-0.5 bg-black mb-1.5"></div>
@@ -49,6 +52,19 @@ import NavbarBrand from './NavbarBrand.astro';
 </header>
 
 <style>
+  .site-header {
+    position: fixed;
+    inset: 0 0 auto;
+    z-index: 300;
+    isolation: isolate;
+    background-color: #fafafa;
+  }
+  #mobile-menu {
+    background-color: #fafafa;
+    max-height: calc(100dvh - 5rem);
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
   .header-inner {
     width: 100%;
     max-width: calc(1648px + 2 * clamp(2rem, 6vw, 7.5rem));
@@ -67,27 +83,28 @@ import NavbarBrand from './NavbarBrand.astro';
   const closeIcon = document.getElementById('close-icon');
   const mobileLinks = document.querySelectorAll('.mobile-link');
 
-  function toggleMenu() {
-    const isOpen = !mobileMenu.classList.contains('hidden');
-
-    if (isOpen) {
-      mobileMenu.classList.add('hidden');
-      menuIcon.classList.remove('hidden');
-      closeIcon.classList.add('hidden');
-    } else {
-      mobileMenu.classList.remove('hidden');
-      menuIcon.classList.add('hidden');
-      closeIcon.classList.remove('hidden');
-    }
+  function setMenuOpen(open: boolean) {
+    mobileMenu?.classList.toggle('hidden', !open);
+    menuIcon?.classList.toggle('hidden', open);
+    closeIcon?.classList.toggle('hidden', !open);
+    mobileMenuBtn?.setAttribute('aria-expanded', String(open));
+    mobileMenuBtn?.setAttribute('aria-label', open ? 'Cerrar menú' : 'Abrir menú');
   }
 
-  mobileMenuBtn?.addEventListener('click', toggleMenu);
+  mobileMenuBtn?.addEventListener('click', () => {
+    setMenuOpen(mobileMenuBtn.getAttribute('aria-expanded') !== 'true');
+  });
 
   mobileLinks.forEach(link => {
-    link.addEventListener('click', () => {
-      mobileMenu.classList.add('hidden');
-      menuIcon.classList.remove('hidden');
-      closeIcon.classList.add('hidden');
-    });
+    link.addEventListener('click', () => setMenuOpen(false));
+  });
+  document.addEventListener('keydown', event => {
+    if (event.key === 'Escape' && mobileMenuBtn?.getAttribute('aria-expanded') === 'true') {
+      setMenuOpen(false);
+      mobileMenuBtn.focus();
+    }
+  });
+  window.matchMedia('(min-width: 768px)').addEventListener('change', event => {
+    if (event.matches) setMenuOpen(false);
   });
 </script>
