@@ -11,14 +11,15 @@ const { class: className } = Astro.props;
     <button data-sphere-play aria-pressed="false">Reproducir giro ▶</button>
     <label class="sphere-axis">Giro
       <select data-sphere-axis aria-label="Eje de giro">
+        <option value="horizontal">Horizontal · 360°</option>
         <option value="both">Horizontal y vertical</option>
-        <option value="horizontal">Horizontal</option>
         <option value="vertical">Vertical</option>
       </select>
     </label>
     <button data-sphere-reset>Vista del logo <span aria-hidden="true">↺</span></button>
     <button data-sphere-fullscreen>Pantalla completa ⛶</button>
   </div>
+  <p class="sphere-help">Arrastrá con el mouse o el dedo para girar. Usá ▶ para una vuelta continua.</p>
   <p class="sphere-angles" data-sphere-angles>Horizontal 0° · Vertical 0°</p>
 </div>
 <script>
@@ -28,7 +29,8 @@ const { class: className } = Astro.props;
 <style>
   .spherical-logo { width: 100%; }
   .sphere-stage { position:relative; aspect-ratio:1; width:100%; touch-action:none; cursor:grab; }
-  .sphere-stage:active { cursor:grabbing; }
+  .sphere-help { text-align:center; font-size:12px; color:#666; margin-top:18px; }
+  .sphere-stage[data-dragging="true"], .sphere-stage:active { cursor:grabbing; }
   .sphere-stage:focus-visible { outline:1px solid #777; outline-offset:4px; border-radius:16px; }
   canvas { position:absolute; inset:0; width:100%; height:100%; }
   .sphere-fallback { position:absolute; inset:8.5%; width:83%; height:83%; object-fit:contain; }

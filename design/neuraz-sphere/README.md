@@ -2,7 +2,7 @@
 
 Recurso independiente del logo principal del sitio.
 
-Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La silueta original se proyecta sobre dos hemisferios redondeados: se eliminan los mapas laterales que añadían un aro negro alrededor de la vista frontal. El marco gira continuamente sin reinicios angulares. El líquido se redistribuye en un sistema orientado hacia la vista: compensa el giro completo y conserva una inclinación residual máxima de 0.025 radianes por eje, sin distorsión lateral del patrón. Así los laterales y polos mantienen un equilibrio de forma y contraforma similar al frente; no es la rotación rígida de una malla inmutable.
+Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La silueta original se proyecta sobre dos hemisferios redondeados: se eliminan los mapas laterales que añadían un aro negro alrededor de la vista frontal. La orientación gira físicamente 360°. Al descubrir los laterales, el campo interpola hacia mapas esféricos en tres ejes: los nodos atraviesan la vista en lugar de cancelar el giro frente a la cámara. El giro automático es horizontal por defecto y el arrastre con mouse o touch controla ambos ejes.
 
 El núcleo blanco de radio 1.115 oculta las conexiones posteriores para evitar duplicaciones en el contorno.
 
