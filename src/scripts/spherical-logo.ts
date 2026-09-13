@@ -15,24 +15,35 @@ float maskAt(vec2 p, float tile) {
   return (texture2D(field,uv).r-.5)*.4;
 }
 float surfaceMask(vec2 uv,float offset){
-  float phase=mod(time*3.3+offset,8.);
+  float phase=mod(time*1.65+offset,8.);
   float a=floor(phase),progress=smoothstep(0.,1.,fract(phase));
   // Damped spring: stretch past the next connection, then settle exactly on it.
   float spring=(1.-exp(-7.*progress)*cos(10.*progress))/(1.-exp(-7.)*cos(10.));
-  float t=clamp(spring,0.,1.16);
+  float t=mix(progress,clamp(spring,0.,1.16),.35);
   return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid*(1.-smoothstep(.72,1.04,length(uv))));
 }
 float neuralShape(vec3 p){
-  // Two independent domed SVG faces. The rear is mirrored in object space
-  // so it reads as the original logo when viewed from behind.
-  vec2 uv=vec2(p.z<0.?-p.x:p.x,p.y);
-  float channels=surfaceMask(uv,0.);
-  float face=length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
-  float gap=.28-abs(p.z);
-  float h=clamp(.5+.5*(gap-face)/.04,0.,1.);
-  return mix(face,gap,h)+.04*h*(1.-h);
+  // Opposing faces share one footprint: corresponding branches join through
+  // the depth, without a mirrored mismatch or an empty equatorial band.
+  float channels=surfaceMask(p.xy,0.);
+  float radius=length(p);
+  float shell=abs(radius-1.02)-.10;
+  float rim=.88-length(p.xy);
+  float unionWeight=clamp(.5+.5*(rim-shell)/.06,0.,1.);
+  float joined=mix(rim,shell,unionWeight)-.06*unionWeight*(1.-unionWeight);
+  float sideWeight=1.-smoothstep(.15,.40,abs(p.z));
+  float sidePattern=mix(surfaceMask(p.zy,2.5),surfaceMask(p.xz,5.),abs(p.y)/max(abs(p.x)+abs(p.y),.001));
+  // Through-cuts make independent round-ended branches, rather than grooves.
+  // They intersect the existing footprint and stop before the front/back faces.
+  float sideCut=sidePattern-.025-(1.-sideWeight)*.3;
+  float cutBlend=clamp(.5+.5*(sideCut-channels)/.045,0.,1.);
+  channels=mix(channels,sideCut,cutBlend)+.045*cutBlend*(1.-cutBlend);
+  float envelope=max(radius-1.12,joined);
+  float h=clamp(.5+.5*(envelope-channels)/.10,0.,1.);
+  return mix(channels,envelope,h)+.10*h*(1.-h);
 }
-float shape(vec3 p){ return min(neuralShape(p),length(p)-1.10); }
+float shape(vec3 p){ return neuralShape(p); }
+
 void main(){
   vec2 xy=(gl_FragCoord.xy/resolution-.5)*2.65;
   vec3 ro=rotation*vec3(xy,3.);
@@ -52,8 +63,7 @@ void main(){
   vec3 light=normalize(rotation*vec3(-.5,.8,1.5));
   float diffuse=max(dot(n,light),0.);
   float spec=pow(max(dot(reflect(-light,n),-rd),0.),24.);
-  bool interior=length(p)<1.102 && neuralShape(p)>.001;
-  float shade=interior ? .980392 : .025+.13*diffuse+.16*spec;
+  float shade=dot(n,normalize(p))<-.12 ? .980392 : .025+.13*diffuse+.16*spec;
   gl_FragColor=vec4(vec3(shade),1.);
 }`;
 async function init(root: HTMLElement) {
@@ -101,7 +111,7 @@ async function init(root: HTMLElement) {
       euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
       const facing=Math.abs(matrix.elements[10]);
       const recovery=THREE.MathUtils.smoothstep(facing,.7,.99);
-      material!.uniforms.fluid.value=reduced.matches?0:(.7*(1-recovery)+.5*recovery)*Math.sin(material!.uniforms.time.value*Math.PI/1.75)**2;
+      material!.uniforms.fluid.value=reduced.matches?0:(.7*(1-recovery)+.5*recovery)*Math.sin(material!.uniforms.time.value*Math.PI/3.5)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;

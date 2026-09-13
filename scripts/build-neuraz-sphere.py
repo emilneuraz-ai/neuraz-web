@@ -16,14 +16,12 @@ brain=bpy.data.objects.new('Neuraz spherical neural logo',mesh);bpy.context.coll
 brain.select_set(True);bpy.context.view_layer.objects.active=brain
 bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bpy.ops.mesh.remove_doubles(threshold=.00001);bpy.ops.mesh.normals_make_consistent(inside=False);bpy.ops.object.mode_set(mode='OBJECT')
 mesh.materials.append(mat)
-for f in mesh.polygons:f.use_smooth=True
-bpy.ops.object.select_all(action='DESELECT')
-bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=96,radius=1.10)
-core=bpy.context.object;core.name='White neural interior'
-white=bpy.data.materials.new('White unlit interior');white.use_nodes=True;white.node_tree.nodes.clear()
+white=bpy.data.materials.new('White inner surfaces');white.use_nodes=True;white.node_tree.nodes.clear()
 emission=white.node_tree.nodes.new('ShaderNodeEmission');emission.inputs['Color'].default_value=(.956,.956,.956,1)
-output=white.node_tree.nodes.new('ShaderNodeOutputMaterial');white.node_tree.links.new(emission.outputs[0],output.inputs['Surface']);core.data.materials.append(white)
-for f in core.data.polygons:f.use_smooth=True
+out=white.node_tree.nodes.new('ShaderNodeOutputMaterial');white.node_tree.links.new(emission.outputs[0],out.inputs['Surface']);mesh.materials.append(white)
+for f in mesh.polygons:
+    f.use_smooth=True
+    f.material_index=1 if f.normal.dot(f.center.normalized()) < -.12 else 0
 brain.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(ROOT/'public/models/neuraz-sphere.glb'),export_format='GLB',use_selection=True)
 scene=bpy.context.scene;scene.render.use_compositing=False;scene.view_settings.view_transform='Standard';scene.view_settings.exposure=0;scene.view_settings.gamma=1;scene.render.engine='CYCLES';scene.cycles.samples=24;scene.render.resolution_x=800;scene.render.resolution_y=800;scene.render.resolution_percentage=100;scene.render.film_transparent=True

@@ -1,26 +1,17 @@
-# Neuraz · Dos caras 3D · V2
+# Neuraz · Logo hueco 3D · V2
 
-Dos caras abombadas independientes construidas a partir del campo del SVG original. El dorso refleja la coordenada horizontal para que el logo se lea correctamente al verlo desde atrás durante el giro horizontal. No hay mapas laterales, puentes entre las dos caras ni un contorno fijo superpuesto a una esfera distinta.
+Frente y dorso comparten el contorno original del SVG y están alineados en las mismas coordenadas XY. Se conectan únicamente por las ramas exteriores; no hay relleno ni esfera blanca en el centro. Visto desde atrás el dibujo aparece reflejado, como el reverso de una pieza real.
 
-Cada cara usa un perfil circular de radio 0.115 sobre radio 1.12. La franja |z| < 0.28 queda libre de geometría negra, con transición redondeada. Un núcleo blanco sin iluminación, de radio 1.10, oculta el dorso al mirar de frente.
+Geometría: envolvente de radio 1.12, capa hueca centrada en radio 1.02 con semiespesor 0.10. Los puentes aparecen únicamente a partir del radio XY 0.88, con unión suave de 0.06 y biseles de transición redondeada de 0.10. El núcleo queda vacío. No hay máscaras ni contornos fijados a la cámara.
 
-En reposo, el contorno frontal coincide con el campo del SVG original (resolución 512 píxeles). Durante el giro se reduce la deformación al acercarse al frente o al dorso para recuperar la figura. La animación retorna a la forma de reposo cada 1.75 segundos, incluso estando quieta. Vista del logo vuelve al frente y reinicia la animación desde la forma original.
+Las conexiones utilizan los campos de movimiento del SVG a 1.65 muestras por segundo. Cada transición combina suavizado con un 35% de respuesta elástica amortiguada, evitando tirones. La animación recupera el reposo cada 3.5 segundos y reduce su amplitud al acercarse al frente o dorso. Vista del logo vuelve al frente y reinicia la animación desde el dibujo original.
 
-Las conexiones usan interpolación con resorte amortiguado entre campos de distancia: sobrepasan el destino hasta un 16% y regresan suavemente. La velocidad se mantiene en 3.3 muestras por segundo. El movimiento ocurre dentro de cada cara; las dos caras nunca se fusionan.
+Play / pausa controla únicamente el giro. Horizontal 360° es el eje predeterminado; también están disponibles vertical y ambos. Arrastrar con mouse o dedo controla los dos ejes y pausa el giro automático. Las flechas giran y R vuelve al frente. Pantalla completa sirve para presentaciones; Escape sale. Movimiento reducido mantiene las conexiones en reposo.
 
-## Controles
+El componente requiere Three.js 0.183.2 y Astro. Copiar `src` y `public` conservando rutas y usar `<SphericalLogo />`. Se liberan recursos al navegar y se pausa el cálculo fuera de pantalla.
 
-- Play / pausa controla el giro; las conexiones continúan animadas.
-- Horizontal 360° predeterminado, vertical o ambos.
-- Arrastrar con mouse o dedo gira y pausa el giro automático.
-- Flechas giran; R o Vista del logo vuelve al frente.
-- Pantalla completa; Escape sale.
-- Movimiento reducido conserva el modelo en reposo; el giro requiere activación explícita.
+El componente web incluye la animación procedural. Los archivos GLB, Blender y PNG representan la geometría estática en reposo.
 
-Three.js 0.183.2 y Astro. Copiar `src` y `public` conservando rutas y usar `<SphericalLogo />`. Se liberan los recursos al navegar y se pausa el cálculo fuera de pantalla.
+Regenerar con `node scripts/build-sphere-distance.mjs`, `node scripts/build-sphere-mesh.mjs` y Blender `--background --python scripts/build-neuraz-sphere.py`. El segundo paso produce `/tmp/neuraz-sphere-mesh.bin`, con 160 muestras por eje.
 
-## Archivos
-
-El componente web contiene la animación. GLB, Blender y PNG muestran la geometría estática en reposo; el GLB no incorpora la animación procedural.
-
-Regenerar con `node scripts/build-sphere-distance.mjs`, después `node scripts/build-sphere-mesh.mjs` y finalmente Blender `--background --python scripts/build-neuraz-sphere.py`. El segundo paso escribe `/tmp/neuraz-sphere-mesh.bin` (cuadrícula de 160 muestras por eje).
+Los laterales incorporan recortes neuronales pasantes con unión redondeada de 0.045: se forman ramas que se unen y separan, no un relieve superficial. Los recortes se atenúan entre |z|=0.15 y 0.40 para proteger ambas caras y solo sustraen material dentro del campo XY del logo. Las superficies orientadas hacia la cavidad son blancas y sin iluminación; el centro permanece vacío.
