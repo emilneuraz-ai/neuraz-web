@@ -85,8 +85,9 @@ import MercuryLogo from './MercuryLogo.astro';
       <div class="services-mercury" data-services-mercury hidden></div>
       <template data-services-mercury-template>
         <MercuryLogo
-          label="Logo negro fluido de Neuraz. Arrastrá para cambiar la perspectiva"
-          finish="black"
+          label="Logo tridimensional de Neuraz en blanco con contornos negros. Arrastrá para cambiar la perspectiva"
+          finish="porcelain"
+          view="isometric"
           interactive={true}
           controls={false}
           framing={1.05}
@@ -166,8 +167,8 @@ import MercuryLogo from './MercuryLogo.astro';
       mercuryShell.hidden = true;
       return;
     }
-    const size = Math.min(760, Math.max(460, window.innerWidth * 0.48), window.innerHeight * 0.86);
-    const overhang = Math.min(88, window.innerWidth * 0.055);
+    const size = Math.min(540, Math.max(360, window.innerWidth * 0.34), window.innerHeight * 0.65);
+    const overhang = Math.min(24, window.innerWidth * 0.015);
     const center = contentRect.top - listRect.top + contentRect.height / 2;
     const top = Math.max(0, Math.min(center - size / 2, Math.max(0, listRect.height - size)));
     // The scene deliberately overlaps multiple rows on the right. Text and

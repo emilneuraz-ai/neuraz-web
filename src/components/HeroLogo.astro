@@ -1,0 +1,201 @@
+---
+import MercuryLogo from "./MercuryLogo.astro";
+import { services } from '../data/services';
+import arrowPath from '../assets/heroicons/outline/arrow-path.svg?raw';
+import chat from '../assets/heroicons/outline/chat-bubble-left-right.svg?raw';
+import gift from '../assets/heroicons/outline/gift.svg?raw';
+import puzzle from '../assets/heroicons/outline/puzzle-piece.svg?raw';
+import pencil from '../assets/heroicons/outline/pencil-square.svg?raw';
+import cpu from '../assets/heroicons/outline/cpu-chip.svg?raw';
+import document from '../assets/heroicons/outline/document-check.svg?raw';
+import academic from '../assets/heroicons/outline/academic-cap.svg?raw';
+import chart from '../assets/heroicons/outline/chart-bar-square.svg?raw';
+
+const icons = [arrowPath, chat, gift, puzzle, pencil, cpu, document, academic, chart];
+const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación', 'Capacitaciones', 'Datos en tiempo real'];
+const descriptions = [
+  'Conectamos herramientas. Liberamos tu tiempo.',
+  'Cada consulta, una conversación que avanza.',
+  'Más motivos para que tus clientes vuelvan.',
+  'Tu marca se convierte en una experiencia.',
+  'Ideas que se convierten en contenido.',
+  'Inteligencia que trabaja con tu equipo.',
+  'Del archivo al dato que necesitás.',
+  'Tu equipo, preparado para lo que viene.',
+  'La información que necesitás para decidir.',
+];
+const explanations = [
+  'Conectamos ventas, atención y seguimiento para que las tareas repetitivas avancen solas y tu equipo pueda concentrarse en el negocio.',
+  'Centralizamos los contactos y automatizamos las respuestas por WhatsApp y redes para que cada consulta tenga seguimiento y contexto.',
+  'Creamos programas de puntos, premios y cupones para que tus clientes tengan motivos concretos para volver y participar.',
+  'Diseñamos juegos con la identidad de tu marca: trivias, ruletas y desafíos que tus clientes pueden abrir desde un QR.',
+  'Generamos contenido, tarjetas y piezas digitales con inteligencia artificial para mantener tus canales actualizados con menos tareas manuales.',
+  'Creamos agentes que analizan el comportamiento y personalizan las acciones de tu negocio para acompañar a tu equipo.',
+  'Extraemos datos de documentos y clasificamos archivos para que tu equipo encuentre la información que necesita sin organizarla a mano.',
+  'Capacitamos a tu equipo en inteligencia artificial y automatización para incorporar herramientas útiles en sus tareas de todos los días.',
+  'Reunimos tus datos en tableros que se actualizan automáticamente para consultar métricas, exportar información y tomar decisiones con más contexto.',
+];
+const paths = (svg: string) => svg.replace(/^[\s\S]*?<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+const pages = import.meta.glob('../pages/servicios/*.astro');
+const entries = services.map((service, i) => ({
+  ...service, label: labels[i], detail: descriptions[i], explanation: explanations[i], icon: paths(icons[i]).replace(/<path\b/g, '<path pathLength="1"'),
+  href: pages[`../pages/servicios/${service.slug}.astro`] ? `/servicios/${service.slug}` : '#servicios',
+}));
+
+// Each point stays inside the original material throughout all 192 frames.
+// The renderer samples its animated surface height before projecting the pin.
+const anchors = [
+  { u: 0.293193717, v: 0.738219895, top: 0.266003 },
+  { u: 0.492146597, v: 0.905759162, top: 0.338025 },
+  { u: 0.774869110, v: 0.811518325, top: 0.310819 },
+  { u: 0.083769634, v: 0.570680628, top: 0.278508 },
+  { u: 0.565445026, v: 0.528795812, top: 0.254475 },
+  { u: 0.916230366, v: 0.570680628, top: 0.277195 },
+  { u: 0.225130890, v: 0.204188482, top: 0.289273 },
+  { u: 0.481675393, v: 0.094240838, top: 0.313901 },
+  { u: 0.753926702, v: 0.172774869, top: 0.331807 },
+];
+const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
+---
+<div class="hero-logo" data-hero-logo data-ready="false">
+  <MercuryLogo
+    finish="porcelain"
+    view="isometric"
+    fluid={true}
+    framing={1.17}
+    controls={false}
+    loading="eager"
+    reducedMotion="static"
+    label="Logo de Neuraz en perspectiva isométrica. Explorá los servicios sobre sus piezas."
+  >
+    <div slot="overlay" class="hero-logo-overlay" data-hero-logo-overlay>
+      {entries.map((entry, index) => (
+        <button
+          type="button"
+          class="hero-logo-pin"
+          data-mercury-pin
+          data-u={anchors[index].u}
+          data-v={anchors[index].v}
+          data-top={anchors[index].top}
+          data-hero-logo-service={entry.id}
+          data-label={entry.label}
+          data-explanation={entry.explanation}
+          data-href={entry.href}
+          data-visible="false"
+          aria-label={`Explorar ${entry.label}`}
+          aria-expanded="false"
+          aria-controls={bubbleId}
+          tabindex="-1"
+        >
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={entry.icon} />
+        </button>
+      ))}
+      <div class="hero-logo-bubble" id={bubbleId} data-hero-logo-bubble data-placement="below" role="note" aria-label="Detalle del servicio" hidden>
+        <div class="hero-logo-bubble-top">
+          <a class="hero-logo-bubble-link" data-hero-logo-link href={entries[0].href}>
+            <span class="hero-logo-bubble-marker" aria-hidden="true"></span>
+            <span data-hero-logo-label>{entries[0].label}</span>
+            <span class="hero-logo-bubble-arrow" aria-hidden="true">↗</span>
+          </a>
+          <button type="button" class="hero-logo-bubble-close" data-hero-logo-close aria-label="Cerrar detalle del servicio">
+            <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="m4 4 8 8M12 4l-8 8" /></svg>
+          </button>
+        </div>
+        <p data-hero-logo-explanation>{entries[0].explanation}</p>
+      </div>
+    </div>
+  </MercuryLogo>
+  <nav class="hero-logo-fallback" data-hero-logo-fallback aria-label="Explorar servicios">
+    {entries.map(entry => <a href={entry.href}>{entry.label}<span aria-hidden="true">↗</span></a>)}
+  </nav>
+  <span class="hero-logo-sr-only" role="status" data-hero-logo-status></span>
+</div>
+
+<script>
+  import { installHeroLogos } from '../scripts/hero-logo';
+  installHeroLogos();
+</script>
+
+<style>
+  .hero-logo { position: relative; width: 100%; color: #111; }
+  .hero-logo-overlay { position: absolute; inset: 0; pointer-events: none; visibility: hidden; }
+  .hero-logo[data-ready="true"] .hero-logo-overlay { visibility: visible; }
+  .hero-logo-pin {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: var(--pin-depth-order, 1);
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    transform: translate(-50%, -50%);
+    border: 1px solid #292929;
+    border-radius: 50%;
+    background: #fff;
+    color: #111;
+    box-shadow: 0 2px 7px #0000000a;
+    pointer-events: auto;
+    cursor: pointer;
+    -webkit-tap-highlight-color: transparent;
+    transition: color .15s, border-color .15s, background .15s;
+  }
+  .hero-logo-pin[data-visible="false"] { visibility: hidden; pointer-events: none; }
+  .hero-logo-pin svg { display: block; width: 22px; height: 22px; }
+  .hero-logo-pin:hover,
+  .hero-logo-pin:focus-visible,
+  .hero-logo-pin[aria-expanded="true"] { z-index: 10000; border-color: #e63946; color: #e63946; background: #fff; }
+  .hero-logo-bubble {
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: 20000;
+    width: min(264px, calc(100% - 24px));
+    padding: 13px 15px 15px;
+    border: 1px solid #d7d7d7;
+    border-radius: 7px;
+    background: #fff;
+    color: #111;
+    box-shadow: 0 10px 26px #0000000b;
+    pointer-events: auto;
+  }
+  .hero-logo-bubble[hidden] { display: none; }
+  .hero-logo-bubble::after {
+    content: '';
+    position: absolute;
+    top: -5px;
+    left: clamp(15px, var(--arrow-x, 50%), calc(100% - 15px));
+    width: 9px;
+    height: 9px;
+    border-top: 1px solid #d7d7d7;
+    border-left: 1px solid #d7d7d7;
+    transform: translateX(-50%) rotate(45deg);
+    background: #fff;
+  }
+  .hero-logo-bubble[data-placement="above"]::after { top: auto; bottom: -5px; transform: translateX(-50%) rotate(225deg); }
+  .hero-logo-bubble-top { display: flex; align-items: center; gap: 8px; }
+  .hero-logo-bubble-link { display: flex; flex: 1; align-items: center; gap: 8px; min-height: 32px; font-size: 13px; font-weight: 500; line-height: 1.35; letter-spacing: -.015em; text-decoration: none; }
+  .hero-logo-bubble-link:hover { color: #e63946; }
+  .hero-logo-bubble-marker { flex: none; width: 5px; height: 5px; border-radius: 50%; background: #e63946; }
+  .hero-logo-bubble-arrow { margin-left: auto; font-size: 17px; font-weight: 400; }
+  .hero-logo-bubble-close { display: grid; place-items: center; flex: none; width: 32px; height: 32px; margin-right: -5px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #777; cursor: pointer; }
+  .hero-logo-bubble-close:hover { background: #f4f4f4; color: #111; }
+  .hero-logo-bubble-close svg { width: 15px; height: 15px; }
+  .hero-logo-bubble p { margin: 7px 0 0; font-size: 11px; line-height: 1.7; color: #626262; text-wrap: pretty; }
+  .hero-logo-fallback { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; border-top: 1px solid #ddd; }
+  .hero-logo-fallback[hidden] { display: none; }
+  .hero-logo-fallback a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding-block: 10px; border-bottom: 1px solid #e8e8e8; font-size: 11px; line-height: 1.5; text-decoration: none; }
+  .hero-logo-fallback a:hover { color: #e63946; }
+  .hero-logo button:focus-visible,
+  .hero-logo a:focus-visible { outline: 2px solid #e63946; outline-offset: 3px; }
+  .hero-logo-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
+  @media (max-width: 767px) {
+    .hero-logo-bubble { width: min(254px, calc(100% - 24px)); padding: 11px 13px 13px; }
+    .hero-logo-bubble-link { font-size: 12px; }
+    .hero-logo-bubble p { font-size: 11px; line-height: 1.65; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-logo-pin { transition: none; }
+  }
+</style>

@@ -22,16 +22,20 @@ interface FluidMetadata {
 interface FluidSurface {
   object: THREE.Group;
   setTime: (seconds: number) => void;
+  sampleTop: (u: number, v: number, target: THREE.Vector3) => boolean;
   dispose: () => void;
 }
 
 function finishParameters(finish: string | undefined) {
+  if (finish === 'porcelain') {
+    return { color: 0xf5f4ef, metalness: 0, roughness: 0.36, clearcoat: 0.12, clearcoatRoughness: 0.32, specularIntensity: 0.55 };
+  }
   return finish === 'mercury'
-    ? { color: 0xdde1e5, metalness: 1, roughness: 0.16, clearcoat: 0.2, clearcoatRoughness: 0.12 }
-    : { color: 0x08090b, metalness: 0, roughness: 0.26, clearcoat: 0, clearcoatRoughness: 0.26 };
+    ? { color: 0xdde1e5, metalness: 1, roughness: 0.16, clearcoat: 0.2, clearcoatRoughness: 0.12, specularIntensity: 1 }
+    : { color: 0x080808, metalness: 0, roughness: 0.82, clearcoat: 0, clearcoatRoughness: 0.82, specularIntensity: 0.16 };
 }
 
-/** A filtered occupancy channel closes both surfaces between sampled grid nodes. */
+/** Smooth occupancy sampled by the geometric contour, never used as alpha. */
 function createFluidCoverage(metadata: FluidMetadata, buffer: ArrayBuffer) {
   const { width, height, frameCount } = metadata;
   const count = width * height;
@@ -167,47 +171,155 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
       vec4 sampled = mix(texture2D(mercuryFrameA, sampleUv), texture2D(mercuryFrameB, sampleUv), mercuryMix);
       vec2 bytes = mercurySide > 0.0 ? sampled.rg : sampled.ba;
       float height = dot(bytes, vec2(256.0, 1.0)) * (mercuryHeightScale / 257.0);
-      // The edge converges to z=0 along the filtered contour, removing the flat
-      // outer-cell fringe while keeping the native 16-bit heights inside.
       return height * pow(smoothstep(0.5, 0.8, mercuryCoverage(gridUv)), 0.25);
     }
+    attribute vec2 mercuryTriangleA;
+    attribute vec2 mercuryTriangleB;
+    attribute vec2 mercuryTriangleC;
+    vec2 mercuryCorner(float corner) {
+      return corner < 0.5 ? mercuryTriangleA : corner < 1.5 ? mercuryTriangleB : mercuryTriangleC;
+    }
+    float mercuryCornerValue(float corner, vec3 values) {
+      return corner < 0.5 ? values.x : corner < 1.5 ? values.y : values.z;
+    }
+    vec2 mercuryCrossing(vec2 a, vec2 b, float ca, float cb) {
+      // Canonical endpoint order gives adjacent triangles and both skins the
+      // exact same floating-point position on their shared contour edge.
+      if (a.x > b.x || (a.x == b.x && a.y > b.y)) {
+        vec2 swapUv = a; a = b; b = swapUv;
+        float swapCoverage = ca; ca = cb; cb = swapCoverage;
+      }
+      return mix(a, b, clamp(ca / (ca - cb), 0.0, 1.0));
+    }
+    void mercuryClipTriangle(float slot, out vec2 surfaceUv, out float boundary, out float triangleEnabled) {
+      vec3 values = vec3(mercuryCoverage(mercuryTriangleA), mercuryCoverage(mercuryTriangleB), mercuryCoverage(mercuryTriangleC)) - 0.5;
+      vec3 inside = step(vec3(0.0), values);
+      float count = inside.x + inside.y + inside.z;
+      boundary = 0.0;
+      triangleEnabled = count < 0.5 || (slot > 2.5 && (count < 1.5 || count > 2.5)) ? 0.0 : 1.0;
+      if (count < 0.5) {
+        // Outside triangles collapse to a point, so there is no transparent
+        // sheet covering the logo's holes or its disconnected components.
+        surfaceUv = mercuryTriangleA;
+        boundary = 1.0;
+      } else if (count > 2.5) {
+        surfaceUv = mercuryCorner(slot < 2.5 ? slot : 0.0);
+      } else {
+        float isolated = count < 1.5
+          ? (inside.x > 0.5 ? 0.0 : inside.y > 0.5 ? 1.0 : 2.0)
+          : (inside.x < 0.5 ? 0.0 : inside.y < 0.5 ? 1.0 : 2.0);
+        float following = mod(isolated + 1.0, 3.0);
+        float preceding = mod(isolated + 2.0, 3.0);
+        vec2 a = mercuryCorner(isolated);
+        vec2 b = mercuryCorner(following);
+        vec2 c = mercuryCorner(preceding);
+        float ca = mercuryCornerValue(isolated, values);
+        vec2 ab = mercuryCrossing(a, b, ca, mercuryCornerValue(following, values));
+        vec2 ac = mercuryCrossing(a, c, ca, mercuryCornerValue(preceding, values));
+        if (count < 1.5) {
+          // One inside corner produces one triangle; its spare collapses.
+          surfaceUv = slot < 0.5 || slot > 2.5 ? a : slot < 1.5 ? ab : ac;
+          boundary = slot > 0.5 && slot < 2.5 ? 1.0 : 0.0;
+        } else {
+          // Two inside corners produce the quad [ab,b,c,ac], split consistently.
+          surfaceUv = slot < 0.5 || (slot > 2.5 && slot < 3.5) ? ab
+            : slot < 1.5 ? b : slot < 4.5 ? c : ac;
+          boundary = slot < 0.5 || (slot > 2.5 && slot < 3.5) || slot > 4.5 ? 1.0 : 0.0;
+        }
+      }
+      if (boundary < 0.5) {
+        float cornerValue = all(equal(surfaceUv, mercuryTriangleA)) ? values.x
+          : all(equal(surfaceUv, mercuryTriangleB)) ? values.y : values.z;
+        // At a topology change the contour can pass exactly through a grid
+        // corner. Give that corner the same rim normal as its clipped neighbors.
+        if (abs(cornerValue) < 0.0000001) boundary = 1.0;
+      }
+    }
   `;
-  const material = (side: 1 | -1) => {
+  const material = (side: 1 | -1, outline = false) => {
     const result = new THREE.MeshPhysicalMaterial({
-      ...finishParameters(root.dataset.finish),
-      side: side === 1 ? THREE.FrontSide : THREE.BackSide,
-      alphaToCoverage: true,
+      ...(outline ? { color: 0x090909, metalness: 0, roughness: 1, clearcoat: 0, specularIntensity: 0 } : finishParameters(root.dataset.finish)),
+      side: (side === 1) !== outline ? THREE.FrontSide : THREE.BackSide,
     });
-    result.customProgramCacheKey = () => `neuraz-fluid-heightfield-v1-${side}`;
+    result.customProgramCacheKey = () => `neuraz-fluid-closed-contour-v3-${side}-${outline}`;
     result.onBeforeCompile = shader => {
-      Object.assign(shader.uniforms, uniforms, { mercurySide: { value: side } });
-      shader.vertexShader = shaderFunctions + '\nvarying vec2 mercuryUv;\n' + shader.vertexShader;
+      Object.assign(shader.uniforms, uniforms, { mercurySide: { value: side }, mercuryOutlineWidth: { value: outline ? 0.013 : 0 } });
+      shader.vertexShader = 'uniform float mercuryOutlineWidth;\n' + shaderFunctions + '\n' + shader.vertexShader;
       shader.vertexShader = shader.vertexShader.replace('#include <beginnormal_vertex>', /* glsl */ `
         #include <beginnormal_vertex>
+        vec2 mercurySurfaceUv;
+        float mercuryBoundary;
+        float mercuryActive;
+        mercuryClipTriangle(position.x, mercurySurfaceUv, mercuryBoundary, mercuryActive);
+        if (mercuryActive > 0.5) {
         vec2 normalStep = mercuryGridStep * 1.75;
-        float slopeX = (mercuryHeight(uv + vec2(normalStep.x, 0.0)) - mercuryHeight(uv - vec2(normalStep.x, 0.0))) / (2.0 * normalStep.x * mercurySize.x);
-        float slopeY = (mercuryHeight(uv + vec2(0.0, normalStep.y)) - mercuryHeight(uv - vec2(0.0, normalStep.y))) / (2.0 * normalStep.y * mercurySize.y);
+        float slopeX = (mercuryHeight(mercurySurfaceUv + vec2(normalStep.x, 0.0)) - mercuryHeight(mercurySurfaceUv - vec2(normalStep.x, 0.0))) / (2.0 * normalStep.x * mercurySize.x);
+        float slopeY = (mercuryHeight(mercurySurfaceUv + vec2(0.0, normalStep.y)) - mercuryHeight(mercurySurfaceUv - vec2(0.0, normalStep.y))) / (2.0 * normalStep.y * mercurySize.y);
         objectNormal = normalize(vec3(-mercurySide * slopeX, -mercurySide * slopeY, 1.0));
+        if (mercuryBoundary > 0.5) {
+          vec2 inward = vec2(
+            mercuryCoverage(mercurySurfaceUv + vec2(normalStep.x, 0.0)) - mercuryCoverage(mercurySurfaceUv - vec2(normalStep.x, 0.0)),
+            mercuryCoverage(mercurySurfaceUv + vec2(0.0, normalStep.y)) - mercuryCoverage(mercurySurfaceUv - vec2(0.0, normalStep.y))
+          ) / (normalStep * mercurySize);
+          if (dot(inward, inward) < 0.00000001) inward = vec2(1.0, 0.0);
+          // The two skins share a horizontal outward normal at their welded rim.
+          objectNormal = normalize(vec3(-mercurySide * inward, 0.0));
+        }
+        }
       `);
       shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', /* glsl */ `
         #include <begin_vertex>
-        transformed.z = mercurySide * mercuryHeight(uv);
-        mercuryUv = uv;
-      `);
-      shader.fragmentShader = shaderFunctions + '\nvarying vec2 mercuryUv;\n' + shader.fragmentShader;
-      shader.fragmentShader = shader.fragmentShader.replace('#include <clipping_planes_fragment>', /* glsl */ `
-        #include <clipping_planes_fragment>
-        float surfaceCoverage = mercuryCoverage(mercuryUv);
-        float fluidCoverage = smoothstep(0.5, 0.5 + max(fwidth(surfaceCoverage), 0.001), surfaceCoverage);
-        if (fluidCoverage <= 0.001) discard;
-        diffuseColor.a *= fluidCoverage;
+        transformed.xy = (mercurySurfaceUv - 0.5) * mercurySize;
+        // Every clipped contour vertex is exactly z=0 on BOTH skins. Fragment
+        // alpha cannot cut inside these triangles and expose an open sidewall.
+        transformed.z = mercuryActive < 0.5 || mercuryBoundary > 0.5 ? 0.0 : mercurySide * mercuryHeight(mercurySurfaceUv);
+        // The black rim is the back face of an expanded, closed shell. It follows
+        // the actual volume and all animated connections, including internal holes.
+        if (mercuryActive > 0.5) transformed += objectNormal * mercurySide * mercuryOutlineWidth;
       `);
     };
     return result;
   };
-  const detail = root.getBoundingClientRect().width >= 400 ? 2 : 1;
-  const geometry = new THREE.PlaneGeometry(boundsWidth, boundsHeight, (width - 1) * detail, (height - 1) * detail);
-  // The CPU plane is flat; its real extent includes the shader-displaced depth.
+  const detail = root.getBoundingClientRect().width >= 700 ? 2 : 1;
+  const occupied = new Uint8Array(width * height);
+  for (let index = 0; index < coverage.length; index++) {
+    if (coverage[index] > 127) occupied[index % occupied.length] = 1;
+  }
+  const trianglesA: number[] = [];
+  const trianglesB: number[] = [];
+  const trianglesC: number[] = [];
+  const addTriangle = (ax: number, ay: number, bx: number, by: number, cx: number, cy: number) => {
+    trianglesA.push(ax / (width - 1), ay / (height - 1));
+    trianglesB.push(bx / (width - 1), by / (height - 1));
+    trianglesC.push(cx / (width - 1), cy / (height - 1));
+  };
+  for (let row = 0; row < height - 1; row++) {
+    for (let col = 0; col < width - 1; col++) {
+      const index = row * width + col;
+      if (!occupied[index] && !occupied[index + 1] && !occupied[index + width] && !occupied[index + width + 1]) continue;
+      for (let y = 0; y < detail; y++) {
+        for (let x = 0; x < detail; x++) {
+          const x0 = col + x / detail;
+          const y0 = row + y / detail;
+          const x1 = col + (x + 1) / detail;
+          const y1 = row + (y + 1) / detail;
+          addTriangle(x0, y0, x1, y0, x1, y1);
+          addTriangle(x0, y0, x1, y1, x0, y1);
+        }
+      }
+    }
+  }
+  // One instance is a grid triangle, with six slots for its clipped polygon.
+  // Instancing stores each source triangle once and changes topology entirely
+  // on the GPU as connections merge and terminals separate.
+  const geometry = new THREE.InstancedBufferGeometry();
+  geometry.setAttribute('position', new THREE.Float32BufferAttribute([0, 0, 0, 1, 0, 0, 2, 0, 0, 3, 0, 0, 4, 0, 0, 5, 0, 0], 3));
+  geometry.setAttribute('normal', new THREE.Float32BufferAttribute([0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1, 0, 0, 1], 3));
+  geometry.setAttribute('mercuryTriangleA', new THREE.InstancedBufferAttribute(new Float32Array(trianglesA), 2));
+  geometry.setAttribute('mercuryTriangleB', new THREE.InstancedBufferAttribute(new Float32Array(trianglesB), 2));
+  geometry.setAttribute('mercuryTriangleC', new THREE.InstancedBufferAttribute(new Float32Array(trianglesC), 2));
+  geometry.instanceCount = trianglesA.length / 2;
+  // The CPU slots are abstract; bounds include all shader-displaced positions.
   geometry.boundingBox = new THREE.Box3(new THREE.Vector3(-boundsWidth / 2, -boundsHeight / 2, -heightScale), new THREE.Vector3(boundsWidth / 2, boundsHeight / 2, heightScale));
   geometry.boundingSphere = geometry.boundingBox.getBoundingSphere(new THREE.Sphere());
   const frontMaterial = material(1);
@@ -218,8 +330,78 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
   front.position.set((bounds.xMin + bounds.xMax) / 2, (bounds.yMin + bounds.yMax) / 2, 0);
   back.position.copy(front.position);
   object.add(front, back);
+  const outlineMaterials: THREE.Material[] = [];
+  if (root.dataset.finish === 'porcelain') {
+    for (const side of [1, -1] as const) {
+      const rimMaterial = material(side, true);
+      const rim = new THREE.Mesh(geometry, rimMaterial);
+      rim.position.copy(front.position);
+      object.add(rim);
+      outlineMaterials.push(rimMaterial);
+    }
+  }
+  type SurfacePoint = { u: number; v: number; height: number; coverage: number };
+  const sampleGrid = (u: number, v: number): SurfacePoint => {
+    const gx = THREE.MathUtils.clamp(u, 0, 1) * (width - 1);
+    const gy = THREE.MathUtils.clamp(v, 0, 1) * (height - 1);
+    const x0 = Math.floor(gx), y0 = Math.floor(gy);
+    const x1 = Math.min(width - 1, x0 + 1), y1 = Math.min(height - 1, y0 + 1);
+    const tx = gx - x0, ty = gy - y0;
+    const ids = [y0 * width + x0, y0 * width + x1, y1 * width + x0, y1 * width + x1];
+    const weights = [(1 - tx) * (1 - ty), tx * (1 - ty), (1 - tx) * ty, tx * ty];
+    const mix = uniforms.mercuryMix.value;
+    let sampledHeight = 0, sampledCoverage = 0;
+    for (const [frameIndex, weight] of [[currentFrame, 1 - mix], [(currentFrame + 1) % frameCount, mix]]) {
+      if (!weight) continue;
+      const heights = frameData(frameIndex);
+      const mask = coverageData(frameIndex);
+      for (let corner = 0; corner < 4; corner++) {
+        const index = ids[corner];
+        const contribution = weights[corner] * weight;
+        sampledHeight += (heights[index * 4] * 256 + heights[index * 4 + 1]) * (heightScale / 65535) * contribution;
+        sampledCoverage += mask[index] / 255 * contribution;
+      }
+    }
+    const rim = THREE.MathUtils.smoothstep(sampledCoverage, 0.5, 0.8);
+    return { u, v, height: sampledHeight * Math.pow(rim, 0.25), coverage: sampledCoverage };
+  };
+  const sampleTop = (u: number, v: number, target: THREE.Vector3) => {
+    if (disposed || !buffer || !Number.isFinite(u) || !Number.isFinite(v) || u < 0 || u > 1 || v < 0 || v > 1) return false;
+    const nx = (width - 1) * detail, ny = (height - 1) * detail;
+    const gx = Math.min(nx - 1, Math.floor(u * nx)), gy = Math.min(ny - 1, Math.floor(v * ny));
+    const fx = u * nx - gx, fy = v * ny - gy;
+    const a = sampleGrid(gx / nx, gy / ny);
+    const c = sampleGrid((gx + 1) / nx, (gy + 1) / ny);
+    const b = fy <= fx ? sampleGrid((gx + 1) / nx, gy / ny) : sampleGrid(gx / nx, (gy + 1) / ny);
+    const triangle = fy <= fx ? [a, b, c] : [a, c, b];
+    const inside = triangle.map(point => point.coverage >= 0.5);
+    const count = inside.filter(Boolean).length;
+    if (!count) return false;
+    let clipped = triangle;
+    if (count < 3) {
+      const isolated = inside.indexOf(count === 1);
+      const start = triangle[isolated], following = triangle[(isolated + 1) % 3], preceding = triangle[(isolated + 2) % 3];
+      const crossing = (end: SurfacePoint): SurfacePoint => {
+        const t = (0.5 - start.coverage) / (end.coverage - start.coverage);
+        return { u: THREE.MathUtils.lerp(start.u, end.u, t), v: THREE.MathUtils.lerp(start.v, end.v, t), height: 0, coverage: 0.5 };
+      };
+      clipped = count === 1 ? [start, crossing(following), crossing(preceding)] : [crossing(following), following, preceding, crossing(preceding)];
+    }
+    for (let index = 1; index + 1 < clipped.length; index++) {
+      const p = clipped[0], q = clipped[index], r = clipped[index + 1];
+      const determinant = (q.u - p.u) * (r.v - p.v) - (q.v - p.v) * (r.u - p.u);
+      if (Math.abs(determinant) < 1e-14) continue;
+      const b1 = ((u - p.u) * (r.v - p.v) - (v - p.v) * (r.u - p.u)) / determinant;
+      const b2 = ((q.u - p.u) * (v - p.v) - (q.v - p.v) * (u - p.u)) / determinant;
+      if (b1 < -1e-6 || b2 < -1e-6 || b1 + b2 > 1 + 1e-6) continue;
+      target.set(bounds.xMin + u * boundsWidth, bounds.yMin + v * boundsHeight, p.height * (1 - b1 - b2) + q.height * b1 + r.height * b2);
+      return true;
+    }
+    return false;
+  };
   return {
     object,
+    sampleTop,
     setTime(seconds) {
       if (disposed || !buffer) return;
       const position = (Math.max(0, seconds) * fps) % frameCount;
@@ -257,6 +439,7 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
       geometry.dispose();
       frontMaterial.dispose();
       backMaterial.dispose();
+      outlineMaterials.forEach(material => material.dispose());
       textureA.dispose();
       textureB.dispose();
       coverageA.dispose();
@@ -326,8 +509,17 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
   const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const interactive = root.dataset.interactive !== 'false';
+  const isometric = root.dataset.view === 'isometric';
   const maxDpr = numberOption(root.dataset.maxDpr, 1.75, 1, 1.75);
   const framing = numberOption(root.dataset.framing, 1.05, 1, 2);
+  const pins = Array.from(root.querySelectorAll<HTMLElement>('[data-mercury-pin]')).map(element => ({
+    element,
+    u: Number(element.dataset.u),
+    v: Number(element.dataset.v),
+    top: numberOption(element.dataset.top, 0.3, 0, 0.5),
+    offset: numberOption(element.dataset.zOffset, 0.025, 0, 0.2),
+  }));
+  pins.forEach(({ element }) => { element.dataset.visible = 'false'; });
   let renderer: THREE.WebGLRenderer | undefined;
   let environment: THREE.WebGLRenderTarget | undefined;
   let fluidSurface: FluidSurface | undefined;
@@ -372,12 +564,19 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     stage.removeAttribute('aria-describedby');
     stage.removeAttribute('aria-keyshortcuts');
     delete root.dataset.dragging;
+    delete root.dataset.keyboardFocus;
     root.dataset.ready = 'false';
     if (controls) controls.hidden = true;
     fluidSurface?.dispose();
     fluidSurface = undefined;
     root.dataset.fluidState = 'idle';
     delete root.dataset.fluidFrame;
+    pins.forEach(({ element }) => {
+      element.dataset.visible = 'false';
+      delete element.dataset.screenX;
+      delete element.dataset.screenY;
+      for (const property of ['left', 'top', '--pin-scale', '--pin-depth-order']) element.style.removeProperty(property);
+    });
     disposeAsset(assets);
     assets = [];
     environment?.dispose();
@@ -403,7 +602,8 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     }
     assets = gltf.scenes;
     const scene = new THREE.Scene();
-    const camera = new THREE.PerspectiveCamera(40, 1, 0.05, 100);
+    const camera = new THREE.PerspectiveCamera(isometric ? 48 : 40, 1, 0.05, 100);
+    if (isometric) camera.up.set(0, 0, 1);
     const pivot = new THREE.Group();
     const centered = new THREE.Group();
     centered.add(gltf.scene);
@@ -431,15 +631,30 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
         if (material instanceof THREE.MeshPhysicalMaterial) {
           material.clearcoat = finish.clearcoat;
           material.clearcoatRoughness = finish.clearcoatRoughness;
+          material.specularIntensity = finish.specularIntensity;
         }
       });
     });
+    if (root.dataset.finish === 'porcelain') {
+      const sources: THREE.Mesh[] = [];
+      gltf.scene.traverse(object => { if ((object as THREE.Mesh).isMesh) sources.push(object as THREE.Mesh); });
+      for (const mesh of sources) {
+        const rim = new THREE.MeshBasicMaterial({ color: 0x090909, side: THREE.BackSide });
+        rim.customProgramCacheKey = () => 'neuraz-porcelain-static-rim-v1';
+        rim.onBeforeCompile = shader => {
+          shader.vertexShader = shader.vertexShader.replace('#include <begin_vertex>', '#include <begin_vertex>\ntransformed += normal * 0.013;');
+        };
+        mesh.add(new THREE.Mesh(mesh.geometry, rim));
+      }
+    }
 
     renderer = new THREE.WebGLRenderer({ canvas, alpha: true, antialias: true, powerPreference: 'low-power' });
     renderer.setClearColor(0x000000, 0);
     renderer.outputColorSpace = THREE.SRGBColorSpace;
     renderer.toneMapping = THREE.AgXToneMapping;
-    renderer.toneMappingExposure = numberOption(root.dataset.exposure, 1.1, 0.2, 3);
+    const matte = root.dataset.finish !== 'mercury';
+    const porcelain = root.dataset.finish === 'porcelain';
+    renderer.toneMappingExposure = numberOption(root.dataset.exposure, matte ? 1 : 1.1, 0.2, 3);
     renderer.shadowMap.enabled = false;
     const room = new RoomEnvironment();
     const pmrem = new THREE.PMREMGenerator(renderer);
@@ -450,15 +665,42 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       pmrem.dispose();
     }
     scene.environment = environment.texture;
-    scene.environmentIntensity = numberOption(root.dataset.environmentIntensity, 1.3, 0, 5);
+    scene.environmentIntensity = numberOption(root.dataset.environmentIntensity, porcelain ? 0.8 : matte ? 0.5 : 1.3, 0, 5);
     scene.environmentRotation.set(0, 0.35, 0);
-    const key = new THREE.DirectionalLight(0xfff5e9, 2.5);
+    const key = new THREE.DirectionalLight(matte ? 0xffffff : 0xfff5e9, matte ? 2 : 2.5);
     key.position.set(-3, 4, 6);
-    const rim = new THREE.DirectionalLight(0xdfe9ff, 1.8);
+    const rim = new THREE.DirectionalLight(matte ? 0xffffff : 0xdfe9ff, matte ? 1 : 1.8);
     rim.position.set(4, 1, 2);
     const fill = new THREE.DirectionalLight(0xffffff, 0.65);
     fill.position.set(-1, -4, 3);
     scene.add(key, rim, fill);
+    const pinPosition = new THREE.Vector3();
+    const pinScreen = new THREE.Vector3();
+    const pinCamera = new THREE.Vector3();
+    const projectPins = () => {
+      if (!pins.length) return;
+      for (const pin of pins) {
+        let onSurface = Number.isFinite(pin.u) && Number.isFinite(pin.v) && pin.u >= 0 && pin.u <= 1 && pin.v >= 0 && pin.v <= 1;
+        if (onSurface && fluidSurface) onSurface = fluidSurface.sampleTop(pin.u, pin.v, pinPosition);
+        else pinPosition.set((pin.u - 0.5) * 5.1, (pin.v - 0.5) * 5.1, pin.top);
+        if (!onSurface) { pin.element.dataset.visible = 'false'; continue; }
+        pinPosition.z += pin.offset;
+        pinPosition.sub(nativeCenter).multiplyScalar(scale).applyMatrix4(pivot.matrixWorld);
+        pinCamera.copy(pinPosition).applyMatrix4(camera.matrixWorldInverse);
+        pinScreen.copy(pinPosition).project(camera);
+        const x = (pinScreen.x * 0.5 + 0.5) * width;
+        const y = (-pinScreen.y * 0.5 + 0.5) * height;
+        const shown = pinCamera.z < 0 && pinScreen.z >= -1 && pinScreen.z <= 1 && x >= 0 && x <= width && y >= 0 && y <= height;
+        pin.element.dataset.visible = String(shown);
+        pin.element.dataset.screenX = x.toFixed(2);
+        pin.element.dataset.screenY = y.toFixed(2);
+        pin.element.style.left = `${x.toFixed(2)}px`;
+        pin.element.style.top = `${y.toFixed(2)}px`;
+        pin.element.style.setProperty('--pin-scale', THREE.MathUtils.clamp(camera.position.length() / -pinCamera.z, 0.85, 1.15).toFixed(3));
+        pin.element.style.setProperty('--pin-depth-order', String(THREE.MathUtils.clamp(1000 + Math.round(pinCamera.z * 20), 1, 999)));
+      }
+      root.dispatchEvent(new CustomEvent('mercury:project', { detail: { width, height } }));
+    };
 
     const canRender = () => !disposed && !contextLost && !document.hidden && visible && width > 0 && height > 0;
     const autoMotion = () => playing && !reducedMotion;
@@ -490,6 +732,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       pivot.position.y = Math.sin(phase * 0.58) * 0.035;
       fluidSurface?.setTime(elapsed - fluidEpoch);
       renderer.render(scene, camera);
+      projectPins();
       if (root.dataset.ready !== 'true') {
         root.dataset.ready = 'true';
         root.dataset.state = 'ready';
@@ -523,7 +766,9 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       camera.aspect = width / height;
       // Reserve a little space for the outer lobes throughout the drag range.
       const distance = (Math.max(2, 2 / camera.aspect) / Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * framing + size.z * scale * 0.5) * 1.03;
-      camera.position.set(0.35, 0.25, 1).normalize().multiplyScalar(distance);
+      // Rx(-PI/2) lays the native XY logo on XZ. Instead of rotating its data,
+      // rotate the maze's original camera/up back into native coordinates.
+      camera.position.set(...(isometric ? [10, -13, 13] as const : [0.35, 0.25, 1] as const)).normalize().multiplyScalar(distance);
       camera.far = distance + 30;
       camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
@@ -556,16 +801,19 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     };
     const onPointerDown = (event: PointerEvent) => {
       if (!interactive || event.button !== 0 || dragging !== undefined || root.dataset.ready !== 'true') return;
+      if (event.target instanceof Element && event.target.closest('button, a, input, select, textarea, [data-hero-logo-bubble]')) return;
       dragging = event.pointerId;
       pointerX = event.clientX;
       pointerY = event.clientY;
       hover.x = hover.y = 0;
+      delete root.dataset.keyboardFocus;
       stage.setPointerCapture(event.pointerId);
       stage.focus({ preventScroll: true });
       root.dataset.dragging = 'true';
     };
     const onPointerMove = (event: PointerEvent) => {
       if (!interactive) return;
+      if (dragging === undefined && event.target instanceof Element && event.target.closest('button, a, input, select, textarea, [data-hero-logo-bubble]')) return;
       if (dragging === event.pointerId) {
         manual.y = THREE.MathUtils.clamp(manual.y + (event.clientX - pointerX) * 0.0045, -0.85, 0.85);
         manual.x = THREE.MathUtils.clamp(manual.x + (event.clientY - pointerY) * 0.0045, -0.6, 0.6);
@@ -591,6 +839,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     };
     const onKeyDown = (event: KeyboardEvent) => {
       if (!interactive || event.target !== stage) return;
+      root.dataset.keyboardFocus = 'true';
       const keys = ['ArrowLeft', 'ArrowRight', 'ArrowUp', 'ArrowDown', ' ', 'r', 'R'];
       if (!keys.includes(event.key)) return;
       event.preventDefault();
@@ -631,6 +880,10 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       stage.addEventListener('lostpointercapture', onPointerEnd, eventOptions);
       stage.addEventListener('pointerleave', onPointerLeave, eventOptions);
       stage.addEventListener('keydown', onKeyDown, eventOptions);
+      stage.addEventListener('focus', () => {
+        if (dragging === undefined) root.dataset.keyboardFocus = 'true';
+      }, eventOptions);
+      stage.addEventListener('blur', () => { delete root.dataset.keyboardFocus; }, eventOptions);
     }
     if ('ResizeObserver' in window) {
       resizeObserver = new ResizeObserver(measure);

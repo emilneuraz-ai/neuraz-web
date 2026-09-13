@@ -1,5 +1,5 @@
 ---
-import HeroMaze from './HeroMaze.astro';
+import HeroLogo from './HeroLogo.astro';
 import SectionAtmosphere from './SectionAtmosphere.astro';
 ---
 
@@ -28,7 +28,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
         </a>
       </div>
       <div class="hero-visual">
-        <HeroMaze />
+        <HeroLogo />
       </div>
     </div>
     <div class="hero-footnote">
@@ -131,11 +131,11 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
   .hero-link:hover svg { transform: translateY(2px); }
   .hero a:focus-visible { outline: 2px solid #e63946; outline-offset: 6px; }
   .hero-visual {
-    grid-column: 5 / -1;
+    grid-column: 6 / -1;
     grid-row: 1;
     min-width: 0;
-    width: 97.2%;
-    margin-left: 1.4%;
+    width: 100%;
+    margin-left: 0;
   }
   .hero-footnote {
     display: flex;
