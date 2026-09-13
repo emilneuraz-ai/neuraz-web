@@ -17,11 +17,8 @@ for(let z=0;z<size;z++)for(let y=0;y<size;y++)for(let x=0;x<size;x++){
  let d=mask(p[0],p[1]);const shell=Math.abs(r-1.02)-.10,rim=.88-Math.hypot(p[0],p[1]);
  const u=Math.max(0,Math.min(1,.5+.5*(rim-shell)/.06));
  const joined=rim*(1-u)+shell*u-.06*u*(1-u);
- const w=Math.abs(p[1])/Math.max(Math.abs(p[0])+Math.abs(p[1]),.001);
- const side=mask(p[2],p[1])*(1-w)+mask(p[0],p[2])*w;
- const weight=1-smooth(.15,.40,Math.abs(p[2]));
- const cut=side-.005-(1-weight)*.3,c=Math.max(0,Math.min(1,.5+.5*(cut-d)/.045));
- d=d*(1-c)+cut*c+.045*c*(1-c);
+ const waist=1-smooth(0,.65,Math.abs(p[2]));
+ d+=.018*waist;
  const envelope=Math.max(r-1.12,joined);
  const h=Math.max(0,Math.min(1,.5+.5*(envelope-d)/.10));
  mc.field[x+y*size+z*size*size]=-(d*(1-h)+envelope*h+.10*h*(1-h));

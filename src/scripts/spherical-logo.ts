@@ -7,7 +7,6 @@ uniform vec2 resolution;
 uniform mat3 rotation;
 uniform float time;
 uniform float fluid;
-uniform float sideFluid;
 float maskAt(vec2 p, float tile) {
   vec2 uv=vec2(p.x/2.2+.5,.5-p.y/2.2);
   if(any(lessThan(uv,vec2(0.)))||any(greaterThan(uv,vec2(1.)))) return .2+max(abs(p.x)-1.1,abs(p.y)-1.1);
@@ -21,7 +20,7 @@ float surfaceMask(vec2 uv,float offset){
   // Damped spring: stretch past the next connection, then settle exactly on it.
   float spring=(1.-exp(-7.*progress)*cos(10.*progress))/(1.-exp(-7.)*cos(10.));
   float t=mix(progress,clamp(spring,0.,1.16),.35);
-  return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),(offset>0.?sideFluid:fluid)*(1.-smoothstep(.72,1.04,length(uv))));
+  return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid*(1.-smoothstep(.72,1.04,length(uv))));
 }
 float neuralShape(vec3 p){
   // Opposing faces share one footprint: corresponding branches join through
@@ -32,13 +31,9 @@ float neuralShape(vec3 p){
   float rim=.88-length(p.xy);
   float unionWeight=clamp(.5+.5*(rim-shell)/.06,0.,1.);
   float joined=mix(rim,shell,unionWeight)-.06*unionWeight*(1.-unionWeight);
-  float sideWeight=1.-smoothstep(.15,.40,abs(p.z));
-  float sidePattern=mix(surfaceMask(p.zy,2.5),surfaceMask(p.xz,5.),abs(p.y)/max(abs(p.x)+abs(p.y),.001));
-  // Through-cuts make independent round-ended branches, rather than grooves.
-  // They intersect the existing footprint and stop before the front/back faces.
-  float sideCut=sidePattern-.005-(1.-sideWeight)*.3;
-  float cutBlend=clamp(.5+.5*(sideCut-channels)/.045,0.,1.);
-  channels=mix(channels,sideCut,cutBlend)+.045*cutBlend*(1.-cutBlend);
+  // Narrow the existing bridges smoothly at their midpoint, without side holes.
+  float waist=1.-smoothstep(0.,.65,abs(p.z));
+  channels+=.018*waist;
   float envelope=max(radius-1.12,joined);
   float h=clamp(.5+.5*(envelope-channels)/.10,0.,1.);
   return mix(channels,envelope,h)+.10*h*(1.-h);
@@ -84,7 +79,7 @@ async function init(root: HTMLElement) {
     texture=await new THREE.TextureLoader().loadAsync('/models/neuraz-sphere-field.png');if(disposed){texture.dispose();return;}
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
     const rotation=new THREE.Matrix3(),matrix=new THREE.Matrix4(),euler=new THREE.Euler();
-    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},time:{value:0},fluid:{value:.8},sideFluid:{value:0}}});
+    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},time:{value:0},fluid:{value:.8}}});
     const scene=new THREE.Scene();mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);scene.add(mesh);const camera=new THREE.Camera();
     renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.getDrawingBufferSize(material.uniforms.resolution.value);
     let x=0,y=0,tx=0,ty=0,dragging=false,lastX=0,lastY=0,lastTime=performance.now(),playing=false;
@@ -113,7 +108,6 @@ async function init(root: HTMLElement) {
       const facing=Math.abs(matrix.elements[10]);
       const recovery=THREE.MathUtils.smoothstep(facing,.7,.99);
       material!.uniforms.fluid.value=reduced.matches?0:(.7*(1-recovery)+.5*recovery)*Math.sin(material!.uniforms.time.value*Math.PI/3.5)**2;
-      material!.uniforms.sideFluid.value=reduced.matches?0:.9*(.5-.5*Math.cos(material!.uniforms.time.value*Math.PI/1.8));
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;

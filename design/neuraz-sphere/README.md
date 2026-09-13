@@ -14,4 +14,4 @@ El componente web incluye la animación procedural. Los archivos GLB, Blender y 
 
 Regenerar con `node scripts/build-sphere-distance.mjs`, `node scripts/build-sphere-mesh.mjs` y Blender `--background --python scripts/build-neuraz-sphere.py`. El segundo paso produce `/tmp/neuraz-sphere-mesh.bin`, con 160 muestras por eje.
 
-Los laterales se calan exclusivamente por sustracción sobre la estructura existente. El campo lateral se intersecta mediante máximo suave con el campo original: nunca añade material ni modifica el contorno hacia fuera. Los recortes pasantes, basados en el mismo patrón neural, se atenúan entre |z|=0.15 y 0.40 para proteger ambas caras. Tienen animación independiente para cerrar y abrir uniones dentro del volumen permitido. El núcleo permanece hueco y las superficies internas son blancas.
+Los nodos correspondientes del frente y del dorso vuelven a unirse sin calados laterales. Las uniones existentes se estrechan suavemente en su punto medio mediante una erosión de 0.018, atenuada hasta cero en |z|=0.65. Se conservan las caras, el centro hueco, el interior blanco y los biseles redondeados.
