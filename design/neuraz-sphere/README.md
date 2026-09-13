@@ -6,7 +6,7 @@ Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La sil
 
 El núcleo blanco de radio 1.115 oculta las conexiones posteriores para evitar duplicaciones en el contorno.
 
-Los bordes usan un perfil circular de radio 0.115 alrededor de la superficie de radio 1.12. La proyección frontal en reposo conserva el contorno del SVG dentro de la resolución del campo (512 píxeles); durante las conexiones, la figura se deforma y vuelve al contorno de reposo cada 3.5 segundos. Las conexiones siguen animadas aunque la orientación esté quieta. Con movimiento reducido se conserva la geometría de reposo.
+Los bordes usan un perfil circular de radio 0.115 alrededor de la superficie de radio 1.12. La proyección frontal en reposo conserva el contorno del SVG dentro de la resolución del campo (512 píxeles); durante las conexiones, la figura se deforma y vuelve al contorno de reposo cada 1.75 segundos. Las conexiones siguen animadas aunque la orientación esté quieta. Con movimiento reducido se conserva la geometría de reposo.
 
 ## Controles
 
@@ -29,3 +29,5 @@ El componente web contiene la animación procedural. El GLB y el archivo Blender
 La malla estática usa una cuadrícula de 160 muestras por eje; el visor calcula la superficie directamente y no depende del GLB.
 
 El giro automático utiliza 1.08 rad/s horizontal y 0.84 rad/s vertical (tres veces la velocidad anterior). La deformación fluida se concentra en el interior y se atenúa hacia el contorno para mantener estable la silueta.
+
+El contorno se recompone gradualmente entre radios proyectados 0.62 y 0.88 usando el campo del SVG original. Esto mantiene abiertos los espacios exteriores en todos los ángulos, mientras los nodos interiores siguen girando. La velocidad del campo fluido es 3.3 muestras/s (el doble de la versión anterior).

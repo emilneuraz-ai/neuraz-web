@@ -5,6 +5,7 @@ precision highp float;
 uniform sampler2D field;
 uniform vec2 resolution;
 uniform mat3 rotation;
+uniform mat3 viewFrame;
 uniform float sideBlend;
 uniform float time;
 uniform float fluid;
@@ -16,7 +17,7 @@ float maskAt(vec2 p, float tile) {
   return (texture2D(field,uv).r-.5)*.4;
 }
 float surfaceMask(vec2 uv,float offset){
-  float phase=mod(time*1.65+offset,8.);
+  float phase=mod(time*3.3+offset,8.);
   float a=floor(phase),t=smoothstep(0.,1.,fract(phase));
   return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid*(1.-smoothstep(.72,1.04,length(uv))));
 }
@@ -27,6 +28,11 @@ float neuralShape(vec3 p){
     +surfaceMask(n.zy*1.1,2.7)*weights.x
     +surfaceMask(n.xz*1.1,5.3)*weights.y;
   float channels=mix(surfaceMask(p.xy,0.),surface,sideBlend);
+  // Re-form the outer nodes before the grazing surface can close into a ring.
+  // Blend distance fields, not opacity: the ends retain their circular bevel.
+  vec2 projected=(viewFrame*p).xy;
+  float contourWeight=smoothstep(.62,.88,length(projected));
+  channels=mix(channels,maskAt(projected,0.),contourWeight);
   return length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
 }
 float shape(vec3 p){ return min(neuralShape(p),length(p)-1.115); }
@@ -70,7 +76,8 @@ async function init(root: HTMLElement) {
     texture=await new THREE.TextureLoader().loadAsync('/models/neuraz-sphere-field.png');if(disposed){texture.dispose();return;}
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
     const rotation=new THREE.Matrix3(),matrix=new THREE.Matrix4(),euler=new THREE.Euler();
-    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},sideBlend:{value:0},time:{value:0},fluid:{value:.8}}});
+    const viewFrame=new THREE.Matrix3();
+    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},viewFrame:{value:viewFrame},sideBlend:{value:0},time:{value:0},fluid:{value:.8}}});
     const scene=new THREE.Scene();mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);scene.add(mesh);const camera=new THREE.Camera();
     renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.getDrawingBufferSize(material.uniforms.resolution.value);
     let x=0,y=0,tx=0,ty=0,dragging=false,lastX=0,lastY=0,lastTime=performance.now(),playing=false;
@@ -80,7 +87,7 @@ async function init(root: HTMLElement) {
     const setPlaying=(value:boolean)=>{playing=value;play.textContent=value?'Pausar giro ⏸':'Reproducir giro ▶';play.setAttribute('aria-pressed',String(value));root.dataset.rotating=String(value);};
     const reset=()=>{setPlaying(false);tx=ty=0;};
     const opts={signal};
-    stage.addEventListener('pointerdown',event=>{if(event.button!==0)return;dragging=true;stage.dataset.dragging='true';event.preventDefault();setPlaying(false);lastX=event.clientX;lastY=event.clientY;stage.setPointerCapture(event.pointerId);},opts);
+    stage.addEventListener('pointerdown',event=>{if(event.button!==0)return;dragging=true;stage.dataset.dragging='true';event.preventDefault();stage.focus({preventScroll:true});setPlaying(false);lastX=event.clientX;lastY=event.clientY;stage.setPointerCapture(event.pointerId);},opts);
     stage.addEventListener('pointermove',event=>{if(!dragging)return;event.preventDefault();ty+=(event.clientX-lastX)*.008;tx+=(event.clientY-lastY)*.008;lastX=event.clientX;lastY=event.clientY;},opts);
     const end=()=>{dragging=false;stage.dataset.dragging='false';};stage.addEventListener('pointerup',end,opts);stage.addEventListener('pointercancel',end,opts);stage.addEventListener('lostpointercapture',end,opts);
     stage.addEventListener('keydown',event=>{if(event.key.toLowerCase()==='r'){reset();return;}if(!event.key.startsWith('Arrow'))return;event.preventDefault();setPlaying(false);tx+=event.key==='ArrowDown'?.2:event.key==='ArrowUp'?-.2:0;ty+=event.key==='ArrowRight'?.25:event.key==='ArrowLeft'?-.25:0;},opts);
@@ -95,10 +102,10 @@ async function init(root: HTMLElement) {
       if(!visible||document.hidden)return;
       if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.84;if(axis.value!=='vertical')ty+=dt*1.08;}
       const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
-      euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
+      euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);viewFrame.copy(rotation).transpose();
       const facing=Math.abs(matrix.elements[10]);
       material!.uniforms.sideBlend.value=1-THREE.MathUtils.smoothstep(facing,.55,.98);
-      material!.uniforms.fluid.value=reduced.matches?0:.65*Math.sin(material!.uniforms.time.value*Math.PI/3.5)**2;
+      material!.uniforms.fluid.value=reduced.matches?0:.65*Math.sin(material!.uniforms.time.value*Math.PI/1.75)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;
