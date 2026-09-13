@@ -16,20 +16,23 @@ float maskAt(vec2 p, float tile) {
 }
 float surfaceMask(vec2 uv,float offset){
   float phase=mod(time*3.3+offset,8.);
-  float a=floor(phase),t=smoothstep(0.,1.,fract(phase));
+  float a=floor(phase),progress=smoothstep(0.,1.,fract(phase));
+  // Damped spring: stretch past the next connection, then settle exactly on it.
+  float spring=(1.-exp(-7.*progress)*cos(10.*progress))/(1.-exp(-7.)*cos(10.));
+  float t=clamp(spring,0.,1.16);
   return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid*(1.-smoothstep(.72,1.04,length(uv))));
 }
 float neuralShape(vec3 p){
-  vec3 n=normalize(p);
-  vec3 weights=pow(abs(n),vec3(6.));weights/=max(dot(weights,vec3(1.)),.001);
-  float surface=surfaceMask(n.xy*1.1,0.)*weights.z
-    +surfaceMask(n.zy*1.1,2.7)*weights.x
-    +surfaceMask(n.xz*1.1,5.3)*weights.y;
-  // Entire field belongs to the object. Camera orientation never changes it.
-  float channels=surface+.012;
-  return length(vec2(max(channels+.09,0.),length(p)-1.12))-.09;
+  // Two independent domed SVG faces. The rear is mirrored in object space
+  // so it reads as the original logo when viewed from behind.
+  vec2 uv=vec2(p.z<0.?-p.x:p.x,p.y);
+  float channels=surfaceMask(uv,0.);
+  float face=length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
+  float gap=.28-abs(p.z);
+  float h=clamp(.5+.5*(gap-face)/.04,0.,1.);
+  return mix(face,gap,h)+.04*h*(1.-h);
 }
-float shape(vec3 p){ return min(neuralShape(p),length(p)-1.115); }
+float shape(vec3 p){ return min(neuralShape(p),length(p)-1.10); }
 void main(){
   vec2 xy=(gl_FragCoord.xy/resolution-.5)*2.65;
   vec3 ro=rotation*vec3(xy,3.);
@@ -49,7 +52,7 @@ void main(){
   vec3 light=normalize(rotation*vec3(-.5,.8,1.5));
   float diffuse=max(dot(n,light),0.);
   float spec=pow(max(dot(reflect(-light,n),-rd),0.),24.);
-  bool interior=length(p)<1.117 && neuralShape(p)>.001;
+  bool interior=length(p)<1.102 && neuralShape(p)>.001;
   float shade=interior ? .980392 : .025+.13*diffuse+.16*spec;
   gl_FragColor=vec4(vec3(shade),1.);
 }`;
@@ -78,7 +81,7 @@ async function init(root: HTMLElement) {
     const play=root.querySelector<HTMLButtonElement>('[data-sphere-play]')!;
     const axis=root.querySelector<HTMLSelectElement>('[data-sphere-axis]')!;
     const setPlaying=(value:boolean)=>{playing=value;play.textContent=value?'Pausar giro ⏸':'Reproducir giro ▶';play.setAttribute('aria-pressed',String(value));root.dataset.rotating=String(value);};
-    const reset=()=>{setPlaying(false);tx=ty=0;};
+    const reset=()=>{setPlaying(false);tx=ty=0;material!.uniforms.time.value=0;};
     const opts={signal};
     stage.addEventListener('pointerdown',event=>{if(event.button!==0)return;dragging=true;stage.dataset.dragging='true';event.preventDefault();stage.focus({preventScroll:true});setPlaying(false);lastX=event.clientX;lastY=event.clientY;stage.setPointerCapture(event.pointerId);},opts);
     stage.addEventListener('pointermove',event=>{if(!dragging)return;event.preventDefault();ty+=(event.clientX-lastX)*.008;tx+=(event.clientY-lastY)*.008;lastX=event.clientX;lastY=event.clientY;},opts);
@@ -96,7 +99,9 @@ async function init(root: HTMLElement) {
       if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.84;if(axis.value!=='vertical')ty+=dt*1.08;}
       const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
       euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
-      material!.uniforms.fluid.value=reduced.matches?0:.65*Math.sin(material!.uniforms.time.value*Math.PI/1.75)**2;
+      const facing=Math.abs(matrix.elements[10]);
+      const recovery=THREE.MathUtils.smoothstep(facing,.7,.99);
+      material!.uniforms.fluid.value=reduced.matches?0:(.7*(1-recovery)+.5*recovery)*Math.sin(material!.uniforms.time.value*Math.PI/1.75)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;

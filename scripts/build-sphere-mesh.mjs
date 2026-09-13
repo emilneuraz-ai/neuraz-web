@@ -13,9 +13,10 @@ function mask(x,y){
 const size=160,extent=1.28,mc=new MarchingCubes(size,new MeshBasicMaterial(),false,false,500000);mc.isolation=0;
 for(let z=0;z<size;z++)for(let y=0;y<size;y++)for(let x=0;x<size;x++){
  const p=[x,y,z].map(v=>(v-size/2)/(size/2)*extent),r=Math.hypot(...p),n=p.map(v=>v/Math.max(r,.001));
- const w=n.map(v=>Math.abs(v)**6),sum=w.reduce((a,b)=>a+b,0)||1;
- const d=(mask(n[0]*1.1,n[1]*1.1)*w[2]+mask(n[2]*1.1,n[1]*1.1)*w[0]+mask(n[0]*1.1,n[2]*1.1)*w[1])/sum+.012;
- mc.field[x+y*size+z*size*size]=-(Math.hypot(Math.max(d+.09,0),r-1.12)-.09);
+ const d=mask(p[2]<0?-p[0]:p[0],p[1]);
+ const face=Math.hypot(Math.max(d+.115,0),r-1.12)-.115,gap=.28-Math.abs(p[2]);
+ const h=Math.max(0,Math.min(1,.5+.5*(gap-face)/.04));
+ mc.field[x+y*size+z*size*size]=-(face*(1-h)+gap*h+.04*h*(1-h));
 }
 mc.update();const vertices=mc.positionArray.slice(0,mc.count*3);for(let i=0;i<vertices.length;i++)vertices[i]*=extent;
 writeFileSync('/tmp/neuraz-sphere-mesh.bin',Buffer.from(vertices.buffer));

@@ -1,30 +1,26 @@
-# Neuraz · Cerebro esférico · V2
+# Neuraz · Dos caras 3D · V2
 
-Recurso independiente del logo principal. Red negra con perfil circular de radio 0.09 sobre una superficie esférica de radio 1.12, con núcleo blanco sin iluminación de radio 1.115.
+Dos caras abombadas independientes construidas a partir del campo del SVG original. El dorso refleja la coordenada horizontal para que el logo se lea correctamente al verlo desde atrás durante el giro horizontal. No hay mapas laterales, puentes entre las dos caras ni un contorno fijo superpuesto a una esfera distinta.
 
-La geometría se define exclusivamente en coordenadas del objeto. Tres mapas del patrón neural se mezclan según la normal de la esfera para cubrir frente, dorso, laterales y polos. La cámara no modifica el campo ni fija partes del contorno: toda la red gira como un solo volumen. Se eliminaron las compensaciones de orientación y las máscaras circulares que producían un efecto de lupa.
+Cada cara usa un perfil circular de radio 0.115 sobre radio 1.12. La franja |z| < 0.28 queda libre de geometría negra, con transición redondeada. Un núcleo blanco sin iluminación, de radio 1.10, oculta el dorso al mirar de frente.
 
-La silueta cambia naturalmente al girar. Esta versión es una interpretación volumétrica de la marca: no conserva una copia exacta del SVG en todas las orientaciones. No tiene un aro independiente; las partes visibles en el contorno pertenecen a la misma red.
+En reposo, el contorno frontal coincide con el campo del SVG original (resolución 512 píxeles). Durante el giro se reduce la deformación al acercarse al frente o al dorso para recuperar la figura. La animación retorna a la forma de reposo cada 1.75 segundos, incluso estando quieta. Vista del logo vuelve al frente y reinicia la animación desde la forma original.
 
-Las conexiones interpolan ocho campos de la animación original a 3.3 muestras por segundo; la mezcla vuelve al reposo cada 1.75 segundos. El giro automático mantiene 1.08 rad/s horizontal y 0.84 rad/s vertical.
+Las conexiones usan interpolación con resorte amortiguado entre campos de distancia: sobrepasan el destino hasta un 16% y regresan suavemente. La velocidad se mantiene en 3.3 muestras por segundo. El movimiento ocurre dentro de cada cara; las dos caras nunca se fusionan.
 
-## Uso
+## Controles
 
-- Reproducir / pausar giro controla solo la orientación.
-- Horizontal 360° es el eje predeterminado; también están disponibles vertical y ambos.
-- Arrastrar con mouse o dedo controla ambos ejes y pausa el giro automático.
+- Play / pausa controla el giro; las conexiones continúan animadas.
+- Horizontal 360° predeterminado, vertical o ambos.
+- Arrastrar con mouse o dedo gira y pausa el giro automático.
 - Flechas giran; R o Vista del logo vuelve al frente.
-- Pantalla completa sirve para presentaciones; Escape sale.
-- Con movimiento reducido no se deforman las conexiones. El giro requiere activación explícita.
+- Pantalla completa; Escape sale.
+- Movimiento reducido conserva el modelo en reposo; el giro requiere activación explícita.
 
-El componente pausa el cálculo fuera de pantalla y libera los recursos al navegar. Requiere Three.js (versión usada: 0.183.2) y Astro; copiar `src` y `public` conservando rutas y utilizar `<SphericalLogo />`.
+Three.js 0.183.2 y Astro. Copiar `src` y `public` conservando rutas y usar `<SphericalLogo />`. Se liberan los recursos al navegar y se pausa el cálculo fuera de pantalla.
 
-## Descargas y regeneración
+## Archivos
 
-El componente web incluye la animación procedural. GLB, Blender y PNG son capturas estáticas de reposo de la misma red; el GLB no incorpora la animación.
+El componente web contiene la animación. GLB, Blender y PNG muestran la geometría estática en reposo; el GLB no incorpora la animación procedural.
 
-1. `node scripts/build-sphere-distance.mjs`
-2. `node scripts/build-sphere-mesh.mjs` genera `/tmp/neuraz-sphere-mesh.bin`.
-3. Blender en segundo plano con `--python scripts/build-neuraz-sphere.py`.
-
-La malla estática usa 160 muestras por eje. El visor calcula la superficie directamente y no depende del GLB.
+Regenerar con `node scripts/build-sphere-distance.mjs`, después `node scripts/build-sphere-mesh.mjs` y finalmente Blender `--background --python scripts/build-neuraz-sphere.py`. El segundo paso escribe `/tmp/neuraz-sphere-mesh.bin` (cuadrícula de 160 muestras por eje).
