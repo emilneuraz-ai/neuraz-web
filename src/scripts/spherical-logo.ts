@@ -17,18 +17,15 @@ float maskAt(vec2 p, float tile) {
   return (texture2D(field,uv).r-.5)*.4;
 }
 float surfaceMask(vec2 uv,float offset){
-  float phase=mod(time*.7+offset,8.);
+  float phase=mod(time*1.65+offset,8.);
   float a=floor(phase),t=smoothstep(0.,1.,fract(phase));
-  return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid);
+  return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid*(1.-smoothstep(.72,1.04,length(uv))));
 }
 float neuralShape(vec3 p){
   // The liquid flows around the globe to face the viewer as its frame turns.
   // A bounded residual tilt keeps depth, without foreshortening the negative space.
   vec3 q=patternFrame*p;
   vec2 uv=q.xy;
-  float drift=.022*sin(orbit.x*.5)*sin(orbit.x*.5)+.022*sin(orbit.y*.5)*sin(orbit.y*.5);
-  uv.x+=drift*sin(uv.y*4.+orbit.y);
-  uv.y+=drift*sin(uv.x*4.-orbit.x);
   float channels=surfaceMask(uv,0.);
   return length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
 }
@@ -97,14 +94,14 @@ async function init(root: HTMLElement) {
     const draw=(now:number)=>{
       if(disposed)return;frame=requestAnimationFrame(draw);const dt=Math.min((now-lastTime)/1000,.08);lastTime=now;
       if(!visible||document.hidden)return;
-      if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.28;if(axis.value!=='vertical')ty+=dt*.36;}
+      if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.84;if(axis.value!=='vertical')ty+=dt*1.08;}
       const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
       euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
       inverse.copy(matrix).invert();
-      residual.makeRotationFromEuler(new THREE.Euler(.10*Math.sin(x),.10*Math.sin(y),.035*Math.sin(x+y)));
+      residual.makeRotationFromEuler(new THREE.Euler(.025*Math.sin(x),.025*Math.sin(y),0));
       patternFrame.setFromMatrix4(residual.multiply(inverse));
       material!.uniforms.orbit.value.set(x,y);
-      material!.uniforms.fluid.value=reduced.matches?0:.8*Math.sin(material!.uniforms.time.value*Math.PI/8)**2;
+      material!.uniforms.fluid.value=reduced.matches?0:.65*Math.sin(material!.uniforms.time.value*Math.PI/3.5)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;
