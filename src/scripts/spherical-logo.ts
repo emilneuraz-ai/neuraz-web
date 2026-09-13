@@ -5,8 +5,6 @@ precision highp float;
 uniform sampler2D field;
 uniform vec2 resolution;
 uniform mat3 rotation;
-uniform mat3 viewFrame;
-uniform float sideBlend;
 uniform float time;
 uniform float fluid;
 float maskAt(vec2 p, float tile) {
@@ -27,13 +25,9 @@ float neuralShape(vec3 p){
   float surface=surfaceMask(n.xy*1.1,0.)*weights.z
     +surfaceMask(n.zy*1.1,2.7)*weights.x
     +surfaceMask(n.xz*1.1,5.3)*weights.y;
-  float channels=mix(surfaceMask(p.xy,0.),surface,sideBlend);
-  // Re-form the outer nodes before the grazing surface can close into a ring.
-  // Blend distance fields, not opacity: the ends retain their circular bevel.
-  vec2 projected=(viewFrame*p).xy;
-  float contourWeight=smoothstep(.62,.88,length(projected));
-  channels=mix(channels,maskAt(projected,0.),contourWeight);
-  return length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
+  // Entire field belongs to the object. Camera orientation never changes it.
+  float channels=surface+.012;
+  return length(vec2(max(channels+.09,0.),length(p)-1.12))-.09;
 }
 float shape(vec3 p){ return min(neuralShape(p),length(p)-1.115); }
 void main(){
@@ -76,8 +70,7 @@ async function init(root: HTMLElement) {
     texture=await new THREE.TextureLoader().loadAsync('/models/neuraz-sphere-field.png');if(disposed){texture.dispose();return;}
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
     const rotation=new THREE.Matrix3(),matrix=new THREE.Matrix4(),euler=new THREE.Euler();
-    const viewFrame=new THREE.Matrix3();
-    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},viewFrame:{value:viewFrame},sideBlend:{value:0},time:{value:0},fluid:{value:.8}}});
+    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},time:{value:0},fluid:{value:.8}}});
     const scene=new THREE.Scene();mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);scene.add(mesh);const camera=new THREE.Camera();
     renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.getDrawingBufferSize(material.uniforms.resolution.value);
     let x=0,y=0,tx=0,ty=0,dragging=false,lastX=0,lastY=0,lastTime=performance.now(),playing=false;
@@ -102,9 +95,7 @@ async function init(root: HTMLElement) {
       if(!visible||document.hidden)return;
       if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.84;if(axis.value!=='vertical')ty+=dt*1.08;}
       const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
-      euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);viewFrame.copy(rotation).transpose();
-      const facing=Math.abs(matrix.elements[10]);
-      material!.uniforms.sideBlend.value=1-THREE.MathUtils.smoothstep(facing,.55,.98);
+      euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
       material!.uniforms.fluid.value=reduced.matches?0:.65*Math.sin(material!.uniforms.time.value*Math.PI/1.75)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';

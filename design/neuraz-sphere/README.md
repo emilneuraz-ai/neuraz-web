@@ -1,33 +1,30 @@
 # Neuraz · Cerebro esférico · V2
 
-Recurso independiente del logo principal del sitio.
+Recurso independiente del logo principal. Red negra con perfil circular de radio 0.09 sobre una superficie esférica de radio 1.12, con núcleo blanco sin iluminación de radio 1.115.
 
-Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La silueta original se proyecta sobre dos hemisferios redondeados: se eliminan los mapas laterales que añadían un aro negro alrededor de la vista frontal. La orientación gira físicamente 360°. Al descubrir los laterales, el campo interpola hacia mapas esféricos en tres ejes: los nodos atraviesan la vista en lugar de cancelar el giro frente a la cámara. El giro automático es horizontal por defecto y el arrastre con mouse o touch controla ambos ejes.
+La geometría se define exclusivamente en coordenadas del objeto. Tres mapas del patrón neural se mezclan según la normal de la esfera para cubrir frente, dorso, laterales y polos. La cámara no modifica el campo ni fija partes del contorno: toda la red gira como un solo volumen. Se eliminaron las compensaciones de orientación y las máscaras circulares que producían un efecto de lupa.
 
-El núcleo blanco de radio 1.115 oculta las conexiones posteriores para evitar duplicaciones en el contorno.
+La silueta cambia naturalmente al girar. Esta versión es una interpretación volumétrica de la marca: no conserva una copia exacta del SVG en todas las orientaciones. No tiene un aro independiente; las partes visibles en el contorno pertenecen a la misma red.
 
-Los bordes usan un perfil circular de radio 0.115 alrededor de la superficie de radio 1.12. La proyección frontal en reposo conserva el contorno del SVG dentro de la resolución del campo (512 píxeles); durante las conexiones, la figura se deforma y vuelve al contorno de reposo cada 1.75 segundos. Las conexiones siguen animadas aunque la orientación esté quieta. Con movimiento reducido se conserva la geometría de reposo.
+Las conexiones interpolan ocho campos de la animación original a 3.3 muestras por segundo; la mezcla vuelve al reposo cada 1.75 segundos. El giro automático mantiene 1.08 rad/s horizontal y 0.84 rad/s vertical.
 
-## Controles
+## Uso
 
-- Reproducir / pausar giro: controla únicamente la orientación.
-- Eje: horizontal, vertical o ambos; vueltas completas continuas.
-- Arrastrar o flechas: orientación manual sin límite angular.
-- Vista del logo / tecla R: detiene el giro y vuelve al frente; la animación neuronal continúa.
-- Pantalla completa: presentación para monitor o televisor; Escape sale.
+- Reproducir / pausar giro controla solo la orientación.
+- Horizontal 360° es el eje predeterminado; también están disponibles vertical y ambos.
+- Arrastrar con mouse o dedo controla ambos ejes y pausa el giro automático.
+- Flechas giran; R o Vista del logo vuelve al frente.
+- Pantalla completa sirve para presentaciones; Escape sale.
+- Con movimiento reducido no se deforman las conexiones. El giro requiere activación explícita.
 
-El componente pausa el cálculo al salir de pantalla y libera sus recursos al navegar. Requiere Three.js (versión usada: 0.183.2) y Astro. Copiar `src` y `public` conservando las rutas y utilizar `<SphericalLogo />`.
+El componente pausa el cálculo fuera de pantalla y libera los recursos al navegar. Requiere Three.js (versión usada: 0.183.2) y Astro; copiar `src` y `public` conservando rutas y utilizar `<SphericalLogo />`.
 
-## Archivos y regeneración
+## Descargas y regeneración
 
-El componente web contiene la animación procedural. El GLB y el archivo Blender son una captura estática de reposo de la misma superficie, sin animación incorporada. El PNG muestra esa malla con iluminación de estudio.
+El componente web incluye la animación procedural. GLB, Blender y PNG son capturas estáticas de reposo de la misma red; el GLB no incorpora la animación.
 
 1. `node scripts/build-sphere-distance.mjs`
-2. `node scripts/build-sphere-mesh.mjs` (genera `/tmp/neuraz-sphere-mesh.bin`)
+2. `node scripts/build-sphere-mesh.mjs` genera `/tmp/neuraz-sphere-mesh.bin`.
 3. Blender en segundo plano con `--python scripts/build-neuraz-sphere.py`.
 
-La malla estática usa una cuadrícula de 160 muestras por eje; el visor calcula la superficie directamente y no depende del GLB.
-
-El giro automático utiliza 1.08 rad/s horizontal y 0.84 rad/s vertical (tres veces la velocidad anterior). La deformación fluida se concentra en el interior y se atenúa hacia el contorno para mantener estable la silueta.
-
-El contorno se recompone gradualmente entre radios proyectados 0.62 y 0.88 usando el campo del SVG original. Esto mantiene abiertos los espacios exteriores en todos los ángulos, mientras los nodos interiores siguen girando. La velocidad del campo fluido es 3.3 muestras/s (el doble de la versión anterior).
+La malla estática usa 160 muestras por eje. El visor calcula la superficie directamente y no depende del GLB.
