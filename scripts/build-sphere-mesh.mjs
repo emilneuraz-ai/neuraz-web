@@ -10,12 +10,11 @@ function mask(x,y){
  const at=(a,b)=>data[(b*info.width+a)*info.channels];
  return ((at(ix,iy)*(1-fx)*(1-fy)+at(Math.min(511,ix+1),iy)*fx*(1-fy)+at(ix,Math.min(511,iy+1))*(1-fx)*fy+at(Math.min(511,ix+1),Math.min(511,iy+1))*fx*fy)/255-.5)*.4;
 }
-const size=160,extent=1.18,mc=new MarchingCubes(size,new MeshBasicMaterial(),false,false,500000);mc.isolation=0;
+const size=160,extent=1.28,mc=new MarchingCubes(size,new MeshBasicMaterial(),false,false,500000);mc.isolation=0;
 for(let z=0;z<size;z++)for(let y=0;y<size;y++)for(let x=0;x<size;x++){
  const p=[x,y,z].map(v=>(v-size/2)/(size/2)*extent),r=Math.hypot(...p),n=p.map(v=>v/Math.max(r,.001));
- const w=n.map(v=>Math.abs(v)**8),sum=w.reduce((a,b)=>a+b,0)||1;
- const d=(mask(n[0]*1.1,n[1]*1.1)*w[2]+mask(n[2]*1.1,n[1]*1.1)*w[0]+mask(n[0]*1.1,n[2]*1.1)*w[1])/sum;
- mc.field[x+y*size+z*size*size]=-(Math.hypot(Math.max(d+.058,0),r-1)-.058);
+ const d=mask(p[0],p[1]);
+ mc.field[x+y*size+z*size*size]=-(Math.hypot(Math.max(d+.115,0),r-1.12)-.115);
 }
 mc.update();const vertices=mc.positionArray.slice(0,mc.count*3);for(let i=0;i<vertices.length;i++)vertices[i]*=extent;
 writeFileSync('/tmp/neuraz-sphere-mesh.bin',Buffer.from(vertices.buffer));

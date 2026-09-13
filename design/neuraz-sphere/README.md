@@ -2,9 +2,9 @@
 
 Recurso independiente del logo principal del sitio.
 
-Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). El patrón del SVG se distribuye por tres mapas de superficie esférica mezclados suavemente, por lo que hay conexiones en el frente, dorso, laterales y polos. No se extruye el frente hacia atrás ni se reinicia la orientación cada 45 grados. La vista frontal es una interpretación esférica del logo, no una coincidencia vectorial exacta con el SVG.
+Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La silueta original se proyecta sobre dos hemisferios redondeados: se eliminan los mapas laterales que añadían un aro negro alrededor de la vista frontal. La geometría gira continuamente sin reinicios angulares.
 
-Los bordes usan un perfil circular de radio 0.058 alrededor de la superficie de radio 1. Las conexiones interpolan ocho campos de la animación original incluso con la orientación quieta. Con movimiento reducido se conserva la geometría de reposo; el giro solo comienza al activarlo explícitamente.
+Los bordes usan un perfil circular de radio 0.115 alrededor de la superficie de radio 1.12. La proyección frontal en reposo conserva el contorno del SVG dentro de la resolución del campo (512 píxeles); durante las conexiones, la figura se deforma y vuelve al contorno de reposo cada ocho segundos. Las conexiones siguen animadas aunque la orientación esté quieta. Con movimiento reducido se conserva la geometría de reposo.
 
 ## Controles
 

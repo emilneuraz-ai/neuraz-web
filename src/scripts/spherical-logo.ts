@@ -20,21 +20,17 @@ float surfaceMask(vec2 uv,float offset){
   return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid);
 }
 float neuralShape(vec3 p){
-  float r=length(p);vec3 n=p/max(r,.001);
-  // Blend spherical surface charts, never extrude a front mask through the globe.
-  vec3 w=pow(abs(n),vec3(8.));w/=max(w.x+w.y+w.z,.001);
-  float channels=surfaceMask(n.xy*1.1,0.)*w.z
-    +surfaceMask(vec2(n.z,n.y)*1.1,2.7)*w.x
-    +surfaceMask(vec2(n.x,n.z)*1.1,5.3)*w.y;
-  // Circular fillet joins the front, side and underside of every organic band.
-  return length(vec2(max(channels+.058,0.),r-1.0))-.058;
+  // Project the original contour onto both rounded hemispheres. No side chart
+  // may add black matter outside the logo's silhouette when viewed head-on.
+  float channels=surfaceMask(p.xy,0.);
+  return length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
 }
-float shape(vec3 p){ return min(neuralShape(p),length(p)-.958); }
+float shape(vec3 p){ return min(neuralShape(p),length(p)-1.0); }
 void main(){
   vec2 xy=(gl_FragCoord.xy/resolution-.5)*2.65;
   vec3 ro=rotation*vec3(xy,3.);
   vec3 rd=rotation*vec3(0.,0.,-1.);
-  float b=dot(ro,rd),c=dot(ro,ro)-1.12*1.12,disc=b*b-c;
+  float b=dot(ro,rd),c=dot(ro,ro)-1.25*1.25,disc=b*b-c;
   if(disc<0.)discard;
   float travel=max(0.,-b-sqrt(disc));float end=-b+sqrt(disc);
   vec3 p;bool hit=false;
@@ -49,8 +45,8 @@ void main(){
   vec3 light=normalize(rotation*vec3(-.5,.8,1.5));
   float diffuse=max(dot(n,light),0.);
   float spec=pow(max(dot(reflect(-light,n),-rd),0.),24.);
-  bool interior=length(p)<.960 && neuralShape(p)>.001;
-  float shade=interior ? .980392 : .025+.09*diffuse+.09*spec;
+  bool interior=length(p)<1.002 && neuralShape(p)>.001;
+  float shade=interior ? .980392 : .025+.13*diffuse+.16*spec;
   gl_FragColor=vec4(vec3(shade),1.);
 }`;
 async function init(root: HTMLElement) {
@@ -96,7 +92,7 @@ async function init(root: HTMLElement) {
       if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.28;if(axis.value!=='vertical')ty+=dt*.36;}
       const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
       euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
-      material!.uniforms.fluid.value=reduced.matches?0:.8;
+      material!.uniforms.fluid.value=reduced.matches?0:.8*Math.sin(material!.uniforms.time.value*Math.PI/8)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;

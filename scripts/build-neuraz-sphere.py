@@ -18,7 +18,7 @@ bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bp
 mesh.materials.append(mat)
 for f in mesh.polygons:f.use_smooth=True
 bpy.ops.object.select_all(action='DESELECT')
-bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=96,radius=.958)
+bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=96,radius=1.0)
 core=bpy.context.object;core.name='White neural interior'
 white=bpy.data.materials.new('White unlit interior');white.use_nodes=True;white.node_tree.nodes.clear()
 emission=white.node_tree.nodes.new('ShaderNodeEmission');emission.inputs['Color'].default_value=(.956,.956,.956,1)
