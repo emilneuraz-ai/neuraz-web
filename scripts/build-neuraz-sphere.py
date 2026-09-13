@@ -18,7 +18,7 @@ bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bp
 mesh.materials.append(mat)
 for f in mesh.polygons:f.use_smooth=True
 bpy.ops.object.select_all(action='DESELECT')
-bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=96,radius=1.0)
+bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=96,radius=1.115)
 core=bpy.context.object;core.name='White neural interior'
 white=bpy.data.materials.new('White unlit interior');white.use_nodes=True;white.node_tree.nodes.clear()
 emission=white.node_tree.nodes.new('ShaderNodeEmission');emission.inputs['Color'].default_value=(.956,.956,.956,1)
@@ -32,6 +32,6 @@ for pos,power,size in [((-3,4,5),650,4),((3,1,3),400,3)]:
     bpy.ops.object.light_add(type='AREA',location=pos);light=bpy.context.object;light.data.energy=power;light.data.shape='DISK';light.data.size=size;light.rotation_euler=(Vector((0,0,0))-light.location).to_track_quat('-Z','Y').to_euler()
 scene.world.color=(.3,.3,.3)
 bpy.ops.wm.save_as_mainfile(filepath=str(OUT/'neuraz-sphere.blend'))
-brain.rotation_euler=(.35,.8,0)
+brain.rotation_euler=(0,0,0)
 scene.render.filepath=str(ROOT/'public/images/neuraz-sphere-poster.png');bpy.ops.render.render(write_still=True)
 print('SPHERE_ASSETS_DONE',len(brain.data.vertices),len(brain.data.polygons))

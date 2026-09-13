@@ -5,6 +5,8 @@ precision highp float;
 uniform sampler2D field;
 uniform vec2 resolution;
 uniform mat3 rotation;
+uniform mat3 patternFrame;
+uniform vec2 orbit;
 uniform float time;
 uniform float fluid;
 float maskAt(vec2 p, float tile) {
@@ -20,12 +22,17 @@ float surfaceMask(vec2 uv,float offset){
   return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid);
 }
 float neuralShape(vec3 p){
-  // Project the original contour onto both rounded hemispheres. No side chart
-  // may add black matter outside the logo's silhouette when viewed head-on.
-  float channels=surfaceMask(p.xy,0.);
+  // The liquid flows around the globe to face the viewer as its frame turns.
+  // A bounded residual tilt keeps depth, without foreshortening the negative space.
+  vec3 q=patternFrame*p;
+  vec2 uv=q.xy;
+  float drift=.022*sin(orbit.x*.5)*sin(orbit.x*.5)+.022*sin(orbit.y*.5)*sin(orbit.y*.5);
+  uv.x+=drift*sin(uv.y*4.+orbit.y);
+  uv.y+=drift*sin(uv.x*4.-orbit.x);
+  float channels=surfaceMask(uv,0.);
   return length(vec2(max(channels+.115,0.),length(p)-1.12))-.115;
 }
-float shape(vec3 p){ return min(neuralShape(p),length(p)-1.0); }
+float shape(vec3 p){ return min(neuralShape(p),length(p)-1.115); }
 void main(){
   vec2 xy=(gl_FragCoord.xy/resolution-.5)*2.65;
   vec3 ro=rotation*vec3(xy,3.);
@@ -40,12 +47,12 @@ void main(){
     travel+=max(d*.55,.00045);if(travel>end)break;
   }
   if(!hit)discard;
-  vec2 e=vec2(.002,0.);
+  vec2 e=vec2(.007,0.);
   vec3 n=normalize(vec3(shape(p+e.xyy)-shape(p-e.xyy),shape(p+e.yxy)-shape(p-e.yxy),shape(p+e.yyx)-shape(p-e.yyx)));
   vec3 light=normalize(rotation*vec3(-.5,.8,1.5));
   float diffuse=max(dot(n,light),0.);
   float spec=pow(max(dot(reflect(-light,n),-rd),0.),24.);
-  bool interior=length(p)<1.002 && neuralShape(p)>.001;
+  bool interior=length(p)<1.117 && neuralShape(p)>.001;
   float shade=interior ? .980392 : .025+.13*diffuse+.16*spec;
   gl_FragColor=vec4(vec3(shade),1.);
 }`;
@@ -66,7 +73,8 @@ async function init(root: HTMLElement) {
     texture=await new THREE.TextureLoader().loadAsync('/models/neuraz-sphere-field.png');if(disposed){texture.dispose();return;}
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
     const rotation=new THREE.Matrix3(),matrix=new THREE.Matrix4(),euler=new THREE.Euler();
-    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},time:{value:0},fluid:{value:.8}}});
+    const patternFrame=new THREE.Matrix3(),residual=new THREE.Matrix4(),inverse=new THREE.Matrix4();
+    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},patternFrame:{value:patternFrame},orbit:{value:new THREE.Vector2()},time:{value:0},fluid:{value:.8}}});
     const scene=new THREE.Scene();mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);scene.add(mesh);const camera=new THREE.Camera();
     renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.getDrawingBufferSize(material.uniforms.resolution.value);
     let x=0,y=0,tx=0,ty=0,dragging=false,lastX=0,lastY=0,lastTime=performance.now(),playing=false;
@@ -92,6 +100,10 @@ async function init(root: HTMLElement) {
       if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.28;if(axis.value!=='vertical')ty+=dt*.36;}
       const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
       euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
+      inverse.copy(matrix).invert();
+      residual.makeRotationFromEuler(new THREE.Euler(.10*Math.sin(x),.10*Math.sin(y),.035*Math.sin(x+y)));
+      patternFrame.setFromMatrix4(residual.multiply(inverse));
+      material!.uniforms.orbit.value.set(x,y);
       material!.uniforms.fluid.value=reduced.matches?0:.8*Math.sin(material!.uniforms.time.value*Math.PI/8)**2;
       material!.uniforms.time.value+=reduced.matches?0:dt;
       renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';

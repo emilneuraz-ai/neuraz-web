@@ -2,7 +2,9 @@
 
 Recurso independiente del logo principal del sitio.
 
-Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La silueta original se proyecta sobre dos hemisferios redondeados: se eliminan los mapas laterales que añadían un aro negro alrededor de la vista frontal. La geometría gira continuamente sin reinicios angulares.
+Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). La silueta original se proyecta sobre dos hemisferios redondeados: se eliminan los mapas laterales que añadían un aro negro alrededor de la vista frontal. El marco gira continuamente sin reinicios angulares. El líquido se redistribuye en un sistema orientado hacia la vista: compensa el giro completo y conserva una inclinación residual máxima de 0.10 radianes por eje, más una advección suave del patrón. Así los laterales y polos mantienen un equilibrio de forma y contraforma similar al frente; no es la rotación rígida de una malla inmutable.
+
+El núcleo blanco de radio 1.115 oculta las conexiones posteriores para evitar duplicaciones en el contorno.
 
 Los bordes usan un perfil circular de radio 0.115 alrededor de la superficie de radio 1.12. La proyección frontal en reposo conserva el contorno del SVG dentro de la resolución del campo (512 píxeles); durante las conexiones, la figura se deforma y vuelve al contorno de reposo cada ocho segundos. Las conexiones siguen animadas aunque la orientación esté quieta. Con movimiento reducido se conserva la geometría de reposo.
 
