@@ -1,21 +1,27 @@
 # Neuraz · Cerebro esférico · V2
 
-Versión independiente del logo, disponible en `/recursos/logo/`. No sustituye el logo del inicio ni el render de servicios.
+Recurso independiente del logo principal del sitio.
 
-## Interacción
+Red negra sobre un núcleo blanco sin iluminación (#fafafa en el visor). El patrón del SVG se distribuye por tres mapas de superficie esférica mezclados suavemente, por lo que hay conexiones en el frente, dorso, laterales y polos. No se extruye el frente hacia atrás ni se reinicia la orientación cada 45 grados. La vista frontal es una interpretación esférica del logo, no una coincidencia vectorial exacta con el SVG.
 
-La vista inicial es frontal y ortográfica, con conexiones negras y núcleo gris claro. El campo de contorno se obtiene del SVG original a 512 × 512 píxeles: conserva su silueta dentro de esa resolución, sin introducir perspectiva frontal. Al arrastrar o usar las flechas se revela una envolvente esférica con canales, nodos y conexiones internas. Tras soltarlo, vuelve suavemente al frente. «Ver transformación» ejecuta un recorrido de 12 segundos; «Vista del logo» lo restablece.
+Los bordes usan un perfil circular de radio 0.058 alrededor de la superficie de radio 1. Las conexiones interpolan ocho campos de la animación original incluso con la orientación quieta. Con movimiento reducido se conserva la geometría de reposo; el giro solo comienza al activarlo explícitamente.
 
-La deformación interpola campos de distancia de ocho momentos de la animación fluida original. Su amplitud vuelve a cero al regresar al logo. Cada 45° horizontales o verticales, el patrón se realinea por deformación procedural: no es una rotación rígida de una malla inmutable. Los controles de 45° permiten mantener cada alineación para inspeccionarla. El campo varía con la profundidad para que las conexiones de ambas caras no cambien al mismo tiempo. Con movimiento reducido, el giro por controles conserva la geometría de reposo y omite la animación fluida.
+## Controles
 
-## Archivos
+- Reproducir / pausar giro: controla únicamente la orientación.
+- Eje: horizontal, vertical o ambos; vueltas completas continuas.
+- Arrastrar o flechas: orientación manual sin límite angular.
+- Vista del logo / tecla R: detiene el giro y vuelve al frente; la animación neuronal continúa.
+- Pantalla completa: presentación para monitor o televisor; Escape sale.
 
-- `src/components/SphericalLogo.astro`: componente independiente.
-- `src/scripts/spherical-logo.ts`: visor Three.js con superficie implícita, control de giro y regreso al origen.
-- `public/models/neuraz-sphere-field.png`: atlas de distancias, un contorno original y ocho estados de fluido.
-- `public/models/neuraz-sphere.glb`: malla estática de la envolvente esférica en reposo, con núcleo gris y bisel redondeado de ocho segmentos; la animación procedural está en el visor web, no en el GLB.
-- `public/images/neuraz-sphere-poster.png`: render lateral de Blender con fondo transparente.
-- `design/neuraz-sphere/neuraz-sphere.blend`: escena editable del recurso estático.
-- `scripts/build-neuraz-sphere.py` y `scripts/build-sphere-distance.mjs`: generación de recursos.
+El componente pausa el cálculo al salir de pantalla y libera sus recursos al navegar. Requiere Three.js (versión usada: 0.183.2) y Astro. Copiar `src` y `public` conservando las rutas y utilizar `<SphericalLogo />`.
 
-El visor requiere `three` (versión usada: 0.183.2). Copiar `src` y `public` conservando rutas y utilizar `<SphericalLogo />`. El SVG original se mantiene como respaldo si WebGL no está disponible. La malla GLB sirve para otras escenas 3D, mientras el componente reproduce la transformación completa.
+## Archivos y regeneración
+
+El componente web contiene la animación procedural. El GLB y el archivo Blender son una captura estática de reposo de la misma superficie, sin animación incorporada. El PNG muestra esa malla con iluminación de estudio.
+
+1. `node scripts/build-sphere-distance.mjs`
+2. `node scripts/build-sphere-mesh.mjs` (genera `/tmp/neuraz-sphere-mesh.bin`)
+3. Blender en segundo plano con `--python scripts/build-neuraz-sphere.py`.
+
+La malla estática usa una cuadrícula de 160 muestras por eje; el visor calcula la superficie directamente y no depende del GLB.

@@ -3,15 +3,21 @@ interface Props { class?: string; }
 const { class: className } = Astro.props;
 ---
 <div class:list={['spherical-logo', className]} data-spherical-logo>
-  <div class="sphere-stage" data-sphere-stage tabindex="0" role="group" aria-label="Logo esférico de Neuraz. Arrastrá o usá las flechas para girarlo; R vuelve a la vista del SVG.">
+  <div class="sphere-stage" data-sphere-stage tabindex="0" role="group" aria-label="Logo esférico de Neuraz. Arrastrá o usá las flechas para girarlo; R vuelve a la vista frontal.">
     <img src="/images/isotipo.svg" alt="Neuraz" width="129" height="130" class="sphere-fallback" />
     <canvas data-sphere-canvas aria-hidden="true"></canvas>
   </div>
   <div class="sphere-actions">
-    <button data-sphere-demo>Ver transformación <span aria-hidden="true">↗</span></button>
-    <button data-sphere-horizontal>45° horizontal</button>
-    <button data-sphere-vertical>45° vertical</button>
+    <button data-sphere-play aria-pressed="false">Reproducir giro ▶</button>
+    <label class="sphere-axis">Giro
+      <select data-sphere-axis aria-label="Eje de giro">
+        <option value="both">Horizontal y vertical</option>
+        <option value="horizontal">Horizontal</option>
+        <option value="vertical">Vertical</option>
+      </select>
+    </label>
     <button data-sphere-reset>Vista del logo <span aria-hidden="true">↺</span></button>
+    <button data-sphere-fullscreen>Pantalla completa ⛶</button>
   </div>
   <p class="sphere-angles" data-sphere-angles>Horizontal 0° · Vertical 0°</p>
 </div>
@@ -21,7 +27,7 @@ const { class: className } = Astro.props;
 </script>
 <style>
   .spherical-logo { width: 100%; }
-  .sphere-stage { position:relative; aspect-ratio:1; width:100%; touch-action:pan-y; cursor:grab; }
+  .sphere-stage { position:relative; aspect-ratio:1; width:100%; touch-action:none; cursor:grab; }
   .sphere-stage:active { cursor:grabbing; }
   .sphere-stage:focus-visible { outline:1px solid #777; outline-offset:4px; border-radius:16px; }
   canvas { position:absolute; inset:0; width:100%; height:100%; }
@@ -29,6 +35,10 @@ const { class: className } = Astro.props;
   [data-ready='true'] .sphere-fallback { visibility:hidden; }
   .sphere-angles { text-align:center; font-size:11px; color:#777; margin-top:14px; }
   .sphere-actions { display:flex; justify-content:center; flex-wrap:wrap; gap:12px; }
+  .spherical-logo:fullscreen { background:#fafafa; display:flex; flex-direction:column; align-items:center; justify-content:center; }
+  .spherical-logo:fullscreen .sphere-stage { width:min(85vh,90vw); }
+  .sphere-axis { display:flex; gap:8px; align-items:center; font-size:12px; }
+  select { min-height:44px; background:#fafafa; border:1px solid #ddd; border-radius:24px; padding:0 12px; color:#111; }
   button { min-height:44px; border:1px solid #ddd; border-radius:24px; background:transparent; padding:0 16px; color:#111; font:inherit; font-size:12px; cursor:pointer; }
   button:hover { border-color:#111; }
   button span { margin-left:12px; }

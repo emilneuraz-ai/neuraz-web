@@ -1,55 +1,30 @@
-"""Independent spherical logo: SVG silhouette intersected with a spherical envelope."""
+"""Run build-sphere-mesh.mjs first; exports the rounded spherical surface network."""
 import bpy, math
 from pathlib import Path
 from mathutils import Matrix, Vector
 ROOT=Path(__file__).resolve().parents[1]
 OUT=ROOT/'design/neuraz-sphere'; OUT.mkdir(parents=True,exist_ok=True)
 bpy.ops.object.select_all(action='SELECT'); bpy.ops.object.delete(use_global=False)
-bpy.ops.import_curve.svg(filepath=str(ROOT/'public/images/isotipo.svg'))
-curves=[o for o in bpy.context.scene.objects if o.type=='CURVE']
-# SVG importer uses metres at 90 DPI. Preserve the complete SVG viewBox, not just its bounds.
-bpy.context.view_layer.update()
-bounds=[o.matrix_world@Vector(c) for o in curves for c in o.bound_box]
-low=Vector([min(v[i] for v in bounds) for i in range(3)]);high=Vector([max(v[i] for v in bounds) for i in range(3)])
-center=(low+high)*.5
-scale=2.04/max(high.x-low.x,high.y-low.y)
 mat=bpy.data.materials.new('Neuraz black satin');mat.diffuse_color=(.008,.008,.008,1);mat.use_nodes=True
 mat.node_tree.nodes.clear()
 bs=mat.node_tree.nodes.new('ShaderNodeBsdfPrincipled');output=mat.node_tree.nodes.new('ShaderNodeOutputMaterial');mat.node_tree.links.new(bs.outputs['BSDF'],output.inputs['Surface']);bs.inputs['Base Color'].default_value=(.008,.008,.008,1);bs.inputs['Roughness'].default_value=.48
-pieces=[]
-for obj in curves:
-    obj.data.transform(Matrix.Scale(scale,4)@Matrix.Translation(-center)@obj.matrix_world);obj.matrix_world=Matrix.Identity(4)
-    # Imported y is negative down the page.
-    obj.location=(0,0,0)
-    obj.data.dimensions='2D';obj.data.fill_mode='BOTH';obj.data.extrude=1.2;obj.data.resolution_u=24
-    bpy.ops.object.select_all(action='DESELECT');obj.select_set(True);bpy.context.view_layer.objects.active=obj;bpy.ops.object.convert(target='MESH');obj=bpy.context.object
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=64,radius=1.1)
-    cutter=bpy.context.object
-    bpy.context.view_layer.objects.active=obj
-    boolean=obj.modifiers.new('Spherical envelope','BOOLEAN');boolean.operation='INTERSECT';boolean.object=cutter
-    bpy.ops.object.modifier_apply(modifier=boolean.name);bpy.data.objects.remove(cutter,do_unlink=True)
-    bpy.ops.mesh.primitive_uv_sphere_add(segments=96,ring_count=48,radius=.76)
-    inner=bpy.context.object;bpy.context.view_layer.objects.active=obj
-    hollow=obj.modifiers.new('Neural shell','BOOLEAN');hollow.operation='DIFFERENCE';hollow.object=inner
-    bpy.ops.object.modifier_apply(modifier=hollow.name);bpy.data.objects.remove(inner,do_unlink=True)
-    bevel=obj.modifiers.new('Soft neural edges','BEVEL');bevel.width=.04;bevel.segments=8
-    bpy.ops.object.modifier_apply(modifier=bevel.name)
-    obj.data.materials.clear();obj.data.materials.append(mat)
-    for f in obj.data.polygons:f.use_smooth=True
-    pieces.append(obj)
+import array
+coords=array.array('f');coords.frombytes(Path('/tmp/neuraz-sphere-mesh.bin').read_bytes())
+verts=list(zip(coords[::3],coords[1::3],coords[2::3]))
+mesh=bpy.data.meshes.new('Rounded spherical surface');mesh.from_pydata(verts,[],[(i,i+1,i+2) for i in range(0,len(verts),3)]);mesh.update()
+brain=bpy.data.objects.new('Neuraz spherical neural logo',mesh);bpy.context.collection.objects.link(brain)
+brain.select_set(True);bpy.context.view_layer.objects.active=brain
+bpy.ops.object.mode_set(mode='EDIT');bpy.ops.mesh.select_all(action='SELECT');bpy.ops.mesh.remove_doubles(threshold=.00001);bpy.ops.mesh.normals_make_consistent(inside=False);bpy.ops.object.mode_set(mode='OBJECT')
+mesh.materials.append(mat)
+for f in mesh.polygons:f.use_smooth=True
 bpy.ops.object.select_all(action='DESELECT')
-for o in pieces:o.select_set(True)
-bpy.ops.mesh.primitive_uv_sphere_add(segments=96,ring_count=64,radius=.99)
-core=bpy.context.object;core.name='Light gray neural interior'
-gray=mat.copy();gray.name='Light gray interior';gray.diffuse_color=(.6,.6,.6,1)
-for node in gray.node_tree.nodes:
-    if node.type=='BSDF_PRINCIPLED':node.inputs['Base Color'].default_value=(.6,.6,.6,1)
-core.data.materials.append(gray)
-for poly in core.data.polygons:poly.use_smooth=True
-for o in pieces:o.select_set(True)
-core.select_set(True)
-bpy.context.view_layer.objects.active=pieces[0];bpy.ops.object.join();brain=bpy.context.object;brain.name='Neuraz spherical neural logo'
-assert len(brain.data.vertices)>1000, 'Empty spherical geometry'
+bpy.ops.mesh.primitive_uv_sphere_add(segments=128,ring_count=96,radius=.958)
+core=bpy.context.object;core.name='White neural interior'
+white=bpy.data.materials.new('White unlit interior');white.use_nodes=True;white.node_tree.nodes.clear()
+emission=white.node_tree.nodes.new('ShaderNodeEmission');emission.inputs['Color'].default_value=(.956,.956,.956,1)
+output=white.node_tree.nodes.new('ShaderNodeOutputMaterial');white.node_tree.links.new(emission.outputs[0],output.inputs['Surface']);core.data.materials.append(white)
+for f in core.data.polygons:f.use_smooth=True
+brain.select_set(True)
 bpy.ops.export_scene.gltf(filepath=str(ROOT/'public/models/neuraz-sphere.glb'),export_format='GLB',use_selection=True)
 scene=bpy.context.scene;scene.render.use_compositing=False;scene.view_settings.view_transform='Standard';scene.view_settings.exposure=0;scene.view_settings.gamma=1;scene.render.engine='CYCLES';scene.cycles.samples=24;scene.render.resolution_x=800;scene.render.resolution_y=800;scene.render.resolution_percentage=100;scene.render.film_transparent=True
 bpy.ops.object.camera_add(location=(0,0,4));cam=bpy.context.object;cam.data.type='ORTHO';cam.data.ortho_scale=2.65;scene.camera=cam

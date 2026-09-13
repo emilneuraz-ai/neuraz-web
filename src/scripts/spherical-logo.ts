@@ -14,28 +14,22 @@ float maskAt(vec2 p, float tile) {
   uv=(cell+(clamp(uv,0.,1.)*511.+.5)/512.)/3.;
   return (texture2D(field,uv).r-.5)*.4;
 }
-float neuralShape(vec3 p){
-  float rest=maskAt(p.xy,0.);
-  float phase=mod(time*.85+p.z*.25,8.);
-  float a=floor(phase),t=fract(phase);
-  float moving=mix(maskAt(p.xy,a+1.),maskAt(p.xy,mod(a+1.,8.)+1.),t);
-  // Depth-dependent flow makes the connections change throughout the sphere.
-  float channels=mix(rest,moving,fluid);
-  channels-=fluid*.012*sin(p.z*8.+time*2.+p.x*6.);
-  float shell=abs(length(p)-.93)-.17;
-  float stems=2.;
-  stems=min(stems,length(p.xy-vec2(-.46,.52))-.07);
-  stems=min(stems,length(p.xy-vec2(-.02,.88))-.07);
-  stems=min(stems,length(p.xy-vec2(.60,.69))-.07);
-  stems=min(stems,length(p.xy-vec2(-.60,-.65))-.07);
-  stems=min(stems,length(p.xy-vec2(-.04,-.89))-.07);
-  stems=min(stems,length(p.xy-vec2(.56,-.72))-.07);
-  float sphere=max(length(p)-1.1,min(shell,stems));
-  // Rounded intersection; the SVG channels determine the orthographic silhouette.
-  float k=.055;float h=clamp(.5+.5*(sphere-channels)/k,0.,1.);
-  return mix(channels,sphere,h)+k*h*(1.-h);
+float surfaceMask(vec2 uv,float offset){
+  float phase=mod(time*.7+offset,8.);
+  float a=floor(phase),t=smoothstep(0.,1.,fract(phase));
+  return mix(maskAt(uv,0.),mix(maskAt(uv,a+1.),maskAt(uv,mod(a+1.,8.)+1.),t),fluid);
 }
-float shape(vec3 p){ return min(neuralShape(p),length(p)-.99); }
+float neuralShape(vec3 p){
+  float r=length(p);vec3 n=p/max(r,.001);
+  // Blend spherical surface charts, never extrude a front mask through the globe.
+  vec3 w=pow(abs(n),vec3(8.));w/=max(w.x+w.y+w.z,.001);
+  float channels=surfaceMask(n.xy*1.1,0.)*w.z
+    +surfaceMask(vec2(n.z,n.y)*1.1,2.7)*w.x
+    +surfaceMask(vec2(n.x,n.z)*1.1,5.3)*w.y;
+  // Circular fillet joins the front, side and underside of every organic band.
+  return length(vec2(max(channels+.058,0.),r-1.0))-.058;
+}
+float shape(vec3 p){ return min(neuralShape(p),length(p)-.958); }
 void main(){
   vec2 xy=(gl_FragCoord.xy/resolution-.5)*2.65;
   vec3 ro=rotation*vec3(xy,3.);
@@ -55,8 +49,8 @@ void main(){
   vec3 light=normalize(rotation*vec3(-.5,.8,1.5));
   float diffuse=max(dot(n,light),0.);
   float spec=pow(max(dot(reflect(-light,n),-rd),0.),24.);
-  bool interior=length(p)<1.005 || dot(n,normalize(p))<.38;
-  float shade=interior ? .68+.16*diffuse : .025+.09*diffuse+.09*spec;
+  bool interior=length(p)<.960 && neuralShape(p)>.001;
+  float shade=interior ? .980392 : .025+.09*diffuse+.09*spec;
   gl_FragColor=vec4(vec3(shade),1.);
 }`;
 async function init(root: HTMLElement) {
@@ -76,39 +70,35 @@ async function init(root: HTMLElement) {
     texture=await new THREE.TextureLoader().loadAsync('/models/neuraz-sphere-field.png');if(disposed){texture.dispose();return;}
     texture.flipY=false;texture.colorSpace=THREE.NoColorSpace;texture.minFilter=THREE.LinearFilter;texture.magFilter=THREE.LinearFilter;
     const rotation=new THREE.Matrix3(),matrix=new THREE.Matrix4(),euler=new THREE.Euler();
-    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},time:{value:0},fluid:{value:0}}});
+    material=new THREE.ShaderMaterial({vertexShader:'void main(){gl_Position=vec4(position.xy,0.,1.);}',fragmentShader:fragment,transparent:true,uniforms:{field:{value:texture},resolution:{value:new THREE.Vector2()},rotation:{value:rotation},time:{value:0},fluid:{value:.8}}});
     const scene=new THREE.Scene();mesh=new THREE.Mesh(new THREE.PlaneGeometry(2,2),material);scene.add(mesh);const camera=new THREE.Camera();
     renderer.setSize(stage.clientWidth,stage.clientHeight,false);renderer.getDrawingBufferSize(material.uniforms.resolution.value);
-    let x=0,y=0,tx=0,ty=0,amount=0,dragging=false,lastX=0,lastY=0,lastInteraction=-Infinity,demo=-Infinity,lastTime=performance.now();
+    let x=0,y=0,tx=0,ty=0,dragging=false,lastX=0,lastY=0,lastTime=performance.now(),playing=false;
     const reduced=matchMedia('(prefers-reduced-motion: reduce)');
-    const reset=()=>{tx=ty=0;demo=-Infinity;lastInteraction=-Infinity;};
-    const step=Math.PI/4;
-    const alignedRotation=(angle:number)=>{const sector=Math.floor(angle/step),f=angle/step-sector;const blend=THREE.MathUtils.smoothstep(f,.72,1);return angle-(sector+blend)*step;};
+    const play=root.querySelector<HTMLButtonElement>('[data-sphere-play]')!;
+    const axis=root.querySelector<HTMLSelectElement>('[data-sphere-axis]')!;
+    const setPlaying=(value:boolean)=>{playing=value;play.textContent=value?'Pausar giro ⏸':'Reproducir giro ▶';play.setAttribute('aria-pressed',String(value));root.dataset.rotating=String(value);};
+    const reset=()=>{setPlaying(false);tx=ty=0;};
     const opts={signal};
-    stage.addEventListener('pointerdown',event=>{if(event.button!==0)return;dragging=true;demo=-Infinity;lastX=event.clientX;lastY=event.clientY;lastInteraction=performance.now();stage.setPointerCapture(event.pointerId);},opts);
-    stage.addEventListener('pointermove',event=>{if(!dragging)return;ty+=(event.clientX-lastX)*.008;tx=THREE.MathUtils.clamp(tx+(event.clientY-lastY)*.008,-1.3,1.3);lastX=event.clientX;lastY=event.clientY;lastInteraction=performance.now();},opts);
-    const end=()=>{dragging=false;lastInteraction=performance.now();};stage.addEventListener('pointerup',end,opts);stage.addEventListener('pointercancel',end,opts);
-    stage.addEventListener('keydown',event=>{if(event.key.toLowerCase()==='r'){reset();return;}if(!event.key.startsWith('Arrow'))return;event.preventDefault();demo=-Infinity;tx+=event.key==='ArrowDown'?.2:event.key==='ArrowUp'?-.2:0;ty+=event.key==='ArrowRight'?.25:event.key==='ArrowLeft'?-.25:0;lastInteraction=performance.now();},opts);
+    stage.addEventListener('pointerdown',event=>{if(event.button!==0)return;dragging=true;setPlaying(false);lastX=event.clientX;lastY=event.clientY;stage.setPointerCapture(event.pointerId);},opts);
+    stage.addEventListener('pointermove',event=>{if(!dragging)return;ty+=(event.clientX-lastX)*.008;tx+=(event.clientY-lastY)*.008;lastX=event.clientX;lastY=event.clientY;},opts);
+    const end=()=>{dragging=false;};stage.addEventListener('pointerup',end,opts);stage.addEventListener('pointercancel',end,opts);
+    stage.addEventListener('keydown',event=>{if(event.key.toLowerCase()==='r'){reset();return;}if(!event.key.startsWith('Arrow'))return;event.preventDefault();setPlaying(false);tx+=event.key==='ArrowDown'?.2:event.key==='ArrowUp'?-.2:0;ty+=event.key==='ArrowRight'?.25:event.key==='ArrowLeft'?-.25:0;},opts);
     root.querySelector('[data-sphere-reset]')?.addEventListener('click',reset,opts);
-    root.querySelector('[data-sphere-horizontal]')?.addEventListener('click',()=>{tx=0;ty=(Math.round(ty/step)+1)*step;demo=-Infinity;lastInteraction=Infinity;},opts);
-    root.querySelector('[data-sphere-vertical]')?.addEventListener('click',()=>{ty=0;tx=(Math.round(tx/step)+1)*step;demo=-Infinity;lastInteraction=Infinity;},opts);
-    root.querySelector('[data-sphere-demo]')?.addEventListener('click',()=>{if(reduced.matches){tx=.45;ty=1;lastInteraction=performance.now();return;}demo=performance.now();},opts);
+    play.addEventListener('click',()=>setPlaying(!playing),opts);
+    root.querySelector('[data-sphere-fullscreen]')?.addEventListener('click',()=>{
+      const action=document.fullscreenElement?document.exitFullscreen():root.requestFullscreen();
+      action.catch(()=>{root.dataset.fullscreenError='true';});
+    },opts);
     const draw=(now:number)=>{
       if(disposed)return;frame=requestAnimationFrame(draw);const dt=Math.min((now-lastTime)/1000,.08);lastTime=now;
       if(!visible||document.hidden)return;
-      const elapsed=(now-demo)/1000;
-      let targetFluid=0;
-      if(elapsed>=0&&elapsed<12){const progress=elapsed/12;const envelope=Math.sin(Math.PI*progress)**2;tx=.65*envelope;ty=Math.PI*2*(progress*progress*(3-2*progress));targetFluid=envelope;if(progress>.995)reset();}
-      else if(Number.isFinite(demo)){y-=Math.PI*2;reset();}
-      else if(!dragging&&now-lastInteraction>2600){tx=0;ty=0;}
-      if(dragging||now-lastInteraction<2600)targetFluid=Math.min(1,Math.abs(tx)+Math.abs(ty));
-      const ease=1-Math.exp(-dt*5);x+=(tx-x)*ease;y+=(ty-y)*ease;amount+=(targetFluid-amount)*ease;
-      if(Math.abs(x)+Math.abs(y)<.001&&targetFluid===0){x=y=0;amount=0;}
-      euler.set(alignedRotation(x),alignedRotation(y),0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
-      const alignment=Math.min(1,Math.sin(x*4)**2+Math.sin(y*4)**2);
-      material!.uniforms.fluid.value=reduced.matches?0:amount*alignment;
+      if(playing&&!dragging){if(axis.value!=='horizontal')tx+=dt*.28;if(axis.value!=='vertical')ty+=dt*.36;}
+      const ease=1-Math.exp(-dt*8);x+=(tx-x)*ease;y+=(ty-y)*ease;
+      euler.set(x,y,0);matrix.makeRotationFromEuler(euler);rotation.setFromMatrix4(matrix);
+      material!.uniforms.fluid.value=reduced.matches?0:.8;
       material!.uniforms.time.value+=reduced.matches?0:dt;
-      renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=alignment<.0001?'logo':'sphere';
+      renderer!.render(scene,camera);root.dataset.ready='true';root.dataset.pose=Math.abs(x)+Math.abs(y)<.001?'logo':'sphere';
       const caption=root.querySelector('[data-sphere-angles]');if(caption)caption.textContent=`Horizontal ${Math.round(y*180/Math.PI)}° · Vertical ${Math.round(x*180/Math.PI)}°`;
     };draw(performance.now());
   } catch(error){root.dataset.error='true';console.warn('Spherical logo unavailable',error);dispose();}
