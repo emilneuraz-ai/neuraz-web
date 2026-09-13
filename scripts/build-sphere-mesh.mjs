@@ -20,7 +20,7 @@ for(let z=0;z<size;z++)for(let y=0;y<size;y++)for(let x=0;x<size;x++){
  const w=Math.abs(p[1])/Math.max(Math.abs(p[0])+Math.abs(p[1]),.001);
  const side=mask(p[2],p[1])*(1-w)+mask(p[0],p[2])*w;
  const weight=1-smooth(.15,.40,Math.abs(p[2]));
- const cut=side-.025-(1-weight)*.3,c=Math.max(0,Math.min(1,.5+.5*(cut-d)/.045));
+ const cut=side-.005-(1-weight)*.3,c=Math.max(0,Math.min(1,.5+.5*(cut-d)/.045));
  d=d*(1-c)+cut*c+.045*c*(1-c);
  const envelope=Math.max(r-1.12,joined);
  const h=Math.max(0,Math.min(1,.5+.5*(envelope-d)/.10));
