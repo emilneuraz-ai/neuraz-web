@@ -10,7 +10,7 @@ Componentes Astro reutilizables y los recursos originales para su integración e
 | `src/components/NavbarBrand.astro` | Marca del navbar con enlace al inicio, sin botones adicionales | El mismo SVG a 44 px, con NEURAZ opcional |
 | `src/components/PageLoader.astro` | Pantalla de carga inicial y navegación entre páginas internas | El mismo SVG a 104 px, con fondo claro |
 | `src/components/MercuryLogo.astro` | Logo en Three.js con fondo transparente; negro mate, mercurio o porcelana | Fusiones, separaciones, perspectiva e iconos proyectados sobre la superficie |
-| `src/components/HeroLogo.astro` y `src/scripts/hero-logo.ts` | Integración del hero del sitio, que reemplaza el laberinto | Logo de porcelana en vista isométrica y nueve servicios interactivos |
+| `src/components/HeroLogo.astro` y `src/scripts/hero-logo.ts` | Integración del hero del sitio, que reemplaza el laberinto | Logo negro mate en vista isométrica y nueve servicios interactivos |
 | `public/images/neuraz-logo-animated.svg` | Archivo vectorial independiente | Contornos animados mediante SVG/SMIL |
 | `public/models/neuraz-logo-motion.json` | Datos compartidos por `AnimatedLogo` | Secuencia vectorial de los contornos |
 | `public/models/neuraz-mercury.glb` | Modelo 3D para Three.js u otro visor compatible | Geometría estática en su forma de reposo |
@@ -79,9 +79,13 @@ Para una operación asíncrona de la aplicación, emití `document.dispatchEvent
 
 ### Hero con servicios
 
-`HeroLogo` reemplaza el laberinto de la portada por `<MercuryLogo finish="porcelain" view="isometric">`. Conserva los nueve servicios, sus iconos y sus destinos. Cada icono se ancla a un punto de la malla y acompaña la altura animada, la perspectiva y el giro. Los puntos elegidos permanecen sobre material durante los 192 fotogramas del ciclo.
+`HeroLogo` reemplaza el laberinto de la portada por `<MercuryLogo finish="black" view="isometric">`. Conserva los nueve servicios, sus iconos y sus destinos. Cada icono se ancla a un punto de la malla y acompaña la altura animada, la perspectiva y el giro. Los puntos elegidos permanecen sobre material durante los 192 fotogramas del ciclo.
 
-Los botones de 44 px muestran la descripción y el enlace del servicio al pasar el cursor, enfocarlos o activarlos. Las flechas recorren los iconos; Inicio y Fin saltan al primero y al último. Escape cierra el detalle. El hero usa `reducedMotion="static"`: conserva el modelo en reposo y los servicios interactivos sin movimiento automático. Si el visor no está disponible, queda una lista de enlaces accesibles.
+Los botones de 44 px muestran la descripción y el enlace del servicio al pasar el cursor, enfocarlos o activarlos. En móvil, se convierten en una etiqueta redondeada con el título y el enlace, sin una tarjeta de descripción. Las flechas recorren los iconos; Inicio y Fin saltan al primero y al último. Escape cierra el detalle. El hero usa `reducedMotion="static"`: conserva el modelo en reposo y los servicios interactivos sin movimiento automático. Si el visor no está disponible, queda una lista de enlaces accesibles.
+
+El inicio y Servicios comparten una única instancia de `HeroLogo`, posicionada por `shared-logo.ts` sobre espacios reservados. Al cambiar de servicio se destaca su icono mediante `hero-logo:select`, sin reiniciar la escena ni abrir una tarjeta. En móvil cada panel reserva espacio para el mismo render.
+
+El negro mate usa un contorno gaussiano de siete muestras por eje, afinado local y menor profundidad. La rampa normalizada del bisel se estrecha con un factor de `0.85`; la escena mantiene la perspectiva y no proyecta sombras sobre el fondo.
 
 ### `AnimatedLogo`
 

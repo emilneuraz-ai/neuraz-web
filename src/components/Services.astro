@@ -2,7 +2,6 @@
 // src/components/Services.astro - Auto-expand on scroll
 import { services, categories } from '../data/services';
 import SectionAtmosphere from './SectionAtmosphere.astro';
-import MercuryLogo from './MercuryLogo.astro';
 ---
 
 <section id="servicios" class="ambient-section py-24 px-6 sm:px-8 bg-white">
@@ -35,6 +34,7 @@ import MercuryLogo from './MercuryLogo.astro';
           <div 
             class="service-item border-b border-black/10" 
             data-index={index}
+            data-service-id={service.id}
           >
             <!-- Title row -->
             <div class="service-header py-6 flex items-center justify-between cursor-pointer group">
@@ -77,23 +77,13 @@ import MercuryLogo from './MercuryLogo.astro';
                   </a>
                 </div>
                 </div>
+                <div class="service-logo-slot" data-service-logo-slot aria-hidden="true"></div>
               </div>
             </div>
           </div>
         );
       })}
-      <div class="services-mercury" data-services-mercury hidden></div>
-      <template data-services-mercury-template>
-        <MercuryLogo
-          label="Logo tridimensional de Neuraz en blanco con contornos negros. Arrastrá para cambiar la perspectiva"
-          finish="porcelain"
-          view="isometric"
-          interactive={true}
-          controls={false}
-          framing={1.05}
-          maxDpr={1.5}
-        />
-      </template>
+
     </div>
   </div>
 </section>
@@ -101,9 +91,9 @@ import MercuryLogo from './MercuryLogo.astro';
 <style>
   .services-title-line { display: block; }
   .services-title-keep { white-space: nowrap; }
-  .services-list { position: relative; }
+  .services-list { position: relative; overflow-anchor: none; }
   .service-copy { min-width: 0; }
-  .services-mercury { display: none; }
+  .service-logo-slot { width: min(100%, 320px); aspect-ratio: 1; margin: 12px auto 0; flex: none; }
 
   @media (min-width: 1024px) {
     .service-detail {
@@ -115,9 +105,7 @@ import MercuryLogo from './MercuryLogo.astro';
     .service-header { position: relative; }
     .service-header > div,
     .service-arrow { position: relative; z-index: 3; }
-    .services-mercury { display: block; position: absolute; z-index: 2; }
-    .services-mercury[hidden] { display: none; }
-    .services-mercury :global(.mercury-logo) { height: 100%; aspect-ratio: auto; }
+    .service-logo-slot { width: 43%; max-width: 490px; margin: 0 0 0 auto; }
   }
   @media (max-width: 479px) {
     .services-title { font-size: 1.9375rem; line-height: 1.12; }
@@ -139,48 +127,11 @@ import MercuryLogo from './MercuryLogo.astro';
   const lastOpenedService = sessionStorage.getItem('lastOpenedService');
   let expandedIndex = -1;
 
-  const servicesList = document.querySelector<HTMLElement>('[data-services-list]');
-  const mercuryShell = document.querySelector<HTMLElement>('[data-services-mercury]');
-  const mercuryTemplate = document.querySelector<HTMLTemplateElement>('[data-services-mercury-template]');
   const desktop = window.matchMedia('(min-width: 1024px)');
   let mercuryFrame = 0;
-
   function syncMercury() {
-    if (!servicesList || !mercuryShell || !mercuryTemplate) return;
-    serviceItems.forEach((item, index) => {
-      item.setAttribute('data-expanded', String(index === expandedIndex));
-    });
-    if (!desktop.matches) {
-      mercuryShell.hidden = true;
-      // Removing the viewer releases its GPU buffers when switching to mobile.
-      mercuryShell.replaceChildren();
-      return;
-    }
-    const content = serviceContents[expandedIndex];
-    if (!content) {
-      mercuryShell.hidden = true;
-      return;
-    }
-    const listRect = servicesList.getBoundingClientRect();
-    const contentRect = content.getBoundingClientRect();
-    if (!listRect.width || !contentRect.height) {
-      mercuryShell.hidden = true;
-      return;
-    }
-    const size = Math.min(540, Math.max(360, window.innerWidth * 0.34), window.innerHeight * 0.65);
-    const overhang = Math.min(24, window.innerWidth * 0.015);
-    const center = contentRect.top - listRect.top + contentRect.height / 2;
-    const top = Math.max(0, Math.min(center - size / 2, Math.max(0, listRect.height - size)));
-    // The scene deliberately overlaps multiple rows on the right. Text and
-    // accordion arrows sit above it, while the clear area accepts drag input.
-    mercuryShell.style.left = `${listRect.width - size + overhang - servicesList.clientLeft}px`;
-    mercuryShell.style.top = `${top}px`;
-    mercuryShell.style.width = `${size}px`;
-    mercuryShell.style.height = `${size}px`;
-    mercuryShell.hidden = false;
-    if (!mercuryShell.querySelector('neuraz-mercury')) {
-      mercuryShell.append(mercuryTemplate.content.cloneNode(true));
-    }
+    serviceItems.forEach((item, index) => item.setAttribute('data-expanded', String(index === expandedIndex)));
+    document.dispatchEvent(new CustomEvent('services:layout'));
   }
 
   function refreshMercury() {
@@ -231,23 +182,16 @@ import MercuryLogo from './MercuryLogo.astro';
   }
   
   function updateExpandedService() {
-    const viewportCenter = window.innerHeight / 2;
-    let closestIndex = -1;
-    let closestDistance = Infinity;
-    
+    const section = document.getElementById('servicios')!.getBoundingClientRect();
+    if (section.top >= window.innerHeight || section.bottom <= 80) return;
+    // Header positions do not jump when their own panel opens. Using panel
+    // centers causes accordion/scroll feedback as the expanded height changes.
+    const focusLine = window.innerHeight * 0.4;
+    let closestIndex = 0;
     serviceItems.forEach((item, index) => {
-      const rect = item.getBoundingClientRect();
-      const itemCenter = rect.top + rect.height / 2;
-      const distance = Math.abs(itemCenter - viewportCenter);
-      
-      if (distance < closestDistance) {
-        closestDistance = distance;
-        closestIndex = index;
-      }
+      if (item.querySelector('.service-header')!.getBoundingClientRect().top <= focusLine) closestIndex = index;
     });
-    
-    // Only expand if within reasonable distance (within viewport)
-    if (closestDistance < window.innerHeight / 2 && closestIndex !== expandedIndex) {
+    if (closestIndex !== expandedIndex) {
       expandedIndex = closestIndex;
       
       serviceContents.forEach((content, index) => {

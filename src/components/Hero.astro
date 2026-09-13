@@ -1,5 +1,4 @@
 ---
-import HeroLogo from './HeroLogo.astro';
 import SectionAtmosphere from './SectionAtmosphere.astro';
 ---
 
@@ -28,7 +27,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
         </a>
       </div>
       <div class="hero-visual">
-        <HeroLogo />
+        <div class="hero-logo-slot" data-hero-logo-slot><img src="/images/isotipo.svg" alt="Neuraz" width="440" height="440" /></div>
       </div>
     </div>
     <div class="hero-footnote">
@@ -46,6 +45,12 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     color: #111;
     display: flex;
   }
+  .hero { isolation: auto; }
+  .hero :global(.section-atmosphere) { z-index: 0; }
+  .hero-logo-slot { width: 100%; aspect-ratio: 1; }
+  .hero-logo-slot img { width: 100%; height: 100%; object-fit: contain; padding: 12%; }
+  .hero-logo-slot[data-shared-ready="true"] img { visibility: hidden; }
+  .hero-footnote { position: relative; z-index: 30; }
   .hero-inner {
     width: 100%;
     max-width: 1648px;

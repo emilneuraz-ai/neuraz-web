@@ -36,30 +36,41 @@ function finishParameters(finish: string | undefined) {
 }
 
 /** Smooth occupancy sampled by the geometric contour, never used as alpha. */
-function createFluidCoverage(metadata: FluidMetadata, buffer: ArrayBuffer) {
+function createFluidCoverage(metadata: FluidMetadata, buffer: ArrayBuffer, streamlined = false) {
   const { width, height, frameCount } = metadata;
   const count = width * height;
   const words = new Uint32Array(buffer);
   const coverage = new Uint8Array(count * frameCount);
   const horizontal = new Uint16Array(count);
+  const kernel = streamlined ? [1, 6, 15, 20, 15, 6, 1] : [1, 2, 1];
+  const radius = (kernel.length - 1) / 2;
+  const divisor = streamlined ? 4096 : 16;
+  // A wider Gaussian removes the grid's stair steps. Moving its level set
+  // inward thins each branch locally while preserving the logo's overall span.
+  const contourLevel = streamlined ? 0.68 : 0.5;
   for (let frame = 0; frame < frameCount; frame++) {
     const offset = frame * count;
     for (let row = 0; row < height; row++) {
       const rowStart = row * width;
       for (let col = 0; col < width; col++) {
         const index = rowStart + col;
-        const left = col > 0 && words[offset + index - 1] !== 0 ? 255 : 0;
-        const middle = words[offset + index] !== 0 ? 255 : 0;
-        const right = col + 1 < width && words[offset + index + 1] !== 0 ? 255 : 0;
-        horizontal[index] = left + middle * 2 + right;
+        let sum = 0;
+        for (let tap = 0; tap < kernel.length; tap++) {
+          const sample = col + tap - radius;
+          if (sample >= 0 && sample < width && words[offset + rowStart + sample] !== 0) sum += kernel[tap];
+        }
+        horizontal[index] = sum;
       }
     }
     for (let row = 0; row < height; row++) {
       for (let col = 0; col < width; col++) {
         const index = row * width + col;
-        const below = row > 0 ? horizontal[index - width] : 0;
-        const above = row + 1 < height ? horizontal[index + width] : 0;
-        coverage[offset + index] = Math.round((below + horizontal[index] * 2 + above) / 16);
+        let sum = 0;
+        for (let tap = 0; tap < kernel.length; tap++) {
+          const sample = row + tap - radius;
+          if (sample >= 0 && sample < height) sum += horizontal[sample * width + col] * kernel[tap];
+        }
+        coverage[offset + index] = Math.round(THREE.MathUtils.clamp(sum / divisor - contourLevel + 0.5, 0, 1) * 255);
       }
     }
   }
@@ -116,8 +127,10 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
   const boundsWidth = bounds.xMax - bounds.xMin;
   const boundsHeight = bounds.yMax - bounds.yMin;
   const bytesPerFrame = width * height * 4;
+  const streamlined = !root.dataset.finish || root.dataset.finish === 'black';
+  const visualHeightScale = heightScale * (streamlined ? 0.92 : 1);
   let buffer: ArrayBuffer | undefined = source;
-  let coverage: Uint8Array | undefined = createFluidCoverage(metadata, source);
+  let coverage: Uint8Array | undefined = createFluidCoverage(metadata, source, streamlined);
   let disposed = false;
   const frameData = (index: number) => new Uint8Array(buffer!, index * bytesPerFrame, bytesPerFrame);
   const coverageData = (index: number) => coverage!.subarray(index * width * height, (index + 1) * width * height);
@@ -143,7 +156,9 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     mercuryCoverageA: { value: coverageA },
     mercuryCoverageB: { value: coverageB },
     mercuryMix: { value: 0 },
-    mercuryHeightScale: { value: heightScale },
+    mercuryHeightScale: { value: visualHeightScale },
+    // Narrow the normalized contour-to-face bevel ramp by 15%.
+    mercuryBevelEnd: { value: 0.5 + 0.3 * (streamlined ? 0.85 : 1) },
     mercuryTexel: { value: new THREE.Vector2(1 / width, 1 / height) },
     mercuryGridStep: { value: new THREE.Vector2(1 / (width - 1), 1 / (height - 1)) },
     mercurySize: { value: new THREE.Vector2(boundsWidth, boundsHeight) },
@@ -155,6 +170,7 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     uniform sampler2D mercuryCoverageB;
     uniform float mercuryMix;
     uniform float mercuryHeightScale;
+    uniform float mercuryBevelEnd;
     uniform float mercurySide;
     uniform vec2 mercuryTexel;
     uniform vec2 mercuryGridStep;
@@ -171,7 +187,7 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
       vec4 sampled = mix(texture2D(mercuryFrameA, sampleUv), texture2D(mercuryFrameB, sampleUv), mercuryMix);
       vec2 bytes = mercurySide > 0.0 ? sampled.rg : sampled.ba;
       float height = dot(bytes, vec2(256.0, 1.0)) * (mercuryHeightScale / 257.0);
-      return height * pow(smoothstep(0.5, 0.8, mercuryCoverage(gridUv)), 0.25);
+      return height * pow(smoothstep(0.5, mercuryBevelEnd, mercuryCoverage(gridUv)), 0.25);
     }
     attribute vec2 mercuryTriangleA;
     attribute vec2 mercuryTriangleB;
@@ -237,11 +253,11 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     }
   `;
   const material = (side: 1 | -1, outline = false) => {
+    const culling = (side === 1) !== outline ? THREE.FrontSide : THREE.BackSide;
     const result = new THREE.MeshPhysicalMaterial({
-      ...(outline ? { color: 0x090909, metalness: 0, roughness: 1, clearcoat: 0, specularIntensity: 0 } : finishParameters(root.dataset.finish)),
-      side: (side === 1) !== outline ? THREE.FrontSide : THREE.BackSide,
+      ...(outline ? { color: 0x090909, metalness: 0, roughness: 1, clearcoat: 0, specularIntensity: 0 } : finishParameters(root.dataset.finish)), side: culling,
     });
-    result.customProgramCacheKey = () => `neuraz-fluid-closed-contour-v3-${side}-${outline}`;
+    result.customProgramCacheKey = () => `neuraz-fluid-closed-contour-v4-${side}-${outline}-${streamlined}`;
     result.onBeforeCompile = shader => {
       Object.assign(shader.uniforms, uniforms, { mercurySide: { value: side }, mercuryOutlineWidth: { value: outline ? 0.013 : 0 } });
       shader.vertexShader = 'uniform float mercuryOutlineWidth;\n' + shaderFunctions + '\n' + shader.vertexShader;
@@ -280,7 +296,7 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     };
     return result;
   };
-  const detail = root.getBoundingClientRect().width >= 700 ? 2 : 1;
+  const detail = root.getBoundingClientRect().width >= (streamlined ? 420 : 700) ? 2 : 1;
   const occupied = new Uint8Array(width * height);
   for (let index = 0; index < coverage.length; index++) {
     if (coverage[index] > 127) occupied[index % occupied.length] = 1;
@@ -358,11 +374,11 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
       for (let corner = 0; corner < 4; corner++) {
         const index = ids[corner];
         const contribution = weights[corner] * weight;
-        sampledHeight += (heights[index * 4] * 256 + heights[index * 4 + 1]) * (heightScale / 65535) * contribution;
+        sampledHeight += (heights[index * 4] * 256 + heights[index * 4 + 1]) * (visualHeightScale / 65535) * contribution;
         sampledCoverage += mask[index] / 255 * contribution;
       }
     }
-    const rim = THREE.MathUtils.smoothstep(sampledCoverage, 0.5, 0.8);
+    const rim = THREE.MathUtils.smoothstep(sampledCoverage, 0.5, uniforms.mercuryBevelEnd.value);
     return { u, v, height: sampledHeight * Math.pow(rim, 0.25), coverage: sampledCoverage };
   };
   const sampleTop = (u: number, v: number, target: THREE.Vector3) => {
