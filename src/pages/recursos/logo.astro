@@ -1,0 +1,214 @@
+---
+import '../../styles/global.css';
+import AnimatedLogo from '../../components/AnimatedLogo.astro';
+import MercuryLogo from '../../components/MercuryLogo.astro';
+import NavbarBrand from '../../components/NavbarBrand.astro';
+import PageLoader from '../../components/PageLoader.astro';
+---
+
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="robots" content="noindex, nofollow" />
+    <meta name="description" content="Versiones del logo de Neuraz: animación vectorial en negro plano, negro fluido en 3D y render de mercurio metalizado." />
+    <meta name="theme-color" content="#fafafa" />
+    <link rel="icon" type="image/svg+xml" href="/images/isotipo.svg" />
+    <title>Logo animado — Neuraz</title>
+  </head>
+  <body>
+    <PageLoader />
+    <a class="skip-link" href="#contenido">Saltar al contenido</a>
+    <div class="resource-page">
+      <header class="page-header">
+        <NavbarBrand />
+        <span class="edition">RECURSOS DE MARCA <span aria-hidden="true">/</span> 01</span>
+      </header>
+
+      <main id="contenido">
+        <div class="introduction">
+          <p class="eyebrow"><span class="accent-dot" aria-hidden="true"></span> IDENTIDAD EN MOVIMIENTO</p>
+          <h1>Logo animado<span class="title-dot">.</span></h1>
+          <p class="intro-copy">Una forma que conecta, se transforma y vuelve a ser Neuraz.</p>
+        </div>
+
+        <div class="specimens">
+          <section class="specimen" aria-labelledby="flat-title">
+            <header class="specimen-heading">
+              <span class="specimen-number" aria-hidden="true">01</span>
+              <h2 id="flat-title">Negro plano</h2>
+              <span class="format-label">SVG</span>
+            </header>
+            <div class="specimen-stage flat-stage">
+              <AnimatedLogo size="76%" label="Logo de Neuraz en negro plano, con conexiones que se unen y se separan" class="flat-logo" controls={false} />
+            </div>
+            <div class="specimen-details">
+              <p>Conexiones orgánicas en una silueta negra. Vectorial y nítido a cualquier tamaño.</p>
+              <a class="download-link" href="/images/neuraz-logo-animated.svg" download>
+                Descargar SVG <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </section>
+
+          <section class="specimen" aria-labelledby="mercury-title">
+            <header class="specimen-heading">
+              <span class="specimen-number" aria-hidden="true">02</span>
+              <h2 id="mercury-title">Negro fluido</h2>
+              <span class="format-label">3D</span>
+            </header>
+            <div class="specimen-stage mercury-stage">
+              <MercuryLogo label="Logo tridimensional de Neuraz en negro fluido, con perspectiva interactiva" class="mercury-logo" finish="black" controls={false} />
+            </div>
+            <div class="specimen-details">
+              <p>Volumen negro que se une y se separa. Mové el cursor o arrastrá para explorar la perspectiva.</p>
+              <a class="download-link" href="/models/neuraz-logo-web.zip" download>
+                Descargar recurso web animado <span aria-hidden="true">↗</span>
+              </a>
+              <a class="download-link" href="/models/neuraz-mercury.glb" download>
+                Descargar modelo base GLB <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </section>
+        </div>
+
+        <section class="render-section" aria-labelledby="render-title">
+          <div class="render-copy">
+            <p class="eyebrow">ANIMACIÓN RENDERIZADA</p>
+            <h2 id="render-title">La materia<br />en movimiento.</h2>
+            <p>Las piezas se atraen, se funden y se separan. El render conserva toda la transformación del mercurio.</p>
+            <div class="render-downloads">
+              <a class="download-link" href="/media/neuraz-mercury.mp4" download>
+                Descargar video MP4 <span aria-hidden="true">↗</span>
+              </a>
+              <a class="download-link" href="/images/neuraz-mercury-poster.png" download>
+                Descargar imagen PNG <span aria-hidden="true">↗</span>
+              </a>
+            </div>
+          </div>
+          <figure class="render-player">
+            <video controls loop muted playsinline preload="metadata" poster="/images/neuraz-mercury-poster.png" aria-label="Animación del logo de Neuraz en mercurio metalizado; sin audio">
+              <source src="/media/neuraz-mercury.mp4" type="video/mp4" />
+              Tu navegador no reproduce este video. <a href="/media/neuraz-mercury.mp4">Descargar la animación</a>.
+            </video>
+            <figcaption>Fusiones orgánicas · Sin audio · Reproducción en bucle</figcaption>
+          </figure>
+        </section>
+      </main>
+
+      <footer class="page-footer">
+        <p>NEURAZ <span aria-hidden="true">/</span> Tecnología con propósito.</p>
+        <a href="/">Volver al sitio <span aria-hidden="true">↗</span></a>
+      </footer>
+    </div>
+  </body>
+</html>
+
+<style>
+  :global(body) {
+    margin: 0;
+    background: #fafafa;
+    color: #111;
+    font-family: 'Inter', 'Helvetica Neue', system-ui, sans-serif;
+  }
+
+  .resource-page {
+    width: min(100% - 112px, 1440px);
+    margin-inline: auto;
+  }
+
+  .skip-link {
+    position: fixed;
+    top: 12px;
+    left: 12px;
+    z-index: 100;
+    padding: 12px 18px;
+    background: #111;
+    color: #fff;
+    transform: translateY(-160%);
+  }
+
+  .skip-link:focus { transform: translateY(0); }
+
+  a:focus-visible,
+  video:focus-visible {
+    outline: 2px solid #e63946;
+    outline-offset: 6px;
+  }
+
+  .page-header,
+  .page-footer {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 24px;
+  }
+
+  .page-header { min-height: 100px; border-bottom: 1px solid #111; }
+  .edition,
+  .eyebrow,
+  .format-label,
+  .specimen-number { font-size: 10px; font-weight: 550; letter-spacing: .13em; }
+  .edition { color: #595959; }
+  .edition span { margin-inline: 12px; color: #e63946; }
+  .introduction { padding-block: clamp(56px, 7vw, 104px) 58px; }
+  .eyebrow { display: flex; align-items: center; gap: 10px; margin: 0 0 23px; }
+  .accent-dot { width: 7px; height: 7px; border-radius: 50%; background: #e63946; }
+  h1 { margin: 0; font-size: clamp(44px, 6.6vw, 96px); font-weight: 450; line-height: 1.05; letter-spacing: -.065em; }
+  .title-dot { color: #e63946; }
+  .intro-copy { max-width: 480px; margin: 24px 0 0; color: #595959; font-size: 17px; line-height: 1.65; }
+  .specimens { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 40px; }
+  .specimen { min-width: 0; border-top: 1px solid #111; }
+  .specimen-heading { display: flex; align-items: baseline; gap: 12px; padding-block: 23px; }
+  .specimen-number { color: #666; }
+  .specimen-heading h2 { margin: 0; font-size: clamp(17px, 1.75vw, 24px); font-weight: 500; letter-spacing: -.035em; }
+  .format-label { margin-left: auto; color: #666; }
+  .specimen-stage { display: grid; place-items: center; min-width: 0; aspect-ratio: 1; background: #f0f0ed; padding: 24px; }
+  .mercury-stage { background: #efefee; }
+  .specimen-stage :global(.mercury-logo) { width: 100%; }
+  .specimen-details { display: flex; flex-direction: column; align-items: flex-start; padding-top: 21px; }
+  .specimen-details p { margin: 0; max-width: 390px; min-height: 48px; font-size: 13px; line-height: 1.65; color: #595959; }
+  .download-link { display: inline-flex; justify-content: space-between; align-items: center; gap: 28px; min-height: 44px; border-bottom: 1px solid #b8b8b8; font-size: 12px; font-weight: 550; text-decoration: none; transition: color .16s ease, border-color .16s ease; }
+  .download-link span { font-size: 18px; font-weight: 400; }
+  .download-link:hover { color: #b62432; border-color: #b62432; }
+  .specimen-details .download-link { margin-top: 13px; }
+  .render-section { display: grid; grid-template-columns: .85fr 1.15fr; gap: clamp(40px, 8vw, 120px); align-items: center; margin-top: 104px; padding-block: 72px; border-top: 1px solid #111; }
+  .render-copy h2 { margin: 0 0 25px; font-size: clamp(32px, 4vw, 58px); font-weight: 450; line-height: 1.1; letter-spacing: -.055em; }
+  .render-copy > p:not(.eyebrow) { max-width: 350px; color: #595959; font-size: 14px; line-height: 1.75; }
+  .render-downloads { display: flex; flex-direction: column; align-items: flex-start; gap: 6px; margin-top: 25px; }
+  .render-player { min-width: 0; margin: 0; }
+  .render-player video { display: block; width: 100%; aspect-ratio: 1; object-fit: contain; background: #efefee; }
+  .render-player figcaption { margin-top: 12px; color: #666; font-size: 10px; line-height: 1.6; }
+  .page-footer { padding-block: 27px 35px; border-top: 1px solid #111; font-size: 10px; }
+  .page-footer p { margin: 0; }
+  .page-footer p span { margin-inline: 10px; color: #e63946; }
+  .page-footer a { min-height: 44px; display: inline-flex; align-items: center; gap: 14px; text-decoration: none; }
+  .page-footer a:hover { color: #b62432; }
+
+  @media (max-width: 900px) {
+    .resource-page { width: calc(100% - 48px); }
+    .specimens { gap: 24px; }
+    .specimen-stage { padding: 12px; }
+    .render-section { gap: 40px; }
+  }
+
+  @media (max-width: 620px) {
+    .resource-page { width: calc(100% - 40px); }
+    .page-header { min-height: 80px; flex-wrap: wrap; gap: 8px 12px; padding-block: 14px; }
+    .edition { font-size: 8px; letter-spacing: .08em; }
+    .edition span { margin-inline: 5px; }
+    .introduction { padding-block: 52px 41px; }
+    .intro-copy { font-size: 15px; }
+    .specimens { grid-template-columns: 1fr; gap: 44px; }
+    .specimen-heading h2 { font-size: 23px; }
+    .specimen-stage { padding: 16px; }
+    .specimen-details p { min-height: 0; }
+    .render-section { grid-template-columns: 1fr; gap: 32px; margin-top: 64px; padding-block: 40px 48px; }
+    .render-copy h2 { font-size: 42px; }
+    .page-footer { align-items: flex-start; gap: 12px; flex-direction: column; padding-bottom: 20px; }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .download-link { transition: none; }
+  }
+</style>

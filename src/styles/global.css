@@ -70,3 +70,9 @@ body {
   width: 1px;
   background: #1a1a1a;
 }
+
+@media (prefers-reduced-motion: reduce) {
+  html.scroll-smooth {
+    scroll-behavior: auto;
+  }
+}

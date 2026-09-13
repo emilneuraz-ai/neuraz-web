@@ -1,0 +1,107 @@
+---
+import isotipo from '../../public/images/isotipo.svg?raw';
+
+interface Props {
+  class?: string;
+  size?: number | string;
+  label?: string;
+  autoplay?: boolean;
+  paused?: boolean;
+  /** Opt in to a keyboard-accessible pause control. */
+  controls?: boolean;
+}
+
+const {
+  class: className,
+  size = 240,
+  label = 'Neuraz',
+  autoplay = true,
+  paused = false,
+  controls = false,
+} = Astro.props;
+const restingPath = [...isotipo.matchAll(/<path\s+d="([^"]+)"/g)]
+  .map((match) => match[1]).join(' ');
+const extent = typeof size === 'number' ? `${size}px` : size;
+const motionUrl = `${import.meta.env.BASE_URL.replace(/\/$/, '')}/models/neuraz-logo-motion.json`;
+---
+
+<span
+  class:list={['animated-logo', className]}
+  style={`--animated-logo-size: ${extent}`}
+  data-animated-logo
+  data-motion-src={motionUrl}
+  data-autoplay={String(autoplay)}
+  data-paused={String(paused || !autoplay)}
+>
+  <svg
+    viewBox="0 0 129 130"
+    width="129"
+    height="130"
+    role={label ? 'img' : undefined}
+    aria-label={label || undefined}
+    aria-hidden={!label ? 'true' : undefined}
+    focusable="false"
+  >
+    <path data-logo-path fill="#000" fill-rule="evenodd" d={restingPath} />
+  </svg>
+  {controls && (
+    <button
+      type="button"
+      class="animated-logo__toggle"
+      data-logo-toggle
+      aria-label="Pausar animación del logo"
+      aria-pressed="false"
+      hidden
+    >
+      <svg viewBox="0 0 16 16" width="14" height="14" aria-hidden="true" focusable="false">
+        <path data-logo-pause-icon d="M4 3h3v10H4zM9 3h3v10H9z" />
+        <path data-logo-play-icon d="M5 2.5 13 8l-8 5.5z" hidden />
+      </svg>
+    </button>
+  )}
+</span>
+
+<script>
+  import { installAnimatedLogos } from '../scripts/animated-logo';
+  installAnimatedLogos();
+</script>
+
+<style>
+  .animated-logo {
+    position: relative;
+    display: inline-block;
+    width: var(--animated-logo-size, 240px);
+    max-width: 100%;
+    aspect-ratio: 129 / 130;
+    vertical-align: middle;
+    line-height: 0;
+  }
+  .animated-logo > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    overflow: visible;
+  }
+  .animated-logo__toggle {
+    position: absolute;
+    right: 0;
+    bottom: 0;
+    display: grid;
+    place-items: center;
+    width: 44px;
+    height: 44px;
+    padding: 0;
+    border: 1px solid #d8d8d8;
+    border-radius: 50%;
+    background: #fff;
+    color: #000;
+    cursor: pointer;
+  }
+  .animated-logo__toggle:hover { border-color: #000; }
+  .animated-logo__toggle:focus-visible { outline: 2px solid #000; outline-offset: 3px; }
+  .animated-logo__toggle svg { fill: currentColor; }
+  .animated-logo [hidden] { display: none !important; }
+  @media (prefers-reduced-motion: reduce) {
+    .animated-logo__toggle { display: none; }
+  }
+</style>

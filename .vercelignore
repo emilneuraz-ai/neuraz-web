@@ -1,0 +1,7 @@
+.agents/
+.codex/
+output/
+/design/
+/scripts/
+.env*
+.DS_Store

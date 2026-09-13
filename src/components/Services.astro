@@ -1,9 +1,12 @@
 ---
 // src/components/Services.astro - Auto-expand on scroll
 import { services, categories } from '../data/services';
+import SectionAtmosphere from './SectionAtmosphere.astro';
+import MercuryLogo from './MercuryLogo.astro';
 ---
 
-<section id="servicios" class="py-24 px-6 sm:px-8 bg-white">
+<section id="servicios" class="ambient-section py-24 px-6 sm:px-8 bg-white">
+  <SectionAtmosphere variant="grid" />
   <div class="max-w-7xl mx-auto">
     
     <!-- Section header -->
@@ -14,15 +17,16 @@ import { services, categories } from '../data/services';
         </div>
       </div>
       
-      <div class="lg:col-span-8">
-        <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[1.1] tracking-[-0.04em] text-black text-left">
-          Soluciones que transforman tu negocio
+      <div class="lg:col-span-8 lg:col-start-1">
+        <h2 class="services-title text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[1.1] tracking-[-0.04em] text-black text-left">
+          <span class="services-title-line">Soluciones que</span>
+          <span class="services-title-line">transforman <span class="services-title-keep">tu negocio</span></span>
         </h2>
       </div>
     </div>
 
     <!-- Services list -->
-    <div class="space-y-0 border-t border-black/10">
+    <div class="services-list space-y-0 border-t border-black/10" data-services-list>
       {services.map((service, index) => {
         const accentColors = ['bg-[#e63946]', 'bg-black', 'bg-[#ffb703]'];
         const accentColor = accentColors[index % 3];
@@ -49,7 +53,8 @@ import { services, categories } from '../data/services';
             <!-- Expandable content -->
             <div class="service-content overflow-hidden transition-all duration-1000 ease-out"
             >
-              <div class="py-8 pl-6">
+              <div class="service-detail py-8 pl-6">
+                <div class="service-copy">
                 <p class="text-sm text-black/60 leading-relaxed mb-3 max-w-2xl">{service.description}</p>
                 
                 <p class="text-xs text-black/40 leading-relaxed mb-4 max-w-2xl">→ {service.benefit}</p>
@@ -71,24 +76,124 @@ import { services, categories } from '../data/services';
                     </svg>
                   </a>
                 </div>
+                </div>
               </div>
             </div>
           </div>
         );
       })}
+      <div class="services-mercury" data-services-mercury hidden></div>
+      <template data-services-mercury-template>
+        <MercuryLogo
+          label="Logo negro fluido de Neuraz. Arrastrá para cambiar la perspectiva"
+          finish="black"
+          interactive={true}
+          controls={false}
+          framing={1.05}
+          maxDpr={1.5}
+        />
+      </template>
     </div>
   </div>
 </section>
+
+<style>
+  .services-title-line { display: block; }
+  .services-title-keep { white-space: nowrap; }
+  .services-list { position: relative; }
+  .service-copy { min-width: 0; }
+  .services-mercury { display: none; }
+
+  @media (min-width: 1024px) {
+    .service-detail {
+      display: flex;
+      align-items: center;
+      min-height: clamp(280px, 24vw, 336px);
+    }
+    .service-copy { position: relative; z-index: 3; width: min(55%, 640px); }
+    .service-header { position: relative; }
+    .service-header > div,
+    .service-arrow { position: relative; z-index: 3; }
+    .services-mercury { display: block; position: absolute; z-index: 2; }
+    .services-mercury[hidden] { display: none; }
+    .services-mercury :global(.mercury-logo) { height: 100%; aspect-ratio: auto; }
+  }
+  @media (max-width: 479px) {
+    .services-title { font-size: 1.9375rem; line-height: 1.12; }
+  }
+</style>
 
 <script>
   // Auto-expand services when centered in viewport
   const serviceItems = document.querySelectorAll('.service-item');
   const serviceContents = document.querySelectorAll('.service-content');
   const serviceArrows = document.querySelectorAll('.service-arrow');
+  // Establish the collapsed layout before an anchor jump crosses this section.
+  serviceContents.forEach((content) => {
+    content.style.maxHeight = '0px';
+    content.style.opacity = '0';
+  });
   
   // Check if we should reopen a service from sessionStorage
   const lastOpenedService = sessionStorage.getItem('lastOpenedService');
   let expandedIndex = -1;
+
+  const servicesList = document.querySelector<HTMLElement>('[data-services-list]');
+  const mercuryShell = document.querySelector<HTMLElement>('[data-services-mercury]');
+  const mercuryTemplate = document.querySelector<HTMLTemplateElement>('[data-services-mercury-template]');
+  const desktop = window.matchMedia('(min-width: 1024px)');
+  let mercuryFrame = 0;
+
+  function syncMercury() {
+    if (!servicesList || !mercuryShell || !mercuryTemplate) return;
+    serviceItems.forEach((item, index) => {
+      item.setAttribute('data-expanded', String(index === expandedIndex));
+    });
+    if (!desktop.matches) {
+      mercuryShell.hidden = true;
+      // Removing the viewer releases its GPU buffers when switching to mobile.
+      mercuryShell.replaceChildren();
+      return;
+    }
+    const content = serviceContents[expandedIndex];
+    if (!content) {
+      mercuryShell.hidden = true;
+      return;
+    }
+    const listRect = servicesList.getBoundingClientRect();
+    const contentRect = content.getBoundingClientRect();
+    if (!listRect.width || !contentRect.height) {
+      mercuryShell.hidden = true;
+      return;
+    }
+    const size = Math.min(760, Math.max(460, window.innerWidth * 0.48), window.innerHeight * 0.86);
+    const overhang = Math.min(88, window.innerWidth * 0.055);
+    const center = contentRect.top - listRect.top + contentRect.height / 2;
+    const top = Math.max(0, Math.min(center - size / 2, Math.max(0, listRect.height - size)));
+    // The scene deliberately overlaps multiple rows on the right. Text and
+    // accordion arrows sit above it, while the clear area accepts drag input.
+    mercuryShell.style.left = `${listRect.width - size + overhang - servicesList.clientLeft}px`;
+    mercuryShell.style.top = `${top}px`;
+    mercuryShell.style.width = `${size}px`;
+    mercuryShell.style.height = `${size}px`;
+    mercuryShell.hidden = false;
+    if (!mercuryShell.querySelector('neuraz-mercury')) {
+      mercuryShell.append(mercuryTemplate.content.cloneNode(true));
+    }
+  }
+
+  function refreshMercury() {
+    if (mercuryFrame) return;
+    mercuryFrame = requestAnimationFrame(() => {
+      mercuryFrame = 0;
+      const content = serviceContents[expandedIndex] as HTMLElement | undefined;
+      if (content) {
+        const height = `${content.scrollHeight}px`;
+        if (content.style.maxHeight !== height) content.style.maxHeight = height;
+      }
+      syncMercury();
+    });
+  }
   
   if (lastOpenedService) {
     // Find the service index by slug
@@ -115,6 +220,7 @@ import { services, categories } from '../data/services';
           serviceArrows[index].style.transform = 'rotate(0deg)';
         }
       });
+      refreshMercury();
       
       // Scroll to the expanded service
       setTimeout(() => {
@@ -154,6 +260,7 @@ import { services, categories } from '../data/services';
           serviceArrows[index].style.transform = 'rotate(0deg)';
         }
       });
+      refreshMercury();
     }
   }
   
@@ -187,6 +294,16 @@ import { services, categories } from '../data/services';
           }
         });
       }
+      refreshMercury();
     });
   });
+
+  // The position of one panel also changes as a panel above it closes.
+  const serviceResize = new ResizeObserver(refreshMercury);
+  serviceContents.forEach(content => serviceResize.observe(content));
+  document.querySelectorAll('.service-detail').forEach(detail => serviceResize.observe(detail));
+  window.addEventListener('resize', refreshMercury, { passive: true });
+  window.addEventListener('pageshow', refreshMercury);
+  desktop.addEventListener('change', refreshMercury);
+  refreshMercury();
 </script>

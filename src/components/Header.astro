@@ -1,19 +1,18 @@
 ---
 // src/components/Header.astro - Simple mobile menu
+import NavbarBrand from './NavbarBrand.astro';
 ---
 
 <header class="fixed top-0 left-0 right-0 z-50 bg-[#fafafa]">
-  <div class="max-w-8xl mx-auto px-6 sm:px-8">
+  <div class="header-inner">
     <div class="flex items-center justify-between h-20">
       <!-- Logo -->
-      <a href="/" class="flex items-center gap-3 text-sm font-medium tracking-[0.2em] text-black hover:text-[#e63946] transition-colors">
-        <img src="/images/isotipo.svg" alt="Neuraz" class="w-5 h-5" />
-        <span>NEURAZ</span>
-      </a>
+      <NavbarBrand />
 
       <!-- Desktop Navigation -->
       <nav class="hidden md:flex items-center gap-8">
         <a href="#servicios" class="text-[11px] font-medium tracking-[0.15em] text-black/60 hover:text-black transition-colors uppercase">Servicios</a>
+        <a href="#trabajos" class="text-[11px] font-medium tracking-[0.15em] text-black/60 hover:text-black transition-colors uppercase">Trabajos</a>
         <a href="#nosotros" class="text-[11px] font-medium tracking-[0.15em] text-black/60 hover:text-black transition-colors uppercase">Nosotros</a>
         <a href="#equipo" class="text-[11px] font-medium tracking-[0.15em] text-black/60 hover:text-black transition-colors uppercase">Equipo</a>
         <a href="#contacto" class="text-[11px] font-medium tracking-[0.15em] text-black/60 hover:text-black transition-colors uppercase">Contacto</a>
@@ -40,6 +39,7 @@
     <div id="mobile-menu" class="hidden md:hidden bg-[#fafafa] border-t border-black/10">
       <nav class="flex flex-col py-6">
         <a href="#servicios" class="py-3 text-lg font-medium text-black/60 hover:text-black transition-colors mobile-link">Servicios</a>
+        <a href="#trabajos" class="py-3 text-lg font-medium text-black/60 hover:text-black transition-colors mobile-link">Trabajos</a>
         <a href="#nosotros" class="py-3 text-lg font-medium text-black/60 hover:text-black transition-colors mobile-link">Nosotros</a>
         <a href="#equipo" class="py-3 text-lg font-medium text-black/60 hover:text-black transition-colors mobile-link">Equipo</a>
         <a href="#contacto" class="py-3 text-lg font-medium text-black/60 hover:text-black transition-colors mobile-link">Contacto</a>
@@ -47,6 +47,18 @@
     </div>
   </div>
 </header>
+
+<style>
+  .header-inner {
+    width: 100%;
+    max-width: calc(1648px + 2 * clamp(2rem, 6vw, 7.5rem));
+    margin-inline: auto;
+    padding-inline: clamp(2rem, 6vw, 7.5rem);
+  }
+  @media (max-width: 767px) {
+    .header-inner { padding-inline: clamp(1.75rem, 8vw, 2.5rem); }
+  }
+</style>
 
 <script>
   const mobileMenuBtn = document.getElementById('mobile-menu-btn');

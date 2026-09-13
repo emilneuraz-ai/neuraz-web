@@ -1,0 +1,61 @@
+---
+import AnimatedLogo from './AnimatedLogo.astro';
+
+interface Props {
+  class?: string;
+  href?: string;
+  showWordmark?: boolean;
+  variant?: 'light' | 'dark';
+  size?: number;
+}
+
+const {
+  class: className,
+  href = '/',
+  showWordmark = true,
+  variant = 'light',
+  size = 28,
+} = Astro.props;
+---
+
+<span class:list={['navbar-brand', `navbar-brand--${variant}`, className]}>
+  <a class="navbar-brand__link" href={href} aria-label="Neuraz, inicio">
+    <span class="navbar-brand__isotipo">
+      <AnimatedLogo size={size} label="" controls={false} />
+    </span>
+    {showWordmark && <span class="navbar-brand__wordmark">NEURAZ</span>}
+  </a>
+</span>
+
+<style>
+  .navbar-brand {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    color: #000;
+  }
+
+  .navbar-brand__link {
+    display: inline-flex;
+    flex: none;
+    align-items: center;
+    gap: 12px;
+    min-height: 44px;
+    color: inherit;
+    text-decoration: none;
+    transition: color .16s ease;
+  }
+
+  .navbar-brand__link:hover { color: #e63946; }
+  .navbar-brand__isotipo { display: inline-flex; align-items: center; justify-content: center; flex: none; }
+  .navbar-brand__wordmark { font-size: 14px; font-weight: 500; letter-spacing: .2em; }
+
+  .navbar-brand__link:focus-visible { outline: 2px solid #e63946; outline-offset: 3px; }
+
+  .navbar-brand--dark { color: #fff; }
+  .navbar-brand--dark .navbar-brand__isotipo { padding: 4px; border-radius: 3px; background: #fafafa; }
+
+  @media (prefers-reduced-motion: reduce) {
+    .navbar-brand__link { transition: none; }
+  }
+</style>

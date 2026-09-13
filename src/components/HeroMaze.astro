@@ -1,0 +1,166 @@
+---
+import { services } from '../data/services';
+import arrowPath from '../assets/heroicons/outline/arrow-path.svg?raw';
+import chat from '../assets/heroicons/outline/chat-bubble-left-right.svg?raw';
+import gift from '../assets/heroicons/outline/gift.svg?raw';
+import puzzle from '../assets/heroicons/outline/puzzle-piece.svg?raw';
+import pencil from '../assets/heroicons/outline/pencil-square.svg?raw';
+import cpu from '../assets/heroicons/outline/cpu-chip.svg?raw';
+import document from '../assets/heroicons/outline/document-check.svg?raw';
+import academic from '../assets/heroicons/outline/academic-cap.svg?raw';
+import chart from '../assets/heroicons/outline/chart-bar-square.svg?raw';
+
+const icons = [arrowPath, chat, gift, puzzle, pencil, cpu, document, academic, chart];
+const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación', 'Capacitaciones', 'Datos en tiempo real'];
+const descriptions = [
+  'Conectamos herramientas. Liberamos tu tiempo.',
+  'Cada consulta, una conversación que avanza.',
+  'Más motivos para que tus clientes vuelvan.',
+  'Tu marca se convierte en una experiencia.',
+  'Ideas que se convierten en contenido.',
+  'Inteligencia que trabaja con tu equipo.',
+  'Del archivo al dato que necesitás.',
+  'Tu equipo, preparado para lo que viene.',
+  'La información que necesitás para decidir.',
+];
+const explanations = [
+  'Conectamos ventas, atención y seguimiento para que las tareas repetitivas avancen solas y tu equipo pueda concentrarse en el negocio.',
+  'Centralizamos los contactos y automatizamos las respuestas por WhatsApp y redes para que cada consulta tenga seguimiento y contexto.',
+  'Creamos programas de puntos, premios y cupones para que tus clientes tengan motivos concretos para volver y participar.',
+  'Diseñamos juegos con la identidad de tu marca: trivias, ruletas y desafíos que tus clientes pueden abrir desde un QR.',
+  'Generamos contenido, tarjetas y piezas digitales con inteligencia artificial para mantener tus canales actualizados con menos tareas manuales.',
+  'Creamos agentes que analizan el comportamiento y personalizan las acciones de tu negocio para acompañar a tu equipo.',
+  'Extraemos datos de documentos y clasificamos archivos para que tu equipo encuentre la información que necesita sin organizarla a mano.',
+  'Capacitamos a tu equipo en inteligencia artificial y automatización para incorporar herramientas útiles en sus tareas de todos los días.',
+  'Reunimos tus datos en tableros que se actualizan automáticamente para consultar métricas, exportar información y tomar decisiones con más contexto.',
+];
+const paths = (svg: string) => svg.replace(/^[\s\S]*?<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '');
+const pages = import.meta.glob('../pages/servicios/*.astro');
+const entries = services.map((service, i) => ({
+  ...service, label: labels[i], detail: descriptions[i], explanation: explanations[i], icon: paths(icons[i]).replace(/<path\b/g, '<path pathLength="1"'),
+  href: pages[`../pages/servicios/${service.slug}.astro`] ? `/servicios/${service.slug}` : '#servicios',
+}));
+---
+
+<div class="maze" data-hero-maze>
+  <div class="maze-viewport" data-maze-viewport role="group" aria-label="Laberinto de servicios. Arrastrá para girar. Con el teclado, usá las flechas para girar, espacio para pausar o reanudar y R para restablecer la vista." aria-keyshortcuts="ArrowLeft ArrowRight ArrowUp ArrowDown Space R">
+    <img class="maze-poster" src="/images/hero-maze-poster.png" alt="Laberinto tridimensional de bordes lineales" width="1000" height="850" fetchpriority="low" />
+    <canvas class="maze-canvas" data-maze-canvas aria-hidden="true"></canvas>
+    <div class="maze-pins" data-maze-enhanced>
+      {entries.map((entry, i) => (
+        <button
+          type="button" class="maze-pin" data-maze-stop={entry.id}
+          data-label={entry.label} data-detail={entry.detail} data-explanation={entry.explanation} data-href={entry.href}
+          aria-label={`Explorar ${entry.label}`} aria-pressed="false"
+          style={`--pin-order: ${i}`}
+        >
+          <span class="maze-pin-disc">
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" set:html={entry.icon} />
+          </span>
+          <span class="maze-pin-label" aria-hidden="true">{entry.label}</span>
+        </button>
+      ))}
+    </div>
+    <div class="maze-bubble" data-maze-bubble data-placement="above" role="note" aria-label="Servicio destacado" hidden>
+      <a class="maze-bubble-heading" data-maze-link href={entries[0].href}>
+        <span class="maze-bubble-marker" aria-hidden="true"></span>
+        <span data-maze-bubble-label>{entries[0].label}</span>
+        <span class="maze-bubble-arrow" aria-hidden="true">↗</span>
+      </a>
+      <p data-maze-bubble-detail>{entries[0].explanation}</p>
+      <div class="maze-bubble-progress" aria-hidden="true"><span></span></div>
+    </div>
+  </div>
+  <nav class="maze-fallback" aria-label="Explorar servicios">
+    {entries.map(entry => <a href={entry.href}>{entry.label}<span aria-hidden="true">↗</span></a>)}
+  </nav>
+  <span class="sr-only" role="status" data-maze-status></span>
+</div>
+
+<script>
+  let cleanup: (() => void) | undefined;
+  let loader: IntersectionObserver | undefined;
+  let generation = 0;
+  const start = () => {
+    const root = document.querySelector<HTMLElement>('[data-hero-maze]');
+    if (!root || root.dataset.initialized) return;
+    root.dataset.initialized = 'true';
+    const current = ++generation;
+    loader = new IntersectionObserver(async ([entry]) => {
+      if (!entry.isIntersecting) return;
+      loader?.disconnect();
+      try {
+        const { initHeroMaze } = await import('../scripts/hero-maze');
+        if (current !== generation) return;
+        const dispose = await initHeroMaze(root);
+        if (current !== generation) dispose();
+        else cleanup = dispose;
+      } catch {
+        root.dataset.ready = 'false';
+      }
+    }, { rootMargin: '200px' });
+    loader.observe(root);
+  };
+  const stop = () => { generation++; loader?.disconnect(); cleanup?.(); cleanup = undefined; };
+  start();
+  document.addEventListener('astro:page-load', start);
+  document.addEventListener('astro:before-swap', stop);
+  window.addEventListener('pagehide', stop);
+  window.addEventListener('pageshow', event => {
+    if (event.persisted) {
+      const root = document.querySelector<HTMLElement>('[data-hero-maze]');
+      if (root) delete root.dataset.initialized;
+      start();
+    }
+  });
+</script>
+
+<style>
+  .maze { position: relative; width: 100%; color: #111; }
+  .maze-viewport { position: relative; width: 100%; aspect-ratio: 1.36; touch-action: pan-y; cursor: grab; outline-offset: -2px; }
+  .maze[data-dragging="true"] .maze-viewport { cursor: grabbing; }
+  .maze-canvas, .maze-poster, .maze-pins { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .maze-poster { object-fit: contain; }
+  .maze-canvas { opacity: 0; }
+  .maze[data-ready="true"] .maze-canvas { opacity: 1; }
+  .maze[data-ready="true"] .maze-poster { visibility: hidden; }
+  .maze [data-maze-enhanced] { visibility: hidden; }
+  .maze[data-ready="true"] [data-maze-enhanced] { visibility: visible; }
+  .maze-pins { pointer-events: none; }
+  .maze-pin { position: absolute; top: 0; left: 0; width: 44px; height: 44px; display: grid; place-items: center; pointer-events: auto; cursor: pointer; -webkit-tap-highlight-color: transparent; border-radius: 50%; color: #777; }
+  .maze-pin-disc { width: 33px; height: 33px; display: grid; place-items: center; background: #fafafa; border: 1px solid #d8d8d8; border-radius: 50%; box-shadow: 0 2px 0 #fafafa; transform: scale(var(--pin-scale, 1)); transition: color .25s, background .25s, border-color .25s, transform .25s; }
+  .maze-pin svg { width: 19px; height: 19px; }
+  .maze-pin svg :global(path) { fill: currentColor; fill-opacity: 0; transition: fill-opacity .5s; }
+  .maze-pin[data-visited="true"] { color: #111; }
+  .maze-pin[data-visited="true"] .maze-pin-disc { border-color: #aaa; }
+  .maze-pin[aria-pressed="true"] { z-index: 500 !important; color: #e63946; }
+  .maze-pin[aria-pressed="true"] .maze-pin-disc { border-color: #e63946; background: #fff5f5; }
+  .maze-pin[aria-pressed="true"] .maze-pin-disc, .maze-pin:hover .maze-pin-disc, .maze-pin:focus-visible .maze-pin-disc { transform: scale(1); }
+  .maze-pin[aria-pressed="true"] svg :global(path) { fill-opacity: .13; stroke-dasharray: 1; animation: icon-discover 1.6s ease both; }
+  .maze-pin:hover, .maze-pin:focus-visible { z-index: 600 !important; color: #e63946; }
+  .maze-pin:hover .maze-pin-disc, .maze-pin:focus-visible .maze-pin-disc { transform: translateY(-3px) scale(1); border-color: #e63946; }
+  .maze-pin-label { position: absolute; left: 50%; bottom: calc(100% + 3px); transform: translateX(-50%) translateY(3px); white-space: nowrap; background: #111; color: white; padding: 7px 9px; font-size: 10px; line-height: 1.25; pointer-events: none; opacity: 0; transition: opacity .15s, transform .15s; border-radius: 2px; }
+  .maze-pin:hover .maze-pin-label, .maze-pin:focus-visible .maze-pin-label { opacity: 1; transform: translateX(-50%) translateY(0); }
+  .maze-bubble { position: absolute; top: 0; left: 0; z-index: 1000; width: min(236px, calc(100% - 24px)); padding: 15px 16px 12px; background: #fff; border: 1px solid #dedede; border-radius: 8px; box-shadow: 0 8px 28px #0000000b; color: #111; pointer-events: none; }
+  .maze-bubble[hidden] { display: none; }
+  .maze-bubble::after { content: ''; position: absolute; bottom: -5px; left: clamp(12px, var(--arrow-x, 50%), calc(100% - 12px)); width: 9px; height: 9px; border-right: 1px solid #dedede; border-bottom: 1px solid #dedede; background: #fff; transform: translateX(-50%) rotate(45deg); }
+  .maze-bubble[data-placement="below"] { --bubble-enter-y: -5px; }
+  .maze-bubble[data-placement="below"]::after { top: -5px; bottom: auto; transform: translateX(-50%) rotate(225deg); }
+  .maze-bubble-heading { display: flex; align-items: center; gap: 8px; font-size: 13px; line-height: 1.35; font-weight: 500; letter-spacing: -.015em; pointer-events: auto; }
+  .maze-bubble-heading:hover { color: #e63946; }
+  .maze-bubble-arrow { margin-left: auto; color: #999; }
+  .maze-bubble-marker { width: 5px; height: 5px; flex: none; border-radius: 50%; background: #e63946; }
+  .maze-bubble p { margin: 9px 0 13px; font-size: 11px; line-height: 1.65; color: #646464; text-wrap: pretty; }
+  .maze-bubble-progress { height: 2px; overflow: hidden; background: #efefef; }
+  .maze-bubble-progress span { display: block; width: 100%; height: 100%; background: #e63946; transform: scaleX(var(--reading-progress, 0)); transform-origin: left; }
+  .maze[data-bubble-open="true"] .maze-bubble { animation: maze-bubble-enter .18s ease-out both; }
+  .maze-fallback { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; border-top: 1px solid #ddd; }
+  .maze-fallback a { display: flex; justify-content: space-between; padding: 10px 0; font-size: 11px; border-bottom: 1px solid #e8e8e8; }
+  .maze[data-ready="true"] .maze-fallback { display: none; }
+  .maze button:focus-visible, .maze a:focus-visible, .maze-viewport:focus-visible { outline: 2px solid #e63946; outline-offset: 3px; }
+  @keyframes icon-discover { from { stroke-dashoffset: 1; fill-opacity: 0; } to { stroke-dashoffset: 0; fill-opacity: .13; } }
+  @keyframes maze-bubble-enter { from { opacity: 0; translate: 0 var(--bubble-enter-y, 5px); } to { opacity: 1; translate: 0 0; } }
+  @media (max-width: 1100px) and (min-width: 768px) { .maze-pin-disc { width: 29px; height: 29px; } .maze-pin svg { width: 17px; height: 17px; } }
+  @media (max-width: 767px) { .maze-viewport { aspect-ratio: 1.06; } .maze-pin-label { font-size: 9px; } }
+  @media (prefers-reduced-motion: reduce) { .maze *, .maze-pin svg :global(path) { animation: none !important; transition: none !important; } }
+</style>

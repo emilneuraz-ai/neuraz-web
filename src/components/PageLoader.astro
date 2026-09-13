@@ -1,0 +1,119 @@
+---
+import AnimatedLogo from './AnimatedLogo.astro';
+---
+
+<div class="page-loader" data-page-loader data-state="idle" role="status" aria-live="polite" aria-hidden="true" hidden>
+  <div class="page-loader__brand">
+    <AnimatedLogo size={104} label="" controls={false} class="page-loader__logo" />
+    <span class="page-loader__wordmark" aria-hidden="true">NEURAZ</span>
+    <span class="page-loader__label">Cargando<span aria-hidden="true">…</span></span>
+  </div>
+</div>
+
+<script is:inline>
+  // Run while the document is still loading. Without JavaScript the overlay
+  // remains hidden; a failed animation asset never prevents access to the site.
+  (() => {
+    const loader = document.currentScript?.previousElementSibling;
+    if (!(loader instanceof HTMLElement) || !loader.matches('[data-page-loader]')) return;
+    window.__neurazPageLoader?.destroy();
+    const lifetime = new AbortController();
+    const { signal } = lifetime;
+    const logo = loader.querySelector('[data-animated-logo]');
+    let deadline;
+    let transition;
+    let blocked = [];
+
+    function restoreContent() {
+      blocked.forEach(element => { element.inert = false; });
+      blocked = [];
+    }
+
+    function coverContent() {
+      const additions = [...document.body.children].filter(element =>
+        element instanceof HTMLElement && element !== loader && !element.inert
+        && !['SCRIPT', 'STYLE', 'LINK'].includes(element.tagName)
+      );
+      additions.forEach(element => { element.inert = true; });
+      blocked.push(...additions);
+    }
+
+    function finish(immediate = false) {
+      clearTimeout(deadline);
+      clearTimeout(transition);
+      restoreContent();
+      delete document.documentElement.dataset.pageLoading;
+      loader.dataset.state = 'idle';
+      loader.setAttribute('aria-hidden', 'true');
+      logo?.setAttribute('data-paused', 'true');
+      if (immediate || window.matchMedia('(prefers-reduced-motion: reduce)').matches) loader.hidden = true;
+      else transition = setTimeout(() => { loader.hidden = true; }, 180);
+    }
+
+    function start() {
+      clearTimeout(deadline);
+      clearTimeout(transition);
+      restoreContent();
+      loader.hidden = false;
+      loader.dataset.state = 'loading';
+      loader.setAttribute('aria-hidden', 'false');
+      logo?.setAttribute('data-paused', 'false');
+      document.documentElement.dataset.pageLoading = 'true';
+      // Keep the covered page out of the tab order and preserve existing inert
+      // states, including those owned by menus or dialogs.
+      coverContent();
+      deadline = setTimeout(() => finish(), 7000);
+    }
+
+    document.addEventListener('click', event => {
+      if (event.defaultPrevented || event.button !== 0 || event.metaKey || event.ctrlKey || event.shiftKey || event.altKey) return;
+      const anchor = event.target instanceof Element ? event.target.closest('a[href]') : null;
+      if (!anchor || anchor.hasAttribute('download') || (anchor.target && anchor.target !== '_self')) return;
+      const target = new URL(anchor.href, window.location.href);
+      if (target.origin !== window.location.origin || !['http:', 'https:'].includes(target.protocol)) return;
+      if (target.pathname === window.location.pathname && target.search === window.location.search) return;
+      start();
+    }, { signal });
+
+    window.addEventListener('load', () => finish(), { once: true, signal });
+    document.addEventListener('DOMContentLoaded', () => {
+      if (loader.dataset.state === 'loading') coverContent();
+    }, { once: true, signal });
+    window.addEventListener('pagehide', () => finish(true), { signal });
+    window.addEventListener('pageshow', event => { if (event.persisted) finish(true); }, { signal });
+    window.addEventListener('keydown', event => { if (event.key === 'Escape') finish(true); }, { signal });
+    document.addEventListener('astro:before-preparation', start, { signal });
+    document.addEventListener('astro:page-load', () => finish(), { signal });
+    document.addEventListener('neuraz:loading-start', start, { signal });
+    document.addEventListener('neuraz:loading-end', () => finish(), { signal });
+
+    window.__neurazPageLoader = {
+      destroy() { finish(true); lifetime.abort(); },
+    };
+    if (document.readyState !== 'complete') start();
+  })();
+</script>
+
+<style>
+  .page-loader {
+    position: fixed;
+    inset: 0;
+    z-index: 1000;
+    display: grid;
+    place-items: center;
+    background: #fafafa;
+    color: #000;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transition: opacity 180ms ease, visibility 180ms ease;
+  }
+  .page-loader[hidden] { display: none; }
+  .page-loader[data-state='loading'] { opacity: 1; visibility: visible; pointer-events: auto; }
+  .page-loader__brand { display: flex; flex-direction: column; align-items: center; }
+  .page-loader__wordmark { margin-top: 27px; padding-left: .23em; font-size: 13px; font-weight: 550; letter-spacing: .23em; }
+  .page-loader__label { margin-top: 14px; color: #666; font-size: 11px; letter-spacing: .04em; }
+  @media (prefers-reduced-motion: reduce) {
+    .page-loader { transition: none; }
+  }
+</style>

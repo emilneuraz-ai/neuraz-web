@@ -1,0 +1,210 @@
+---
+import projects from '../data/behance-projects.json';
+---
+
+<section id="trabajos" class="works" aria-labelledby="works-title">
+  <works-carousel>
+    <div class="works-heading works-inner">
+      <h2 id="works-title">Trabajos</h2>
+      <div class="works-controls" data-controls hidden>
+        <button type="button" data-previous aria-label="Ver trabajos anteriores" aria-controls="works-track" disabled>
+          <span aria-hidden="true">←</span>
+        </button>
+        <button type="button" data-next aria-label="Ver trabajos siguientes" aria-controls="works-track">
+          <span aria-hidden="true">→</span>
+        </button>
+      </div>
+    </div>
+
+    <p id="works-help" class="works-sr-only">Arrastrá con el mouse o deslizá para recorrer los trabajos. También podés usar las flechas izquierda y derecha, Inicio para ir al primero y Fin para ir al último.</p>
+    <div id="works-track" class="works-track" data-track tabindex="0" role="region" aria-label="Proyectos en Behance" aria-describedby="works-help">
+      <ul class="works-list">
+        {projects.map((project) => (
+          <li class="works-item">
+            <a class="works-project" href={project.url} target="_blank" rel="noopener noreferrer" draggable="false" aria-label={`${project.title} — ver en Behance (abre en otra pestaña)`}>
+              <img src={project.thumbnail} alt={`Portada de ${project.title}`} width="404" height="316" loading="lazy" decoding="async" draggable="false" />
+              <span class="works-caption" aria-hidden="true">
+                <span>{project.title}</span>
+                <span class="works-external">↗</span>
+              </span>
+            </a>
+          </li>
+        ))}
+      </ul>
+    </div>
+
+    <div class="works-footer works-inner">
+      <a href="https://www.behance.net/emilgonzalez" target="_blank" rel="noopener noreferrer">
+        Ver todos los trabajos en Behance <span aria-hidden="true">↗</span>
+      </a>
+    </div>
+  </works-carousel>
+</section>
+
+<style>
+  .works { padding-block: 6rem; background: #fafafa; scroll-margin-top: 2rem; }
+  works-carousel { display: block; }
+  .works-inner { width: 100%; max-width: 1344px; margin-inline: auto; padding-inline: 24px; }
+  .works-heading { display: flex; align-items: center; justify-content: space-between; gap: 24px; margin-bottom: 2.5rem; }
+  .works-heading h2 { margin: 0; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.04em; color: #111; }
+  .works-controls { display: flex; gap: 8px; flex-shrink: 0; }
+  .works-controls[hidden] { display: none; }
+  .works-controls button { display: grid; place-items: center; width: 44px; height: 44px; padding: 0; border: 1px solid #d4d4d4; border-radius: 0; background: transparent; color: #111; font-size: 23px; cursor: pointer; transition: background-color 160ms, color 160ms; }
+  .works-controls button:hover:not(:disabled) { background: #111; color: white; }
+  .works-controls button:disabled { color: #b8b8b8; border-color: #e5e5e5; cursor: default; }
+  .works-controls button:focus-visible, .works-footer a:focus-visible { outline: 2px solid #e63946; outline-offset: 4px; }
+  .works-track { width: 100%; overflow-x: auto; scroll-snap-type: x mandatory; scroll-behavior: auto; overscroll-behavior-x: contain; scrollbar-width: none; }
+  .works-track::-webkit-scrollbar { display: none; }
+  .works-track[data-drag-ready], .works-track[data-drag-ready] .works-project { cursor: grab; user-select: none; -webkit-user-select: none; }
+  .works-track.is-dragging { scroll-snap-type: none; }
+  .works-track.is-dragging, .works-track.is-dragging .works-project { cursor: grabbing; }
+  .works-track:focus-visible { outline: 2px solid #e63946; outline-offset: -2px; }
+  .works-list { display: flex; gap: 0; margin: 0; padding: 0; list-style: none; }
+  .works-item { flex: 0 0 calc(100% / 1.15); min-width: 0; scroll-snap-align: start; }
+  .works-project { position: relative; display: block; aspect-ratio: 404 / 316; overflow: hidden; border: 0; border-radius: 0; background: #eee; }
+  .works-project img { display: block; width: 100%; height: 100%; object-fit: cover; }
+  .works-project:focus-visible { outline: 3px solid #e63946; outline-offset: -3px; }
+  .works-caption { position: absolute; inset: auto 0 0; display: flex; align-items: flex-end; justify-content: space-between; gap: 20px; padding: 3rem 24px 22px; color: #fff; background: linear-gradient(transparent, rgb(0 0 0 / .82)); font-size: 14px; font-weight: 500; line-height: 1.45; opacity: 0; transition: opacity 180ms; pointer-events: none; }
+  .works-external { flex-shrink: 0; font-size: 22px; line-height: 1; }
+  .works-project:hover .works-caption, .works-project:focus-visible .works-caption { opacity: 1; }
+  .works-footer { display: flex; justify-content: flex-end; margin-top: 2rem; }
+  .works-footer a { display: inline-flex; align-items: center; gap: 12px; color: #111; font-size: 13px; font-weight: 500; line-height: 1.5; text-decoration: underline; text-decoration-color: #bdbdbd; text-underline-offset: 5px; }
+  .works-footer a:hover { color: #e63946; text-decoration-color: currentColor; }
+  .works-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
+  @media (min-width: 640px) {
+    .works-inner { padding-inline: 32px; }
+    .works-item { flex-basis: 50%; }
+  }
+  @media (min-width: 1024px) {
+    .works-item { flex-basis: calc(100% / 3); }
+  }
+  @media (max-width: 639px) {
+    .works { padding-block: 4rem; }
+    .works-heading { margin-bottom: 2rem; }
+    .works-footer { justify-content: flex-start; margin-top: 1.5rem; }
+    .works-caption { opacity: 1; font-size: 13px; }
+  }
+  @media (hover: none) { .works-caption { opacity: 1; } }
+  @media (prefers-reduced-motion: reduce) {
+    .works-controls button, .works-caption { transition: none; }
+  }
+</style>
+
+<script>
+  class WorksCarousel extends HTMLElement {
+    private cleanup?: () => void;
+
+    connectedCallback() {
+      if (this.cleanup) return;
+      const track = this.querySelector<HTMLElement>('[data-track]');
+      const previous = this.querySelector<HTMLButtonElement>('[data-previous]');
+      const next = this.querySelector<HTMLButtonElement>('[data-next]');
+      const controls = this.querySelector<HTMLElement>('[data-controls]');
+      if (!track || !previous || !next || !controls) return;
+
+      const events = new AbortController();
+      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      let frame = 0;
+      let drag: { pointerId: number; startX: number; startScroll: number; active: boolean } | undefined;
+      let suppressClick = false;
+      const limit = () => Math.max(0, track.scrollWidth - track.clientWidth);
+      const update = () => {
+        previous.disabled = track.scrollLeft <= 1;
+        next.disabled = track.scrollLeft >= limit() - 1;
+      };
+      const onScroll = () => {
+        if (frame) return;
+        frame = requestAnimationFrame(() => { frame = 0; update(); });
+      };
+      const goTo = (left: number) => track.scrollTo({ left: Math.max(0, Math.min(limit(), left)), behavior: motion.matches ? 'instant' : 'smooth' });
+      const move = (direction: number) => {
+        const item = track.querySelector<HTMLElement>('.works-item');
+        goTo(track.scrollLeft + direction * (item?.getBoundingClientRect().width ?? track.clientWidth));
+      };
+
+      const finishDrag = (event?: PointerEvent, snap = true) => {
+        if (!drag || (event && event.pointerId !== drag.pointerId)) return;
+        const ended = drag;
+        drag = undefined;
+        const left = track.scrollLeft;
+        track.classList.remove('is-dragging');
+        if (track.hasPointerCapture(ended.pointerId)) track.releasePointerCapture(ended.pointerId);
+        if (!ended.active || !snap) return;
+
+        const width = track.querySelector<HTMLElement>('.works-item')?.getBoundingClientRect().width ?? track.clientWidth;
+        const distance = left - ended.startScroll;
+        const start = Math.round(ended.startScroll / width);
+        let target = Math.round(left / width);
+        // A deliberate short swipe advances a card instead of snapping back.
+        if (target === start && Math.abs(distance) >= Math.min(80, width * .2)) target += Math.sign(distance);
+        goTo(target * width);
+      };
+
+      track.addEventListener('pointerdown', (event) => {
+        suppressClick = false;
+        if (event.pointerType !== 'mouse' || event.button !== 0 || !event.isPrimary || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || limit() === 0) return;
+        track.scrollTo({ left: track.scrollLeft, behavior: 'instant' });
+        drag = { pointerId: event.pointerId, startX: event.clientX, startScroll: track.scrollLeft, active: false };
+      }, { signal: events.signal });
+      window.addEventListener('pointermove', (event) => {
+        if (!drag || event.pointerId !== drag.pointerId) return;
+        if (!(event.buttons & 1)) { finishDrag(event); return; }
+        const distance = event.clientX - drag.startX;
+        if (!drag.active) {
+          if (Math.abs(distance) < 6) return;
+          drag.active = true;
+          suppressClick = true;
+          track.classList.add('is-dragging');
+          // Delay capture so a normal click still targets the project link.
+          track.setPointerCapture(event.pointerId);
+        }
+        event.preventDefault();
+        track.scrollLeft = Math.max(0, Math.min(limit(), drag.startScroll - distance));
+      }, { signal: events.signal });
+      window.addEventListener('pointerup', (event) => finishDrag(event), { signal: events.signal });
+      window.addEventListener('pointercancel', (event) => finishDrag(event), { signal: events.signal });
+      track.addEventListener('lostpointercapture', (event) => finishDrag(event), { signal: events.signal });
+      window.addEventListener('blur', () => finishDrag(), { signal: events.signal });
+      track.addEventListener('click', (event) => {
+        if (!suppressClick || event.detail === 0) return;
+        event.preventDefault();
+        event.stopPropagation();
+        suppressClick = false;
+      }, { capture: true, signal: events.signal });
+
+      previous.addEventListener('click', () => move(-1), { signal: events.signal });
+      next.addEventListener('click', () => move(1), { signal: events.signal });
+      track.addEventListener('scroll', onScroll, { passive: true, signal: events.signal });
+      track.addEventListener('keydown', (event) => {
+        if (event.target !== track || event.altKey || event.ctrlKey || event.metaKey) return;
+        if (event.key === 'ArrowLeft') move(-1);
+        else if (event.key === 'ArrowRight') move(1);
+        else if (event.key === 'Home') goTo(0);
+        else if (event.key === 'End') goTo(limit());
+        else return;
+        event.preventDefault();
+      }, { signal: events.signal });
+
+      const resize = new ResizeObserver(update);
+      resize.observe(track);
+      update();
+      controls.hidden = false;
+      track.dataset.dragReady = '';
+      this.cleanup = () => {
+        events.abort();
+        finishDrag(undefined, false);
+        delete track.dataset.dragReady;
+        resize.disconnect();
+        cancelAnimationFrame(frame);
+        controls.hidden = true;
+      };
+    }
+
+    disconnectedCallback() {
+      this.cleanup?.();
+      this.cleanup = undefined;
+    }
+  }
+
+  if (!customElements.get('works-carousel')) customElements.define('works-carousel', WorksCarousel);
+</script>

@@ -1,13 +1,15 @@
 ---
 // src/layouts/Layout.astro
 import '../styles/global.css';
+import PageLoader from '../components/PageLoader.astro';
 
 interface Props {
   title: string;
   description?: string;
 }
 
-const { title, description = "Neuraz - Inteligencia Artificial Aplicada. Diseñamos sistemas inteligentes para crear, documentar y automatizar tu negocio." } = Astro.props;
+const { title, description = "Neuraz - Tecnología con propósito. Diseñamos sistemas inteligentes para crear, documentar y automatizar tu negocio." } = Astro.props;
+const canonicalURL = new URL(Astro.url.pathname, Astro.site);
 ---
 
 <!DOCTYPE html>
@@ -24,7 +26,7 @@ const { title, description = "Neuraz - Inteligencia Artificial Aplicada. Diseña
     <meta property="og:type" content="website" />
     <meta property="og:title" content={title} />
     <meta property="og:description" content={description} />
-    <meta property="og:url" content="https://neuraz.io" />
+    <meta property="og:url" content={canonicalURL} />
     <meta property="og:site_name" content="Neuraz" />
     <meta property="og:locale" content="es_AR" />
     
@@ -34,7 +36,7 @@ const { title, description = "Neuraz - Inteligencia Artificial Aplicada. Diseña
     <meta name="twitter:description" content={description} />
     
     <!-- Canonical -->
-    <link rel="canonical" href="https://neuraz.io" />
+    <link rel="canonical" href={canonicalURL} />
     
     <meta name="generator" content={Astro.generator} />
     <link rel="icon" type="image/svg+xml" href="/images/isotipo.svg" />
@@ -47,6 +49,7 @@ const { title, description = "Neuraz - Inteligencia Artificial Aplicada. Diseña
     <title>{title}</title>
   </head>
   <body class="bg-[#fafafa] text-black font-sans antialiased">
+    <PageLoader />
     <slot />
   </body>
 </html>

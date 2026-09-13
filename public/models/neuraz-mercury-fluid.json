@@ -1,0 +1,40 @@
+{
+  "version": 1,
+  "width": 192,
+  "height": 192,
+  "resolution": 192,
+  "frameCount": 192,
+  "fps": 24,
+  "duration": 8.0,
+  "worldWidth": 5.1,
+  "bounds": {
+    "xMin": -2.55,
+    "xMax": 2.55,
+    "yMin": -2.55,
+    "yMax": 2.55
+  },
+  "heightScale": 0.5,
+  "encoding": "rg-top16-ba-bottom16-xor-delta",
+  "compression": "gzip",
+  "rowOrder": "bottom-to-top",
+  "byteOrder": "little-endian",
+  "channels": {
+    "r": "top-msb",
+    "g": "top-lsb",
+    "b": "bottom-msb",
+    "a": "bottom-lsb"
+  },
+  "sampleConvention": "inclusive-grid",
+  "heightCoordinates": "local-z; top=positive-z, bottom=negative-z-magnitude",
+  "source": "design/neuraz-metal/neuraz-mercury.blend",
+  "sourceObject": "Neuraz | Mercurio metalizado",
+  "sourceFrames": [
+    1,
+    192
+  ],
+  "rawByteLength": 28311552,
+  "compressedByteLength": 1307443,
+  "sha256": "a7d6e6a431cdfb7c59c87af61a83324547f2bcf801ab520fa0025ffb531fe545",
+  "dataUrl": "/models/neuraz-mercury-fluid.bin.gz",
+  "limitations": "Two exterior height surfaces sampled from evaluated native geometry; no internal cavities or overhang layers."
+}
