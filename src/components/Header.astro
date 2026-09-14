@@ -58,7 +58,11 @@ import NavbarBrand from './NavbarBrand.astro';
     z-index: 300;
     isolation: isolate;
     background-color: #fafafa;
+    transform: translateY(0);
+    transition: transform 320ms cubic-bezier(.2,.75,.2,1);
+    will-change: transform;
   }
+  .site-header[data-hidden="true"] { transform: translateY(-100%); }
   #mobile-menu {
     background-color: #fafafa;
     max-height: calc(100dvh - 5rem);
@@ -74,6 +78,9 @@ import NavbarBrand from './NavbarBrand.astro';
   @media (max-width: 767px) {
     .header-inner { padding-inline: clamp(1.75rem, 8vw, 2.5rem); }
   }
+  @media (prefers-reduced-motion: reduce) {
+    .site-header { transition: none; }
+  }
 </style>
 
 <script>
@@ -82,8 +89,33 @@ import NavbarBrand from './NavbarBrand.astro';
   const menuIcon = document.getElementById('menu-icon');
   const closeIcon = document.getElementById('close-icon');
   const mobileLinks = document.querySelectorAll('.mobile-link');
+  const siteHeader = document.querySelector<HTMLElement>('.site-header');
+  let previousScroll = Math.max(window.scrollY, 0);
+  let headerFrame = 0;
+
+  function showHeader() {
+    siteHeader?.removeAttribute('data-hidden');
+  }
+
+  function updateHeader() {
+    headerFrame = 0;
+    const currentScroll = Math.max(window.scrollY, 0);
+    const distance = currentScroll - previousScroll;
+    const menuOpen = mobileMenuBtn?.getAttribute('aria-expanded') === 'true';
+    const headerFocused = !!siteHeader?.contains(document.activeElement);
+
+    if (currentScroll < 80 || menuOpen || headerFocused || distance < -6) showHeader();
+    else if (distance > 6) siteHeader?.setAttribute('data-hidden', 'true');
+
+    if (Math.abs(distance) > 3) previousScroll = currentScroll;
+  }
+
+  function scheduleHeaderUpdate() {
+    if (!headerFrame) headerFrame = requestAnimationFrame(updateHeader);
+  }
 
   function setMenuOpen(open: boolean) {
+    if (open) showHeader();
     mobileMenu?.classList.toggle('hidden', !open);
     menuIcon?.classList.toggle('hidden', open);
     closeIcon?.classList.toggle('hidden', !open);
@@ -106,5 +138,11 @@ import NavbarBrand from './NavbarBrand.astro';
   });
   window.matchMedia('(min-width: 768px)').addEventListener('change', event => {
     if (event.matches) setMenuOpen(false);
+  });
+  siteHeader?.addEventListener('focusin', showHeader);
+  window.addEventListener('scroll', scheduleHeaderUpdate, { passive: true });
+  window.addEventListener('pageshow', () => {
+    previousScroll = Math.max(window.scrollY, 0);
+    showHeader();
   });
 </script>

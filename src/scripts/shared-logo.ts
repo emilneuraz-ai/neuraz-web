@@ -25,7 +25,7 @@ export function installSharedLogo() {
       const panel = document.querySelector<HTMLElement>('.service-item[data-expanded="true"]');
       const content = panel?.querySelector<HTMLElement>('.service-content');
       const slot = panel?.querySelector<HTMLElement>('[data-service-logo-slot]');
-      const panelRect = content?.getBoundingClientRect();
+      const panelRect = (desktop.matches ? content : panel)?.getBoundingClientRect();
       let inServices: boolean;
       let rect: { left: number; top: number; width: number; height: number; bottom: number };
       let renderWidth = 0;
