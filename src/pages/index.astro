@@ -28,9 +28,14 @@ import Footer from '../components/Footer.astro';
 </Layout>
 
 <style>
-  .shared-logo-host { position: fixed; z-index: 20; pointer-events: none; }
+  .shared-logo-host { position: fixed; z-index: 60; pointer-events: none; }
   @media (min-width: 1024px) {
-    .shared-logo-host { position: absolute; top: 0; left: 0; will-change: transform; }
+    .shared-logo-host {
+      position: fixed;
+      top: 0;
+      left: 0;
+      will-change: transform, width, height;
+    }
   }
   .shared-logo-host[hidden] { display: none; }
   .shared-logo-host :global([data-mercury-stage]) { pointer-events: auto; }

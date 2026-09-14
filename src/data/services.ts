@@ -108,3 +108,14 @@ export const services: Service[] = [
 export const categories = [...new Set(services.map(s => s.category))];
 
 export const featuredServices = services.filter(s => s.featured);
+
+/** Shared by the service markers and the 3D scene. Angles are in radians. */
+export function serviceVisual(index: number) {
+  const colors = ['#e63946', '#171717', '#ffb703'];
+  const angles = [
+    [0.16, -0.3, -0.09], [-0.2, 0.32, 0.08], [0.24, -0.18, -0.12],
+    [-0.12, -0.36, 0.12], [0.2, 0.28, -0.06], [-0.24, -0.2, 0.1],
+    [0.12, 0.36, -0.1], [-0.18, -0.28, 0.06], [0.22, 0.2, 0.12],
+  ];
+  return { color: colors[index % colors.length], angle: angles[index % angles.length] };
+}

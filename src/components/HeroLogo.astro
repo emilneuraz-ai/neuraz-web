@@ -1,17 +1,19 @@
 ---
 import MercuryLogo from "./MercuryLogo.astro";
-import { services } from '../data/services';
-import arrowPath from '../assets/heroicons/outline/arrow-path.svg?raw';
-import chat from '../assets/heroicons/outline/chat-bubble-left-right.svg?raw';
-import gift from '../assets/heroicons/outline/gift.svg?raw';
-import puzzle from '../assets/heroicons/outline/puzzle-piece.svg?raw';
-import pencil from '../assets/heroicons/outline/pencil-square.svg?raw';
-import cpu from '../assets/heroicons/outline/cpu-chip.svg?raw';
-import document from '../assets/heroicons/outline/document-check.svg?raw';
-import academic from '../assets/heroicons/outline/academic-cap.svg?raw';
-import chart from '../assets/heroicons/outline/chart-bar-square.svg?raw';
-
-const icons = [arrowPath, chat, gift, puzzle, pencil, cpu, document, academic, chart];
+import { services, serviceVisual } from '../data/services';
+// Recognisable service symbols drawn with soft, continuous strokes so they
+// belong to the organic surface without looking like generic UI badges.
+const icons = [
+  '<path d="M5 8h8a4 4 0 0 1 4 4v6m0 0-3-3m3 3 3-3M19 6H9a4 4 0 0 0-4 4v6"/>',
+  '<path d="M5 6.5h9a4 4 0 0 1 4 4v2a4 4 0 0 1-4 4h-3.5L7 19v-2.5H5a3 3 0 0 1-3-3v-4a3 3 0 0 1 3-3Z"/>',
+  '<path d="M12 20s-7-4.2-7-9.4A3.6 3.6 0 0 1 11.5 8L12 9l.5-1A3.6 3.6 0 0 1 19 10.6C19 15.8 12 20 12 20Z"/><path d="M8 12h2l1-2 2 4 1-2h2"/>',
+  '<path d="m8 5 11 7-11 7V5Z"/><path d="M5 8.5A6 6 0 0 0 5 16"/>',
+  '<path d="m5 19 3.5-.8L19 7.7 16.3 5 5.8 15.5 5 19Z"/><path d="m14.8 6.5 2.7 2.7"/>',
+  '<path d="M9 5.5A3.5 3.5 0 0 0 5.5 9v1A3.5 3.5 0 0 0 7 16.7V19M15 5.5A3.5 3.5 0 0 1 18.5 9v1a3.5 3.5 0 0 1-1.5 6.7V19M9 5.5c0-2 3-2 3 0v13m3-13c0-2-3-2-3 0M7 10h3m4 0h4M8 15h2m4 0h3"/>',
+  '<path d="M7 3.5h7l4 4V20H7a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2Z"/><path d="M14 3.5v4h4M8.5 13l2 2 4-4"/>',
+  '<path d="M3.5 9 12 4l8.5 5L12 14 3.5 9Z"/><path d="M7 11.2v4.3c3 2.2 7 2.2 10 0v-4.3M20.5 9v6"/>',
+  '<path d="M5 20V9m5 11V5m5 15v-7m5 7V3"/><path d="M3 20h19"/>',
+];
 const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación', 'Capacitaciones', 'Datos en tiempo real'];
 const descriptions = [
   'Conectamos herramientas. Liberamos tu tiempo.',
@@ -35,10 +37,9 @@ const explanations = [
   'Capacitamos a tu equipo en inteligencia artificial y automatización para incorporar herramientas útiles en sus tareas de todos los días.',
   'Reunimos tus datos en tableros que se actualizan automáticamente para consultar métricas, exportar información y tomar decisiones con más contexto.',
 ];
-const paths = (svg: string) => svg.replace(/^[\s\S]*?<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '');
 const pages = import.meta.glob('../pages/servicios/*.astro');
 const entries = services.map((service, i) => ({
-  ...service, label: labels[i], detail: descriptions[i], explanation: explanations[i], icon: paths(icons[i]).replace(/<path\b/g, '<path pathLength="1"'),
+  ...service, label: labels[i], detail: descriptions[i], explanation: explanations[i], icon: icons[i].replace(/<path\b/g, '<path pathLength="1"'),
   href: pages[`../pages/servicios/${service.slug}.astro`] ? `/servicios/${service.slug}` : '#servicios',
 }));
 
@@ -78,6 +79,8 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
           data-v={anchors[index].v}
           data-top={anchors[index].top}
           data-hero-logo-service={entry.id}
+          data-service-color={serviceVisual(index).color}
+          data-service-angle={serviceVisual(index).angle.join(",")}
           data-label={entry.label}
           data-explanation={entry.explanation}
           data-href={entry.href}
@@ -135,24 +138,26 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
     height: 44px;
     padding: 0;
     transform: translate(-50%, -50%);
-    border: 1px solid #292929;
-    border-radius: 50%;
-    background: #fafafa;
-    color: #111;
+    border: 1px solid transparent;
+    border-radius: 43% 57% 61% 39% / 52% 42% 58% 48%;
+    background: transparent;
+    color: var(--service-glyph, #f4f1eb);
     pointer-events: auto;
     cursor: pointer;
     -webkit-tap-highlight-color: transparent;
-    transition: color .15s, border-color .15s, background .15s;
+    transition: color .3s, border-color .3s, background .3s;
   }
   .hero-logo-pin[data-visible="false"] { visibility: hidden; pointer-events: none; }
   .hero-logo-pin[data-available="false"] { visibility: hidden; pointer-events: none; }
   .hero-logo-pin[data-badge-origin="true"] { opacity: 0; pointer-events: none; }
   .hero-logo-pin[data-badge-origin="true"]:focus-visible { opacity: 1; border-color: transparent; background: transparent; color: transparent; }
-  .hero-logo-pin svg { display: block; width: 22px; height: 22px; }
+  .hero-logo-pin svg { display: block; width: 24px; height: 24px; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.2)); transition: transform .35s ease; }
   .hero-logo-pin:hover,
   .hero-logo-pin:focus-visible,
   .hero-logo-pin[aria-expanded="true"],
-  .hero-logo-pin[data-active="true"] { z-index: 10000; border-color: #e63946; color: #e63946; background: #fafafa; }
+  .hero-logo-pin[data-active="true"] { z-index: 10000; color: var(--service-glyph, #fff); background: rgb(255 255 255 / 0.07); }
+  .hero-logo-pin:hover svg, .hero-logo-pin:focus-visible svg { transform: rotate(-8deg) scale(1.12); }
+  .hero-logo-pin:focus-visible { outline-color: #fff !important; }
   .hero-logo-bubble {
     position: absolute;
     top: 0;
@@ -182,14 +187,14 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
   }
   .hero-logo-bubble[data-placement="above"]::after { top: auto; bottom: -5px; transform: translateX(-50%) rotate(225deg); }
   .hero-logo-bubble-top { display: flex; align-items: center; gap: 8px; }
-  .hero-logo-bubble-link { display: flex; flex: 1; align-items: center; gap: 8px; min-height: 32px; font-size: 13px; font-weight: 500; line-height: 1.35; letter-spacing: -.015em; text-decoration: none; }
+  .hero-logo-bubble-link { display: flex; flex: 1; align-items: center; gap: 8px; min-height: 32px; font-size: 14px; font-weight: 500; line-height: 1.35; letter-spacing: -.015em; text-decoration: none; }
   .hero-logo-bubble-link:hover { color: #e63946; }
   .hero-logo-bubble-marker { flex: none; width: 5px; height: 5px; border-radius: 50%; background: #e63946; }
   .hero-logo-bubble-arrow { margin-left: auto; font-size: 17px; font-weight: 400; }
   .hero-logo-bubble-close { display: grid; place-items: center; flex: none; width: 32px; height: 32px; margin-right: -5px; padding: 0; border: 0; border-radius: 50%; background: transparent; color: #777; cursor: pointer; }
   .hero-logo-bubble-close:hover { color: #111; }
   .hero-logo-bubble-close svg { width: 15px; height: 15px; }
-  .hero-logo-bubble p { margin: 7px 0 0; font-size: 11px; line-height: 1.7; color: #626262; text-wrap: pretty; }
+  .hero-logo-bubble p { margin: 7px 0 0; font-size: 13px; line-height: 1.7; color: #626262; text-wrap: pretty; }
   .hero-logo-fallback { display: grid; grid-template-columns: 1fr 1fr; gap: 0 20px; border-top: 1px solid #ddd; }
   .hero-logo-fallback[hidden] { display: none; }
   .hero-logo-fallback a { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 44px; padding-block: 10px; border-bottom: 1px solid #e8e8e8; font-size: 11px; line-height: 1.5; text-decoration: none; }
@@ -208,7 +213,7 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
       height: 44px;
       transform: translate(-50%, -50%);
     }
-    .hero-logo-pin svg { width: 16px; height: 16px; }
+    .hero-logo-pin svg { width: 19px; height: 19px; }
     .hero-logo-bubble {
       display: flex;
       align-items: center;
@@ -258,6 +263,7 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-logo-pin,
+    .hero-logo-pin svg,
     .hero-logo-bubble { transition: none !important; animation: none !important; }
   }
 </style>

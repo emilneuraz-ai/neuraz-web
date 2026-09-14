@@ -694,6 +694,36 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     const fill = new THREE.DirectionalLight(0xffffff, 0.65);
     fill.position.set(-1, -4, 3);
     scene.add(key, rim, fill);
+    // Service selection changes the actual material and camera-facing pose.
+    const heroLogo = root.closest<HTMLElement>('[data-hero-logo]');
+    const baseColor = new THREE.Color(finishParameters(root.dataset.finish).color);
+    const serviceColor = baseColor.clone();
+    const currentColor = baseColor.clone();
+    const serviceAngle = new THREE.Vector3();
+    const coloredMaterials = new Set<THREE.MeshStandardMaterial>();
+    const collectMaterials = (object: THREE.Object3D) => object.traverse(child => {
+      const mesh = child as THREE.Mesh;
+      if (!mesh.isMesh) return;
+      for (const material of Array.isArray(mesh.material) ? mesh.material : [mesh.material]) {
+        if (material instanceof THREE.MeshStandardMaterial) {
+          material.color.copy(currentColor);
+          coloredMaterials.add(material);
+        }
+      }
+    });
+    collectMaterials(centered);
+    const syncService = () => {
+      const inServices = heroLogo?.closest<HTMLElement>('[data-shared-logo-host]')?.dataset.destination === 'services';
+      const selected = inServices ? pins.find(pin => pin.element.dataset.heroLogoService === heroLogo?.dataset.activeService)?.element : undefined;
+      serviceColor.set(selected?.dataset.serviceColor || baseColor);
+      const angle = selected?.dataset.serviceAngle?.split(',').map(Number);
+      serviceAngle.set(angle?.[0] || 0, angle?.[1] || 0, angle?.[2] || 0);
+      root.dataset.serviceColor = selected?.dataset.serviceColor || '';
+      root.dataset.serviceAngle = angle?.join(',') || '0,0,0';
+      // A dark glyph remains legible on the yellow material.
+      heroLogo?.style.setProperty('--service-glyph', selected?.dataset.serviceColor === '#ffb703' ? '#241900' : '#f4f1eb');
+      requestDraw();
+    };
     const pinPosition = new THREE.Vector3();
     const pinScreen = new THREE.Vector3();
     const pinCamera = new THREE.Vector3();
@@ -743,13 +773,16 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       if (autoMotion()) elapsed += delta;
       // Keep the hero's chosen angle stable while the material keeps flowing.
       const phase = reducedMotion || heroFront ? 0 : elapsed;
-      const targetX = manual.x - hover.y * 0.075 + Math.sin(phase * 0.53) * 0.018;
-      const targetY = manual.y + hover.x * 0.11 + Math.sin(phase * 0.37) * 0.035;
-      const targetZ = restRotationZ + Math.sin(phase * 0.29) * 0.007;
+      const targetX = serviceAngle.x + manual.x - hover.y * 0.075 + Math.sin(phase * 0.53) * 0.018;
+      const targetY = serviceAngle.y + manual.y + hover.x * 0.11 + Math.sin(phase * 0.37) * 0.035;
+      const targetZ = restRotationZ + serviceAngle.z + Math.sin(phase * 0.29) * 0.007;
       const damping = reducedMotion ? 1 : 1 - Math.exp(-dampingDelta * 10);
       pivot.rotation.x = THREE.MathUtils.lerp(pivot.rotation.x, targetX, damping);
       pivot.rotation.y = THREE.MathUtils.lerp(pivot.rotation.y, targetY, damping);
       pivot.rotation.z = THREE.MathUtils.lerp(pivot.rotation.z, targetZ, damping);
+      const colorDamping = reducedMotion ? 1 : 1 - Math.exp(-dampingDelta * 5);
+      currentColor.lerp(serviceColor, colorDamping);
+      coloredMaterials.forEach(material => material.color.copy(currentColor));
       pivot.position.y = Math.sin(phase * 0.58) * 0.035;
       fluidSurface?.setTime(elapsed - fluidEpoch);
       renderer.render(scene, camera);
@@ -767,7 +800,8 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
         root.dispatchEvent(new CustomEvent('mercury:ready'));
       }
       const settling = Math.abs(pivot.rotation.x - targetX) + Math.abs(pivot.rotation.y - targetY) + Math.abs(pivot.rotation.z - targetZ) > 0.0001;
-      if (autoMotion() || settling) frame = requestAnimationFrame(draw);
+      const colorSettling = Math.abs(currentColor.r - serviceColor.r) + Math.abs(currentColor.g - serviceColor.g) + Math.abs(currentColor.b - serviceColor.b) > 0.0001;
+      if (autoMotion() || settling || colorSettling) frame = requestAnimationFrame(draw);
       else { lastTime = 0; root.dataset.rendering = 'false'; }
     };
     const requestDraw = () => {
@@ -884,6 +918,8 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       if (status) status.textContent = 'Se muestra la imagen del logo.';
     };
     const eventOptions = { signal: listeners.signal };
+    heroLogo?.addEventListener('hero-logo:change', syncService, eventOptions);
+    syncService();
     document.addEventListener('visibilitychange', onVisibility, eventOptions);
     window.addEventListener('resize', measure, eventOptions);
     motion.addEventListener('change', onMotionChange, eventOptions);
@@ -930,6 +966,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
         surface.object.position.copy(nativeCenter).multiplyScalar(-scale);
         fluidSurface = surface;
         pivot.add(surface.object);
+        collectMaterials(surface.object);
         centered.visible = false;
         fluidEpoch = elapsed;
         root.dataset.fluidState = 'ready';

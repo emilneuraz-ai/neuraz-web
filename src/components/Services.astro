@@ -1,266 +1,285 @@
 ---
-// src/components/Services.astro - Auto-expand on scroll
-import { services } from '../data/services';
-import SectionAtmosphere from './SectionAtmosphere.astro';
+import { services, serviceVisual } from '../data/services';
+
+const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
+const number = (index: number) => String(index + 1).padStart(2, '0');
 ---
 
-<section id="servicios" class="ambient-section py-24 px-6 sm:px-8 bg-white">
-  <SectionAtmosphere variant="grid" />
-  <div class="services-inner max-w-7xl mx-auto">
-    
-    <!-- Section header -->
-    <div class="services-heading grid lg:grid-cols-12 gap-8 mb-12">
-      <div class="lg:col-span-4">
-        <div class="mb-4">
-          <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">Servicios</span>
-        </div>
-      </div>
-      
-      <div class="lg:col-span-8 lg:col-start-1">
-        <h2 class="services-title text-[clamp(2rem,5vw,3.5rem)] font-bold leading-[1.1] tracking-[-0.04em] text-black text-left">
-          <span class="services-title-line">Soluciones que</span>
-          <span class="services-title-line">transforman <span class="services-title-keep">tu negocio</span></span>
-        </h2>
-      </div>
-    </div>
-
-    <!-- Services list -->
-    <div class="services-list space-y-0 border-t border-black/10" data-services-list>
-      {services.map((service, index) => {
-        const accentColors = ['bg-[#e63946]', 'bg-black', 'bg-[#ffb703]'];
-        const accentColor = accentColors[index % 3];
-        
-        return (
-          <div 
-            class="service-item border-b border-black/10" 
+<section
+  id="servicios"
+  class="services-section bg-white"
+  aria-label="Servicios"
+  style={`--services-scroll-height: ${scrollHeight}vh`}
+>
+  <div class="services-sticky">
+    <div class="services-inner max-w-7xl mx-auto">
+      <div class="services-list" data-services-list>
+        {services.map((service, index) => (
+          <article
+            class="service-item"
             data-index={index}
             data-service-id={service.id}
+            data-expanded={String(index === 0)}
+            data-position={index === 0 ? 'current' : 'after'}
+            style={`--service-accent: ${serviceVisual(index).color}`}
           >
-            <!-- Title row -->
-            <div class="service-header py-6 flex items-center justify-between cursor-pointer group">
-              <div class="flex items-center gap-4">
-                <span class={`w-2 h-2 ${accentColor} rounded-full flex-shrink-0`}></span>
-                <h3 class="text-lg font-medium text-black group-hover:text-black/70 transition-colors">
-                  {service.name}
-                </h3>
-              </div>
-              
-              <svg class="service-arrow w-5 h-5 text-black/30 transform transition-transform duration-300" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                <path d="M9 6l6 6-6 6" stroke-linecap="square" stroke-linejoin="miter"/>
-              </svg>
-            </div>
-
-            <!-- Expandable content -->
-            <div class="service-content overflow-hidden transition-all duration-1000 ease-out"
+            <h2>
+              <button
+                type="button"
+                class="service-header"
+                id={`service-trigger-${service.id}`}
+                aria-expanded={String(index === 0)}
+                aria-controls={`service-panel-${service.id}`}
+              >
+                <span class="service-dot" aria-hidden="true"></span>
+                <span class="service-name">{service.name}</span>
+                <span class="service-toggle" aria-hidden="true"><span></span><span></span></span>
+              </button>
+            </h2>
+            <div
+              class="service-content"
+              id={`service-panel-${service.id}`}
+              role="region"
+              aria-labelledby={`service-trigger-${service.id}`}
+              inert={index !== 0}
             >
-              <div class="service-detail pl-6">
-                <div class="service-copy">
-                <p class="text-sm text-black/60 leading-relaxed mb-3 max-w-2xl">{service.description}</p>
-                
-                <p class="text-xs text-black/40 leading-relaxed mb-4 max-w-2xl">→ {service.benefit}</p>
-                
-                <div class="flex flex-wrap items-center gap-4">
-                  {service.industries.slice(0, 3).map(industry => (
-                    <span class="text-[10px] font-medium tracking-[0.1em] text-black/30 uppercase">
-                      {industry}
-                    </span>
-                  ))}
-                  
-                  <a 
-                    href={`/servicios/${service.slug}`} 
-                    class="inline-flex items-center gap-1 text-xs font-medium text-[#e63946] hover:text-black transition-colors"
-                  >
-                    Saber más
-                    <svg class="w-3 h-3" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                      <path d="M5 12h14M12 5l7 7-7 7" stroke-linecap="square" stroke-linejoin="miter"/>
-                    </svg>
-                  </a>
+              <div class="service-content-inner">
+                <div class="service-detail">
+                  <div class="service-copy">
+                    <p class="service-description">{service.description}</p>
+                    <p class="service-benefit">{service.benefit}</p>
+                    <div class="service-industries" aria-label="Sectores">
+                      {service.industries.slice(0, 3).map(industry => <span>{industry}</span>)}
+                    </div>
+                    <a
+                      href={`/servicios/${service.slug}`}
+                      class="service-link"
+                      aria-label={`Saber más sobre ${service.name}`}
+                    >
+                      Saber más <span aria-hidden="true">↗</span>
+                    </a>
+                  </div>
+                  <div class="service-logo-slot" data-service-logo-slot aria-hidden="true"></div>
                 </div>
-                </div>
-                <div class="service-logo-slot" data-service-logo-slot aria-hidden="true"></div>
               </div>
             </div>
-          </div>
-        );
-      })}
+          </article>
+        ))}
+      </div>
 
+      <nav class="services-neighbors" aria-label="Cambiar servicio">
+        <button type="button" class="service-neighbor service-neighbor-previous" data-service-previous hidden>
+          <span aria-hidden="true">↑</span>
+          <span><small>Anterior</small><strong data-service-previous-label></strong></span>
+        </button>
+        <span class="services-counter" aria-live="polite" data-services-counter>{number(0)} / {number(services.length - 1)}</span>
+        <button type="button" class="service-neighbor service-neighbor-next" data-service-next>
+          <span><small>Siguiente</small><strong data-service-next-label>{services[1]?.name}</strong></span>
+          <span aria-hidden="true">↓</span>
+        </button>
+      </nav>
+
+      <div class="services-logo-anchor" data-desktop-service-logo-slot aria-hidden="true"></div>
     </div>
-    <div class="services-logo-anchor" data-desktop-service-logo-slot aria-hidden="true"></div>
   </div>
 </section>
 
 <style>
-  .services-title-line { display: block; }
-  .services-title-keep { white-space: nowrap; }
-  .services-inner { position: relative; }
-  .services-list { position: relative; overflow-anchor: none; }
-  .service-detail { padding-block: 0.5rem 1.75rem; }
+  .services-section { position: relative; min-height: 100svh; scroll-margin-top: 80px; }
+  .services-sticky { min-height: 100svh; padding: 6rem 1.5rem; }
+  .services-inner { position: relative; min-height: calc(100svh - 12rem); }
+  .services-list { position: relative; overflow-anchor: none; border-top: 1px solid #dedede; }
+  .service-item { border-bottom: 1px solid #dedede; }
+  .service-header { display: flex; align-items: center; gap: 0.8rem; width: 100%; min-height: 72px; padding: 1.2rem 0; text-align: left; color: #999; cursor: pointer; }
+  .service-dot { width: 9px; height: 9px; flex: none; border-radius: 50%; background: var(--service-accent); transition: transform 400ms ease; }
+  .service-name { flex: 1; font-size: 1rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.02em; transition: font-size 400ms ease, color 250ms ease; }
+  .service-toggle { position: relative; flex: none; width: 28px; height: 28px; border: 1px solid #d6d6d6; border-radius: 50%; transition: background 250ms, border-color 250ms; }
+  .service-toggle span { position: absolute; left: 8px; top: 13px; width: 10px; height: 1px; background: currentColor; }
+  .service-toggle span:last-child { transform: rotate(90deg); transition: transform 300ms ease; }
+  .service-header:hover .service-name { color: #555; }
+  .service-header:focus-visible, .service-link:focus-visible, .service-neighbor:focus-visible { outline: 2px solid #111; outline-offset: 5px; border-radius: 2px; }
+  .service-item[data-expanded="true"] .service-header { padding-top: 2.25rem; padding-bottom: 1.75rem; color: #111; }
+  .service-item[data-expanded="true"] .service-name { font-size: clamp(2rem, 8vw, 2.8rem); font-weight: 650; line-height: 1.04; letter-spacing: -0.05em; }
+  .service-item[data-expanded="true"] .service-dot { transform: scale(1.35); }
+  .service-item[data-expanded="true"] .service-toggle { background: #111; border-color: #111; color: #fff; }
+  .service-item[data-expanded="true"] .service-toggle span:last-child { transform: rotate(0); }
+  .service-content { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 400ms ease, opacity 300ms ease, visibility 400ms; }
+  .service-item[data-expanded="true"] .service-content { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
+  .service-content-inner { min-height: 0; overflow: hidden; }
+  .service-detail { padding: 0 0 3rem 21px; }
   .service-copy { min-width: 0; }
-  .service-logo-slot { width: min(100%, 320px); aspect-ratio: 1; margin: 12px auto 0; flex: none; }
-  .services-logo-anchor { display: none; }
+  .service-description { max-width: 35rem; margin-bottom: 1.25rem; font-size: 1.0625rem; line-height: 1.62; color: #505050; }
+  .service-benefit { max-width: 36rem; margin-bottom: 1.5rem; padding-left: 1rem; border-left: 2px solid var(--service-accent); font-size: 1rem; line-height: 1.6; color: #222; }
+  .service-industries { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #636363; }
+  .service-link { display: inline-flex; align-items: center; gap: 1.5rem; min-height: 44px; font-size: 1rem; font-weight: 500; color: #111; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: #aaa; }
+  .service-link span { font-size: 1.3rem; transition: transform 200ms; }
+  .service-link:hover span { transform: translate(3px, -3px); }
+  .service-logo-slot { width: min(100%, 230px); aspect-ratio: 1; margin: 0.75rem auto 0; }
+  .services-neighbors, .services-logo-anchor { display: none; }
 
   @media (min-width: 1024px) {
-    .services-list { width: 57%; }
+    .services-section { height: var(--services-scroll-height); }
+    .services-sticky { position: sticky; top: 80px; height: calc(100svh - 80px); min-height: 0; padding: 0 2rem; overflow: clip; }
+    .services-inner { height: 100%; min-height: 0; }
+    .services-list { position: absolute; inset: 0 auto 0 0; width: 51%; border: 0; }
+    .service-item {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      border: 0;
+      opacity: 0;
+      visibility: hidden;
+      pointer-events: none;
+      transform: translateY(32px);
+      transition: opacity 360ms ease, transform 520ms cubic-bezier(.2,.75,.2,1), visibility 520ms;
+    }
+    .service-item[data-position="before"] { transform: translateY(-32px); }
+    .service-item[data-position="current"] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+    .service-header { min-height: auto; padding: 0 0 1.75rem; color: #111; cursor: default; pointer-events: none; }
+    .service-item[data-expanded="true"] .service-header { padding: 0 0 1.75rem; }
+    .service-item[data-expanded="true"] .service-name { font-size: clamp(2.25rem, 3.3vw, 3.25rem); }
+    .service-toggle { display: none; }
+    .service-content, .service-item[data-expanded="true"] .service-content { display: block; opacity: 1; visibility: visible; }
+    .service-content-inner { overflow: visible; }
+    .service-detail { padding: 0 0 0 22px; }
+    .service-description { font-size: 1.125rem; }
     .service-copy { position: relative; z-index: 3; }
     .service-logo-slot { display: none; }
-    .services-logo-anchor {
-      display: block;
-      position: absolute;
-      top: 0;
-      right: -1.5rem;
-      width: min(44%, 560px, 70vh);
-      aspect-ratio: 1;
-      pointer-events: none;
-    }
-    .service-header { position: relative; }
-    .service-header > div,
-    .service-arrow { position: relative; z-index: 3; }
+    .services-logo-anchor { display: block; position: absolute; top: 50%; right: -2%; width: min(52%, 700px, calc(100svh - 190px)); aspect-ratio: 1; transform: translateY(-50%); pointer-events: none; }
+    .services-neighbors { display: block; position: absolute; inset: 0 auto 0 0; width: 51%; pointer-events: none; }
+    .service-neighbor { position: absolute; display: flex; align-items: center; gap: 0.75rem; max-width: 80%; padding: 0; border: 0; background: transparent; color: #a5a5a5; text-align: left; pointer-events: auto; cursor: pointer; transition: color 200ms ease; }
+    .service-neighbor:hover { color: #333; }
+    .service-neighbor[hidden] { display: none; }
+    .service-neighbor-previous { top: clamp(2.5rem, 8vh, 5rem); }
+    .service-neighbor-next { bottom: clamp(2.5rem, 8vh, 5rem); }
+    .service-neighbor small { display: block; margin-bottom: 0.15rem; font-size: 0.625rem; font-weight: 600; letter-spacing: 0.14em; text-transform: uppercase; color: #b8b8b8; }
+    .service-neighbor strong { display: block; overflow: hidden; font-size: 0.875rem; font-weight: 500; line-height: 1.25; white-space: nowrap; text-overflow: ellipsis; }
+    .service-neighbor > span[aria-hidden] { font-size: 1.1rem; }
+    .services-counter { position: absolute; right: 0; top: clamp(1rem, 4vh, 2.5rem); font-size: 0.6875rem; font-weight: 600; letter-spacing: 0.14em; color: #aaa; }
   }
-  @media (max-width: 479px) {
-    .services-title { font-size: 1.9375rem; line-height: 1.12; }
+
+  @media (min-width: 1024px) and (max-height: 760px) {
+    .services-logo-anchor { width: min(51%, 590px, calc(100svh - 150px)); }
+    .service-item[data-expanded="true"] .service-name { font-size: clamp(2rem, 3vw, 2.75rem); }
+    .service-description { margin-bottom: 0.85rem; font-size: 1rem; line-height: 1.5; }
+    .service-benefit { margin-bottom: 0.85rem; font-size: 0.9375rem; line-height: 1.45; }
+    .service-industries { margin-bottom: 0.5rem; }
   }
+
   @media (prefers-reduced-motion: reduce) {
-    .service-content { transition: none; }
+    .service-item, .service-content, .service-name, .service-dot, .service-toggle, .service-toggle span, .service-link span { transition: none; }
   }
 </style>
 
 <script>
-  // Auto-expand services when centered in viewport
-  const serviceItems = document.querySelectorAll('.service-item');
-  const serviceContents = document.querySelectorAll('.service-content');
-  const serviceArrows = document.querySelectorAll('.service-arrow');
-  // Establish the collapsed layout before an anchor jump crosses this section.
-  serviceContents.forEach((content) => {
-    content.style.maxHeight = '0px';
-    content.style.opacity = '0';
+  const section = document.querySelector<HTMLElement>('#servicios')!;
+  const items = Array.from(section.querySelectorAll<HTMLElement>('.service-item'));
+  const triggers = items.map(item => item.querySelector<HTMLButtonElement>('.service-header')!);
+  const contents = items.map(item => item.querySelector<HTMLElement>('.service-content')!);
+  const previous = section.querySelector<HTMLButtonElement>('[data-service-previous]')!;
+  const next = section.querySelector<HTMLButtonElement>('[data-service-next]')!;
+  const previousLabel = section.querySelector<HTMLElement>('[data-service-previous-label]')!;
+  const nextLabel = section.querySelector<HTMLElement>('[data-service-next-label]')!;
+  const counter = section.querySelector<HTMLElement>('[data-services-counter]')!;
+  const desktop = matchMedia('(min-width: 1024px)');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  let expandedIndex = 0;
+  let frame = 0;
+
+  const number = (index: number) => String(index + 1).padStart(2, '0');
+  const syncLogo = () => document.dispatchEvent(new CustomEvent('services:layout'));
+
+  function updateNeighbors(index: number) {
+    previous.hidden = index <= 0;
+    next.hidden = index >= items.length - 1;
+    previousLabel.textContent = index > 0 ? triggers[index - 1].textContent?.trim() || '' : '';
+    nextLabel.textContent = index < items.length - 1 ? triggers[index + 1].textContent?.trim() || '' : '';
+    counter.textContent = `${number(index)} / ${number(items.length - 1)}`;
+  }
+
+  function select(index: number) {
+    const safeIndex = Math.min(Math.max(index, 0), items.length - 1);
+    if (safeIndex === expandedIndex && items[safeIndex].dataset.position === 'current') {
+      items.forEach((item, i) => { item.inert = desktop.matches && i !== safeIndex; });
+      return;
+    }
+    expandedIndex = safeIndex;
+    items.forEach((item, i) => {
+      const open = i === safeIndex;
+      item.dataset.expanded = String(open);
+      item.dataset.position = open ? 'current' : i < safeIndex ? 'before' : 'after';
+      item.inert = desktop.matches && !open;
+      triggers[i].setAttribute('aria-expanded', String(open));
+      contents[i].inert = !open;
+    });
+    updateNeighbors(safeIndex);
+    syncLogo();
+  }
+
+  function scrollToService(index: number) {
+    if (!desktop.matches) {
+      select(index);
+      items[index].scrollIntoView({ behavior: motion.matches ? 'instant' : 'smooth', block: 'center' });
+      return;
+    }
+    const top = section.getBoundingClientRect().top + scrollY - 80;
+    const range = Math.max(1, section.offsetHeight - innerHeight + 80);
+    const progress = items.length > 1 ? index / (items.length - 1) : 0;
+    scrollTo({ top: top + range * progress, behavior: motion.matches ? 'instant' : 'smooth' });
+  }
+
+  function updateFromScroll() {
+    if (!desktop.matches) return;
+    const rect = section.getBoundingClientRect();
+    const range = Math.max(1, section.offsetHeight - innerHeight + 80);
+    const progress = Math.min(Math.max((80 - rect.top) / range, 0), 1);
+    select(Math.round(progress * (items.length - 1)));
+  }
+
+  function scheduleScrollUpdate() {
+    if (frame) return;
+    frame = requestAnimationFrame(() => { frame = 0; updateFromScroll(); });
+  }
+
+  triggers.forEach((trigger, index) => {
+    trigger.addEventListener('click', () => { if (!desktop.matches) select(index); });
+    trigger.addEventListener('keydown', event => {
+      let target = index;
+      if (event.key === 'ArrowDown') target = Math.min(index + 1, items.length - 1);
+      else if (event.key === 'ArrowUp') target = Math.max(index - 1, 0);
+      else if (event.key === 'Home') target = 0;
+      else if (event.key === 'End') target = items.length - 1;
+      else return;
+      event.preventDefault();
+      if (desktop.matches) scrollToService(target);
+      else { select(target); triggers[target].focus(); }
+    });
   });
-  
-  // Check if we should reopen a service from sessionStorage
-  const lastOpenedService = sessionStorage.getItem('lastOpenedService');
-  let expandedIndex = -1;
 
-  const desktop = window.matchMedia('(min-width: 1024px)');
-  let mercuryFrame = 0;
-  function syncMercury() {
-    serviceItems.forEach((item, index) => item.setAttribute('data-expanded', String(index === expandedIndex)));
-    document.dispatchEvent(new CustomEvent('services:layout'));
-  }
+  previous.addEventListener('click', () => scrollToService(expandedIndex - 1));
+  next.addEventListener('click', () => scrollToService(expandedIndex + 1));
+  window.addEventListener('scroll', scheduleScrollUpdate, { passive: true });
+  window.addEventListener('resize', scheduleScrollUpdate, { passive: true });
+  desktop.addEventListener('change', () => {
+    if (desktop.matches) updateFromScroll();
+    else select(expandedIndex);
+    syncLogo();
+  });
 
-  function refreshMercury() {
-    if (mercuryFrame) return;
-    mercuryFrame = requestAnimationFrame(() => {
-      mercuryFrame = 0;
-      const content = serviceContents[expandedIndex] as HTMLElement | undefined;
-      if (content) {
-        const height = `${content.scrollHeight}px`;
-        if (content.style.maxHeight !== height) content.style.maxHeight = height;
-      }
-      syncMercury();
-    });
-  }
-  
-  if (lastOpenedService) {
-    // Find the service index by slug
-    serviceItems.forEach((item, index) => {
-      const link = item.querySelector('a[href^="/servicios/"]');
-      if (link && link.getAttribute('href').includes(lastOpenedService)) {
-        expandedIndex = index;
-      }
-    });
-    
-    // Clear the stored service
+  const resize = new ResizeObserver(syncLogo);
+  contents.forEach(content => resize.observe(content));
+
+  let restored = -1;
+  try {
+    const lastOpened = sessionStorage.getItem('lastOpenedService');
     sessionStorage.removeItem('lastOpenedService');
-    
-    // If we found a match, expand it immediately
-    if (expandedIndex !== -1) {
-      serviceContents.forEach((content, index) => {
-        if (index === expandedIndex) {
-          content.style.maxHeight = content.scrollHeight + 'px';
-          content.style.opacity = '1';
-          serviceArrows[index].style.transform = 'rotate(180deg)';
-        } else {
-          content.style.maxHeight = '0px';
-          content.style.opacity = '0';
-          serviceArrows[index].style.transform = 'rotate(0deg)';
-        }
-      });
-      refreshMercury();
-      
-      // Scroll to the expanded service
-      setTimeout(() => {
-        serviceItems[expandedIndex].scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
-    }
-  }
-  
-  function updateExpandedService() {
-    const section = document.getElementById('servicios')!.getBoundingClientRect();
-    if (section.top >= window.innerHeight || section.bottom <= 80) return;
-    // Header positions do not jump when their own panel opens. Using panel
-    // centers causes accordion/scroll feedback as the expanded height changes.
-    const focusLine = window.innerHeight * 0.4;
-    let closestIndex = 0;
-    serviceItems.forEach((item, index) => {
-      if (item.querySelector('.service-header')!.getBoundingClientRect().top <= focusLine) closestIndex = index;
-    });
-    if (closestIndex !== expandedIndex) {
-      expandedIndex = closestIndex;
-      
-      serviceContents.forEach((content, index) => {
-        if (index === expandedIndex) {
-          content.style.maxHeight = content.scrollHeight + 'px';
-          content.style.opacity = '1';
-          serviceArrows[index].style.transform = 'rotate(180deg)';
-        } else {
-          content.style.maxHeight = '0px';
-          content.style.opacity = '0';
-          serviceArrows[index].style.transform = 'rotate(0deg)';
-        }
-      });
-      refreshMercury();
-    }
-  }
-  
-  // Update on scroll
-  window.addEventListener('scroll', updateExpandedService, { passive: true });
-  
-  // Initial check
-  updateExpandedService();
-  
-  // Also allow click to toggle
-  document.querySelectorAll('.service-header').forEach((header, index) => {
-    header.addEventListener('click', () => {
-      if (expandedIndex === index) {
-        // Collapse if already expanded
-        expandedIndex = -1;
-        serviceContents[index].style.maxHeight = '0px';
-        serviceContents[index].style.opacity = '0';
-        serviceArrows[index].style.transform = 'rotate(0deg)';
-      } else {
-        // Expand clicked
-        expandedIndex = index;
-        serviceContents.forEach((content, i) => {
-          if (i === index) {
-            content.style.maxHeight = content.scrollHeight + 'px';
-            content.style.opacity = '1';
-            serviceArrows[i].style.transform = 'rotate(180deg)';
-          } else {
-            content.style.maxHeight = '0px';
-            content.style.opacity = '0';
-            serviceArrows[i].style.transform = 'rotate(0deg)';
-          }
-        });
-      }
-      refreshMercury();
-    });
-  });
+    restored = lastOpened ? items.findIndex(item => item.querySelector('a')?.getAttribute('href') === `/servicios/${lastOpened}`) : -1;
+  } catch { /* Browser storage is optional. */ }
 
-  // The position of one panel also changes as a panel above it closes.
-  const serviceResize = new ResizeObserver(refreshMercury);
-  serviceContents.forEach(content => serviceResize.observe(content));
-  document.querySelectorAll('.service-detail').forEach(detail => serviceResize.observe(detail));
-  window.addEventListener('resize', refreshMercury, { passive: true });
-  window.addEventListener('pageshow', refreshMercury);
-  desktop.addEventListener('change', refreshMercury);
-  refreshMercury();
+  items.forEach((item, index) => { item.dataset.position = index === 0 ? 'current' : 'after'; });
+  updateNeighbors(0);
+  if (restored >= 0) requestAnimationFrame(() => scrollToService(restored));
+  else updateFromScroll();
 </script>

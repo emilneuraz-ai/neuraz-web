@@ -28,47 +28,52 @@ export function installSharedLogo() {
       const panelRect = content?.getBoundingClientRect();
       let inServices: boolean;
       let rect: { left: number; top: number; width: number; height: number; bottom: number };
+      let renderWidth = 0;
       let bottomClip = 0;
 
       if (desktop.matches) {
         const rail = desktopSlot.getBoundingClientRect();
-        const listRect = list.getBoundingClientRect();
         const sectionRect = services.getBoundingClientRect();
-        const homeTop = homeRect.top + scrollY;
-        const listTop = listRect.top + scrollY;
+        const headerBottom = document.querySelector<HTMLElement>('header')?.getBoundingClientRect().bottom || 80;
         const size = rail.width;
-        // Follow the active reading area without adding height to any accordion panel.
-        const railTop = clamp(scrollY + innerHeight * .5 - size / 2,
-          listTop - 24, Math.max(listTop - 24, listRect.bottom + scrollY - size));
-        const start = Math.max(0, homeTop + homeRect.height - innerHeight * .9);
-        const end = Math.max(start + 1, listTop - innerHeight * .32);
-        const linear = clamp((scrollY - start) / (end - start), 0, 1);
+        const safeTop = Math.max(96, headerBottom + 18);
+        const safeBottom = 28;
+        const fixedTop = safeTop + Math.max(0, innerHeight - safeTop - safeBottom - size) / 2;
+        const sectionTop = sectionRect.top;
+        const enterStart = Math.min(innerHeight * .9, sectionTop + innerHeight * .9);
+        const enterEnd = Math.min(innerHeight * .48, sectionTop + innerHeight * .48);
+        const linear = clamp((enterStart - sectionTop) / Math.max(1, enterStart - enterEnd), 0, 1);
         const progress = motion.matches ? Number(linear >= .5) : linear * linear * (3 - 2 * linear);
-        const top = lerp(homeTop, railTop, progress) - scrollY;
-        const width = lerp(homeRect.width, size, progress);
-        rect = { left: lerp(homeRect.left, rail.left, progress), top, width, height: width, bottom: top + width };
+        const pinnedTop = Math.min(fixedTop, sectionRect.bottom - size - 36);
+        const top = lerp(homeRect.top, pinnedTop, progress);
+        const visualWidth = lerp(homeRect.width, size, progress);
+        const scale = visualWidth / size;
+        rect = { left: lerp(homeRect.left, rail.left, progress), top, width: visualWidth, height: visualWidth, bottom: top + visualWidth };
+        renderWidth = size;
         inServices = linear >= .5;
-        bottomClip = Math.max(0, rect.bottom - sectionRect.bottom);
         host.style.left = '0px';
         host.style.top = '0px';
-        host.style.transform = `translate3d(${rect.left}px, ${rect.top + scrollY}px, 0)`;
+        host.style.transformOrigin = 'top left';
+        host.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(${scale})`;
         host.dataset.scrollProgress = progress.toFixed(3);
       } else {
         inServices = !!(slot && panelRect && panelRect.top < innerHeight * .85 && panelRect.bottom > 100 && homeRect.bottom < innerHeight * .45);
         rect = (inServices ? slot! : home).getBoundingClientRect();
         bottomClip = inServices ? Math.max(0, rect.bottom - panelRect!.bottom) : 0;
         host.style.transform = '';
+        host.style.transformOrigin = '';
         host.style.left = `${rect.left}px`;
         host.style.top = `${rect.top}px`;
+        renderWidth = rect.width;
         delete host.dataset.scrollProgress;
       }
 
       const visible = rect.width > 0 && rect.bottom > 80 && rect.top < innerHeight && (desktop.matches || !inServices || panelRect!.height > 30);
       host.hidden = !visible;
       host.dataset.destination = inServices ? 'services' : 'hero';
-      host.style.width = `${rect.width}px`;
-      host.style.height = `${rect.height}px`;
-      const topClip = Math.max(0, 80 - rect.top, !desktop.matches && inServices ? panelRect!.top - rect.top : 0);
+      host.style.width = `${renderWidth}px`;
+      host.style.height = `${renderWidth}px`;
+      const topClip = Math.max(0, !desktop.matches ? 80 - rect.top : 0, !desktop.matches && inServices ? panelRect!.top - rect.top : 0);
       host.style.clipPath = `inset(${topClip}px 0 ${bottomClip}px 0)`;
       const id = inServices ? panel?.dataset.serviceId || null : null;
       if (id !== selection) {
