@@ -71,6 +71,11 @@ export function installSharedLogo() {
       const visible = rect.width > 0 && rect.bottom > 80 && rect.top < innerHeight && (desktop.matches || !inServices || panelRect!.height > 30);
       host.hidden = !visible;
       host.dataset.destination = inServices ? 'services' : 'hero';
+      const motionSection = inServices ? services : home.closest<HTMLElement>('section');
+      const sectionVisibility = motionSection
+        ? getComputedStyle(motionSection).getPropertyValue('--section-visibility').trim()
+        : '';
+      host.style.opacity = desktop.matches ? '1' : sectionVisibility || '1';
       host.style.width = `${renderWidth}px`;
       host.style.height = `${renderWidth}px`;
       const topClip = Math.max(0, !desktop.matches ? 80 - rect.top : 0, !desktop.matches && inServices ? panelRect!.top - rect.top : 0);

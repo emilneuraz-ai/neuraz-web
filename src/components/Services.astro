@@ -2,13 +2,14 @@
 import { services, serviceVisual } from '../data/services';
 
 const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
+const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
 ---
 
 <section
   id="servicios"
   class="services-section"
   aria-label="Servicios"
-  style={`--services-scroll-height: ${scrollHeight}vh; --service-wash: ${serviceVisual(0).color}`}
+  style={`--services-scroll-height: ${scrollHeight}vh; --services-mobile-scroll-height: ${mobileScrollHeight}vh; --service-wash: ${serviceVisual(0).color}`}
 >
   <div class="services-sticky">
     <div class="services-wash" aria-hidden="true"></div>
@@ -92,7 +93,7 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
     inherits: true;
     initial-value: #e63946;
   }
-  .services-section { position: relative; height: var(--services-scroll-height); min-height: 100svh; scroll-margin-top: 0; background: #fafafa; transition: --service-wash 720ms cubic-bezier(.2,.75,.2,1); }
+  .services-section { position: relative; height: var(--services-mobile-scroll-height); min-height: 100svh; scroll-margin-top: 0; background: #fafafa; transition: --service-wash 720ms cubic-bezier(.2,.75,.2,1); }
   .services-sticky { position: sticky; top: 0; height: 100svh; min-height: 0; padding: 5rem clamp(1.75rem, 8vw, 2.5rem) 0; overflow: clip; }
   .services-wash {
     position: absolute;
@@ -173,7 +174,7 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   }
 
   @media (min-width: 1024px) {
-    .services-section { scroll-margin-top: 80px; }
+    .services-section { height: var(--services-scroll-height); scroll-margin-top: 80px; }
     .services-sticky { position: sticky; top: 80px; height: calc(100svh - 80px); min-height: 0; padding-block: 0; padding-inline: clamp(2rem, 6vw, 7.5rem); overflow: clip; }
     .services-inner { width: 100%; max-width: 1648px; height: 100%; min-height: 0; }
     .services-list { position: absolute; inset: 0 auto 0 0; width: 51%; border: 0; }
@@ -243,10 +244,15 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   const triggers = items.map(item => item.querySelector<HTMLButtonElement>('.service-header')!);
   const contents = items.map(item => item.querySelector<HTMLElement>('.service-content')!);
   const pages = Array.from(section.querySelectorAll<HTMLButtonElement>('[data-service-page]'));
+  const sticky = section.querySelector<HTMLElement>('.services-sticky')!;
   const desktop = matchMedia('(min-width: 1024px)');
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let expandedIndex = 0;
   let frame = 0;
+  let touchStartX = 0;
+  let touchStartY = 0;
+  let touchStartIndex = 0;
+  let touchTracking = false;
 
   const syncLogo = () => document.dispatchEvent(new CustomEvent('services:layout'));
 
@@ -331,6 +337,28 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   });
 
   pages.forEach((page, index) => page.addEventListener('click', () => scrollToService(index)));
+  sticky.addEventListener('touchstart', event => {
+    touchTracking = !desktop.matches && event.touches.length === 1;
+    if (!touchTracking) return;
+    touchStartX = event.touches[0].clientX;
+    touchStartY = event.touches[0].clientY;
+    touchStartIndex = expandedIndex;
+  }, { passive: true });
+  sticky.addEventListener('touchend', event => {
+    if (!touchTracking || desktop.matches || event.changedTouches.length !== 1) return;
+    touchTracking = false;
+    const deltaX = touchStartX - event.changedTouches[0].clientX;
+    const deltaY = touchStartY - event.changedTouches[0].clientY;
+    if (Math.abs(deltaY) < 34 || Math.abs(deltaY) < Math.abs(deltaX) * 1.15) return;
+
+    const rect = section.getBoundingClientRect();
+    const sectionIsPinned = rect.top <= 2 && rect.bottom >= innerHeight - 2;
+    if (!sectionIsPinned) return;
+
+    const target = Math.min(Math.max(touchStartIndex + (deltaY > 0 ? 1 : -1), 0), items.length - 1);
+    if (target !== touchStartIndex) scrollToService(target);
+  }, { passive: true });
+  sticky.addEventListener('touchcancel', () => { touchTracking = false; }, { passive: true });
   window.addEventListener('scroll', scheduleScrollUpdate, { passive: true });
   window.addEventListener('resize', scheduleScrollUpdate, { passive: true });
   window.addEventListener('load', settleHashAlignment, { once: true });

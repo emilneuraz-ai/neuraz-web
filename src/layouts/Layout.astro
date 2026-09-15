@@ -67,4 +67,40 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     background-color: rgba(14, 165, 233, 0.3);
     color: white;
   }
+
+  @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+    html[data-section-motion="true"] main > section > :not(.section-atmosphere) {
+      opacity: calc(0.12 + var(--section-visibility, 1) * 0.88);
+      transform: translate3d(0, calc((1 - var(--section-visibility, 1)) * 16px), 0);
+      will-change: opacity, transform;
+    }
+  }
 </style>
+
+<script>
+  const motionSections = Array.from(document.querySelectorAll<HTMLElement>('main > section'));
+  const reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
+  let sectionMotionFrame = 0;
+
+  function updateSectionMotion() {
+    sectionMotionFrame = 0;
+    const viewportHeight = innerHeight;
+    motionSections.forEach(section => {
+      const rect = section.getBoundingClientRect();
+      const visiblePixels = Math.max(0, Math.min(rect.bottom, viewportHeight) - Math.max(rect.top, 0));
+      const ratio = Math.min(1, visiblePixels / Math.min(viewportHeight, Math.max(1, rect.height)));
+      const eased = ratio * ratio * (3 - 2 * ratio);
+      section.style.setProperty('--section-visibility', reducedMotion.matches ? '1' : eased.toFixed(3));
+    });
+  }
+
+  function scheduleSectionMotion() {
+    if (!sectionMotionFrame) sectionMotionFrame = requestAnimationFrame(updateSectionMotion);
+  }
+
+  document.documentElement.dataset.sectionMotion = 'true';
+  updateSectionMotion();
+  window.addEventListener('scroll', scheduleSectionMotion, { passive: true });
+  window.addEventListener('resize', scheduleSectionMotion, { passive: true });
+  reducedMotion.addEventListener('change', scheduleSectionMotion);
+</script>

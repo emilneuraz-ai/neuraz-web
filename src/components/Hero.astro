@@ -182,7 +182,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     .hero { --hero-gutter: clamp(1.75rem, 8vw, 2.5rem); padding: 6.5rem var(--hero-gutter) 0; }
     .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 0; padding-bottom: 1.5rem; }
     .hero-copy { grid-column: 1; grid-row: 1; }
-    .hero-eyebrow { font-size: 9px; margin-bottom: 1.75rem; }
+    .hero-eyebrow { display: none; }
     h1 { font-size: clamp(2.35rem, 15.4vw, 9rem); }
     @supports (font-size: 1cqi) {
       .hero-copy { container-type: inline-size; }
@@ -190,6 +190,8 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     }
     .hero-outline { -webkit-text-stroke-width: 1.5px; }
     .hero-description { margin-top: 1.5rem; max-width: 330px; }
+    .hero-link { gap: 0; text-decoration: underline; text-decoration-color: #aaa; text-underline-offset: 5px; }
+    .hero-link-icon { display: none; }
     .hero-visual {
       grid-column: 1;
       grid-row: 2;
@@ -198,8 +200,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
       margin: -1rem 0 0;
       justify-self: center;
     }
-    .hero-footnote { font-size: 10px; align-items: flex-start; }
-    .hero-footnote p span { display: block; }
+    .hero-footnote { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-link-icon, .hero-link-icon svg { transition: none; }
