@@ -92,8 +92,8 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
     inherits: true;
     initial-value: #e63946;
   }
-  .services-section { position: relative; min-height: 100svh; scroll-margin-top: 0; background: #fafafa; transition: --service-wash 720ms cubic-bezier(.2,.75,.2,1); }
-  .services-sticky { position: relative; min-height: 100svh; padding: 5rem clamp(1.75rem, 8vw, 2.5rem) 0; }
+  .services-section { position: relative; height: var(--services-scroll-height); min-height: 100svh; scroll-margin-top: 0; background: #fafafa; transition: --service-wash 720ms cubic-bezier(.2,.75,.2,1); }
+  .services-sticky { position: sticky; top: 0; height: 100svh; min-height: 0; padding: 5rem clamp(1.75rem, 8vw, 2.5rem) 0; overflow: clip; }
   .services-wash {
     position: absolute;
     inset: 0;
@@ -103,45 +103,77 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
       linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--service-wash) 2.5%, transparent) 52%, transparent 100%);
     pointer-events: none;
   }
-  .services-inner { position: relative; z-index: 1; min-height: calc(100svh - 12rem); }
-  .services-list { position: relative; overflow-anchor: none; border-top: 1px solid #dedede; }
-  .service-item { border-bottom: 1px solid #dedede; }
-  .service-item[data-expanded="true"] { display: flex; min-height: calc(100svh - 5rem); flex-direction: column; justify-content: center; }
-  .service-header { display: flex; align-items: center; width: 100%; min-height: 72px; padding: 1.2rem 0; text-align: left; color: #999; cursor: pointer; }
-  .service-name { flex: 1; font-size: 1.125rem; font-weight: 500; line-height: 1.3; letter-spacing: -0.02em; transition: font-size 400ms ease, color 250ms ease; }
-  .service-toggle { position: relative; flex: none; width: 28px; height: 28px; border: 1px solid #d6d6d6; border-radius: 50%; transition: background 250ms, border-color 250ms; }
-  .service-toggle span { position: absolute; left: 8px; top: 13px; width: 10px; height: 1px; background: currentColor; }
-  .service-toggle span:last-child { transform: rotate(90deg); transition: transform 300ms ease; }
-  .service-header:hover .service-name { color: #555; }
+  .services-inner { position: relative; z-index: 1; height: calc(100svh - 5rem); min-height: 0; }
+  .services-list { position: absolute; inset: 0; overflow-anchor: none; }
+  .service-item {
+    position: absolute;
+    inset: 0;
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    justify-content: center;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(28px);
+    transition: opacity 360ms ease, transform 520ms cubic-bezier(.2,.75,.2,1), visibility 520ms;
+  }
+  .service-item[data-position="before"] { transform: translateY(-28px); }
+  .service-item[data-position="current"] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
+  .service-header { display: flex; align-items: center; width: 100%; min-height: auto; padding: 1.25rem 2rem 1rem 0; text-align: left; color: #111; cursor: default; pointer-events: none; }
+  .service-name { flex: 1; font-size: clamp(2.35rem, 10vw, 3.2rem); font-weight: 650; line-height: 1.02; letter-spacing: -0.055em; }
+  .service-toggle { display: none; }
   .service-header:focus-visible, .service-link:focus-visible { outline: 2px solid #111; outline-offset: 5px; border-radius: 2px; }
-  .service-item[data-expanded="true"] .service-header { padding-top: 1.5rem; padding-bottom: 1.25rem; color: #111; }
-  .service-item[data-expanded="true"] .service-name { font-size: clamp(2.35rem, 10vw, 3.2rem); font-weight: 650; line-height: 1.02; letter-spacing: -0.055em; }
-  .service-item[data-expanded="true"] .service-toggle { background: #111; border-color: #111; color: #fff; }
-  .service-item[data-expanded="true"] .service-toggle span:last-child { transform: rotate(0); }
-  .service-content { display: grid; grid-template-rows: 0fr; opacity: 0; visibility: hidden; transition: grid-template-rows 400ms ease, opacity 300ms ease, visibility 400ms; }
-  .service-item[data-expanded="true"] .service-content { grid-template-rows: 1fr; opacity: 1; visibility: visible; }
-  .service-content-inner { min-height: 0; overflow: hidden; }
+  .service-content, .service-item[data-expanded="true"] .service-content { display: block; opacity: 1; visibility: visible; }
+  .service-content-inner { min-height: 0; overflow: visible; }
   .service-detail { padding: 0 0 1.5rem; }
-  .service-copy { min-width: 0; }
+  .service-copy { min-width: 0; padding-right: 1.25rem; }
   .service-description { max-width: 35rem; margin-bottom: 1.25rem; font-size: 1.0625rem; line-height: 1.62; color: #505050; }
   .service-benefit { max-width: 36rem; margin-bottom: 1.5rem; padding-left: 1rem; border-left: 2px solid var(--service-accent); font-size: 1rem; line-height: 1.6; color: #222; }
   .service-industries { display: flex; flex-wrap: wrap; gap: 0.5rem 1rem; margin-bottom: 1rem; font-size: 0.6875rem; font-weight: 500; letter-spacing: 0.08em; text-transform: uppercase; color: #636363; }
   .service-link { display: inline-flex; align-items: center; gap: 1.5rem; min-height: 44px; font-size: 1rem; font-weight: 500; color: #111; text-decoration: underline; text-underline-offset: 5px; text-decoration-color: #aaa; }
   .service-link span { font-size: 1.3rem; transition: transform 200ms; }
   .service-link:hover span { transform: translate(3px, -3px); }
-  .service-logo-slot { display: none; width: min(66.666vw, 260px); aspect-ratio: 1; margin: 0 auto 0.5rem; flex: none; }
+  .service-logo-slot { display: none; width: min(66.666vw, 260px); aspect-ratio: 1; margin: 0 auto 0.25rem; flex: none; }
   .service-item[data-expanded="true"] > .service-logo-slot { display: block; }
-  .services-pagination, .services-logo-anchor { display: none; }
+  .services-logo-anchor { display: none; }
+  .services-pagination {
+    position: absolute;
+    z-index: 80;
+    top: 50%;
+    right: max(0.25rem, env(safe-area-inset-right));
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.42rem;
+    transform: translateY(-50%);
+  }
+  .service-page { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
+  .service-page span { width: 6px; height: 6px; border-radius: 50%; background: var(--page-color); opacity: 0.34; transition: width 240ms ease, height 240ms ease, opacity 240ms ease, box-shadow 240ms ease; }
+  .service-page:hover span { opacity: 0.72; }
+  .service-page[aria-current="true"] span { width: 11px; height: 11px; opacity: 1; box-shadow: 0 0 0 3px #fafafa, 0 0 0 4px color-mix(in srgb, var(--page-color), transparent 58%); }
+  .service-page:focus-visible { outline: 2px solid #111; outline-offset: 1px; }
 
   @media (max-width: 374px) {
     .service-logo-slot { width: min(64vw, 240px); }
-    .service-item[data-expanded="true"] .service-header { padding-top: 1.25rem; padding-bottom: 1rem; }
+    .service-header { padding-top: 1rem; padding-bottom: 0.8rem; }
     .service-description { margin-bottom: 1rem; }
     .service-benefit { margin-bottom: 1.25rem; }
   }
 
+  @media (max-width: 420px) and (max-height: 850px) {
+    .service-logo-slot { width: min(58vw, 225px); }
+    .service-header { padding-top: 0.8rem; padding-bottom: 0.7rem; }
+    .service-name { font-size: clamp(2rem, 9vw, 2.35rem); }
+    .service-detail { padding-bottom: 0.5rem; }
+    .service-description { margin-bottom: 0.75rem; font-size: 0.9375rem; line-height: 1.5; }
+    .service-benefit { margin-bottom: 0.85rem; font-size: 0.9rem; line-height: 1.45; }
+    .service-industries { gap: 0.4rem 0.75rem; margin-bottom: 0.55rem; font-size: 0.625rem; }
+    .service-link { min-height: 40px; font-size: 0.9375rem; }
+  }
+
   @media (min-width: 1024px) {
-    .services-section { height: var(--services-scroll-height); scroll-margin-top: 80px; }
+    .services-section { scroll-margin-top: 80px; }
     .services-sticky { position: sticky; top: 80px; height: calc(100svh - 80px); min-height: 0; padding-block: 0; padding-inline: clamp(2rem, 6vw, 7.5rem); overflow: clip; }
     .services-inner { width: 100%; max-width: 1648px; height: 100%; min-height: 0; }
     .services-list { position: absolute; inset: 0 auto 0 0; width: 51%; border: 0; }
@@ -158,18 +190,15 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
       transform: translateY(32px);
       transition: opacity 360ms ease, transform 520ms cubic-bezier(.2,.75,.2,1), visibility 520ms;
     }
-    .service-item[data-expanded="true"] { min-height: 0; }
     .service-item[data-position="before"] { transform: translateY(-32px); }
     .service-item[data-position="current"] { opacity: 1; visibility: visible; pointer-events: auto; transform: translateY(0); }
     .service-header { min-height: auto; padding: 0 0 1.75rem; color: #111; cursor: default; pointer-events: none; }
     .service-item[data-expanded="true"] .service-header { padding: 0 0 1.75rem; }
     .service-item[data-expanded="true"] .service-name { font-size: clamp(3rem, 4.3vw, 4.75rem); }
     .service-toggle { display: none; }
-    .service-content, .service-item[data-expanded="true"] .service-content { display: block; opacity: 1; visibility: visible; }
-    .service-content-inner { overflow: visible; }
     .service-detail { padding: 0; }
     .service-description { font-size: 1.125rem; }
-    .service-copy { position: relative; z-index: 3; }
+    .service-copy { position: relative; z-index: 3; padding-right: 0; }
     .service-logo-slot { display: none; }
     .services-logo-anchor { display: block; position: absolute; top: 50%; right: -2%; width: min(52%, 700px, calc(100svh - 190px)); aspect-ratio: 1; transform: translateY(-50%); pointer-events: none; }
     .services-pagination {
@@ -183,11 +212,8 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
       gap: 0.72rem;
       transform: translateY(-50%);
     }
-    .service-page { display: grid; place-items: center; width: 24px; height: 24px; padding: 0; border: 0; border-radius: 50%; background: transparent; cursor: pointer; }
-    .service-page span { width: 7px; height: 7px; border-radius: 50%; background: var(--page-color); opacity: 0.34; transition: width 240ms ease, height 240ms ease, opacity 240ms ease, box-shadow 240ms ease; }
-    .service-page:hover span { opacity: 0.72; }
-    .service-page[aria-current="true"] span { width: 12px; height: 12px; opacity: 1; box-shadow: 0 0 0 4px #fafafa, 0 0 0 5px color-mix(in srgb, var(--page-color), transparent 58%); }
-    .service-page:focus-visible { outline: 2px solid #111; outline-offset: 1px; }
+    .service-page span { width: 7px; height: 7px; }
+    .service-page[aria-current="true"] span { width: 12px; height: 12px; box-shadow: 0 0 0 4px #fafafa, 0 0 0 5px color-mix(in srgb, var(--page-color), transparent 58%); }
   }
 
   @media (min-width: 1024px) and (max-height: 760px) {
@@ -221,7 +247,6 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   const motion = matchMedia('(prefers-reduced-motion: reduce)');
   let expandedIndex = 0;
   let frame = 0;
-  let mobileCenterTimer = 0;
 
   const syncLogo = () => document.dispatchEvent(new CustomEvent('services:layout'));
 
@@ -235,7 +260,7 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   function select(index: number) {
     const safeIndex = Math.min(Math.max(index, 0), items.length - 1);
     if (safeIndex === expandedIndex && items[safeIndex].dataset.position === 'current') {
-      items.forEach((item, i) => { item.inert = desktop.matches && i !== safeIndex; });
+      items.forEach((item, i) => { item.inert = i !== safeIndex; });
       return;
     }
     expandedIndex = safeIndex;
@@ -244,7 +269,7 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
       const open = i === safeIndex;
       item.dataset.expanded = String(open);
       item.dataset.position = open ? 'current' : i < safeIndex ? 'before' : 'after';
-      item.inert = desktop.matches && !open;
+      item.inert = !open;
       triggers[i].setAttribute('aria-expanded', String(open));
       contents[i].inert = !open;
     });
@@ -253,36 +278,18 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   }
 
   function scrollToService(index: number) {
-    if (!desktop.matches) {
-      select(index);
-      window.clearTimeout(mobileCenterTimer);
-      const centerItem = () => {
-        if (expandedIndex !== index || desktop.matches) return;
-        const item = items[index];
-        const rect = item.getBoundingClientRect();
-        const headerHeight = document.querySelector<HTMLElement>('.site-header')?.offsetHeight || 80;
-        const availableHeight = innerHeight - headerHeight;
-        const viewportTop = headerHeight + Math.max(0, (availableHeight - rect.height) / 2);
-        const top = rect.top + scrollY - viewportTop;
-        scrollTo({ top, behavior: motion.matches ? 'instant' : 'smooth' });
-      };
-      requestAnimationFrame(() => {
-        centerItem();
-        mobileCenterTimer = window.setTimeout(centerItem, 440);
-      });
-      return;
-    }
-    const top = section.getBoundingClientRect().top + scrollY - 80;
-    const range = Math.max(1, section.offsetHeight - innerHeight + 80);
+    const stickyOffset = desktop.matches ? 80 : 0;
+    const top = section.getBoundingClientRect().top + scrollY - stickyOffset;
+    const range = Math.max(1, section.offsetHeight - innerHeight + stickyOffset);
     const progress = items.length > 1 ? index / (items.length - 1) : 0;
     scrollTo({ top: top + range * progress, behavior: motion.matches ? 'instant' : 'smooth' });
   }
 
   function updateFromScroll() {
-    if (!desktop.matches) return;
+    const stickyOffset = desktop.matches ? 80 : 0;
     const rect = section.getBoundingClientRect();
-    const range = Math.max(1, section.offsetHeight - innerHeight + 80);
-    const progress = Math.min(Math.max((80 - rect.top) / range, 0), 1);
+    const range = Math.max(1, section.offsetHeight - innerHeight + stickyOffset);
+    const progress = Math.min(Math.max((stickyOffset - rect.top) / range, 0), 1);
     select(Math.round(progress * (items.length - 1)));
   }
 
@@ -310,7 +317,6 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   }
 
   triggers.forEach((trigger, index) => {
-    trigger.addEventListener('click', () => { if (!desktop.matches) scrollToService(index); });
     trigger.addEventListener('keydown', event => {
       let target = index;
       if (event.key === 'ArrowDown') target = Math.min(index + 1, items.length - 1);
@@ -319,8 +325,8 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
       else if (event.key === 'End') target = items.length - 1;
       else return;
       event.preventDefault();
-      if (desktop.matches) scrollToService(target);
-      else { select(target); triggers[target].focus(); }
+      scrollToService(target);
+      pages[target]?.focus({ preventScroll: true });
     });
   });
 
@@ -331,8 +337,7 @@ const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
   window.addEventListener('pageshow', settleHashAlignment);
   window.addEventListener('hashchange', scheduleHashAlignment);
   desktop.addEventListener('change', () => {
-    if (desktop.matches) updateFromScroll();
-    else select(expandedIndex);
+    updateFromScroll();
     syncLogo();
   });
 

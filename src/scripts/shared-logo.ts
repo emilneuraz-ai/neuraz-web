@@ -80,9 +80,12 @@ export function installSharedLogo() {
         selection = id;
         logo.dispatchEvent(new CustomEvent('hero-logo:select', { detail: { id } }));
       }
-      home.dataset.sharedReady = String(renderer.dataset.ready === 'true');
+      // The shared scene already includes its own poster while WebGL loads.
+      // Hide the separate SVG as soon as the scene takes its place so the two
+      // silhouettes can never be painted on top of each other.
+      home.dataset.sharedReady = String(visible);
       const fallback = home.querySelector<HTMLImageElement>('img');
-      if (fallback) fallback.hidden = renderer.dataset.ready === 'true';
+      if (fallback) fallback.hidden = visible;
     };
     const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
     const options = { signal: life.signal };
@@ -98,7 +101,15 @@ export function installSharedLogo() {
     resize.observe(list);
     document.querySelectorAll('.service-content').forEach(el => resize.observe(el));
     update();
-    disposeCurrent = () => { life.abort(); resize.disconnect(); cancelAnimationFrame(frame); host.hidden = true; };
+    disposeCurrent = () => {
+      life.abort();
+      resize.disconnect();
+      cancelAnimationFrame(frame);
+      host.hidden = true;
+      home.dataset.sharedReady = 'false';
+      const fallback = home.querySelector<HTMLImageElement>('img');
+      if (fallback) fallback.hidden = false;
+    };
   };
   if (!installed) {
     installed = true;
