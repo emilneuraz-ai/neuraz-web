@@ -7,11 +7,9 @@ import puzzle from '../assets/heroicons/outline/puzzle-piece.svg?raw';
 import pencil from '../assets/heroicons/outline/pencil-square.svg?raw';
 import cpu from '../assets/heroicons/outline/cpu-chip.svg?raw';
 import document from '../assets/heroicons/outline/document-check.svg?raw';
-import academic from '../assets/heroicons/outline/academic-cap.svg?raw';
-import chart from '../assets/heroicons/outline/chart-bar-square.svg?raw';
 
-const icons = [arrowPath, chat, gift, puzzle, pencil, cpu, document, academic, chart];
-const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación', 'Capacitaciones', 'Datos en tiempo real'];
+const icons = [arrowPath, chat, gift, puzzle, pencil, cpu, document];
+const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación'];
 const descriptions = [
   'Conectamos herramientas. Liberamos tu tiempo.',
   'Cada consulta, una conversación que avanza.',
@@ -20,8 +18,6 @@ const descriptions = [
   'Ideas que se convierten en contenido.',
   'Inteligencia que trabaja con tu equipo.',
   'Del archivo al dato que necesitás.',
-  'Tu equipo, preparado para lo que viene.',
-  'La información que necesitás para decidir.',
 ];
 const explanations = [
   'Conectamos ventas, atención y seguimiento para que las tareas repetitivas avancen solas y tu equipo pueda concentrarse en el negocio.',
@@ -31,8 +27,6 @@ const explanations = [
   'Generamos contenido, tarjetas y piezas digitales con inteligencia artificial para mantener tus canales actualizados con menos tareas manuales.',
   'Creamos agentes que analizan el comportamiento y personalizan las acciones de tu negocio para acompañar a tu equipo.',
   'Extraemos datos de documentos y clasificamos archivos para que tu equipo encuentre la información que necesita sin organizarla a mano.',
-  'Capacitamos a tu equipo en inteligencia artificial y automatización para incorporar herramientas útiles en sus tareas de todos los días.',
-  'Reunimos tus datos en tableros que se actualizan automáticamente para consultar métricas, exportar información y tomar decisiones con más contexto.',
 ];
 const paths = (svg: string) => svg.replace(/^[\s\S]*?<svg\b[^>]*>/, '').replace(/<\/svg>\s*$/, '');
 const pages = import.meta.glob('../pages/servicios/*.astro');

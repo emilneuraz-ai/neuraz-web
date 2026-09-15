@@ -82,26 +82,6 @@ export const services: Service[] = [
     featured: true,
     industries: ["Legal", "Automotriz", "Institucional", "Finanzas"],
     slug: "documentacion-inteligente"
-  },
-  {
-    id: "capacitaciones",
-    name: "Capacitaciones en IA y Automatización",
-    description: "Formación en IA, automatización y herramientas de productividad para equipos y organizaciones.",
-    benefit: "Equipos capacitados para implementar y aprovechar la tecnología en su día a día.",
-    category: "Inteligencia Artificial",
-    featured: false,
-    industries: ["Educación", "Institucional", "Finanzas", "Salud & Fitness"],
-    slug: "capacitaciones-en-ia-y-automatizacion"
-  },
-  {
-    id: "dashboards",
-    name: "Dashboards & Estadísticas en Tiempo Real",
-    description: "Dashboards interactivos con actualización automática vía scraping y gestión visual. Tablas exportables, widgets personalizables, gráficas configurables y reportes programados.",
-    benefit: "Tus métricas siempre activas, sin depender de un desarrollador para actualizar un solo número.",
-    category: "Análisis de datos",
-    featured: true,
-    industries: ["Retail", "Energía", "Finanzas", "Legal", "Institucional", "Media"],
-    slug: "dashboards"
   }
 ];
 

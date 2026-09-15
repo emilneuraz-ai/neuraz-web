@@ -11,10 +11,8 @@ const icons = [
   '<path d="m5 19 3.5-.8L19 7.7 16.3 5 5.8 15.5 5 19Z"/><path d="m14.8 6.5 2.7 2.7"/>',
   '<path d="M9 5.5A3.5 3.5 0 0 0 5.5 9v1A3.5 3.5 0 0 0 7 16.7V19M15 5.5A3.5 3.5 0 0 1 18.5 9v1a3.5 3.5 0 0 1-1.5 6.7V19M9 5.5c0-2 3-2 3 0v13m3-13c0-2-3-2-3 0M7 10h3m4 0h4M8 15h2m4 0h3"/>',
   '<path d="M7 3.5h7l4 4V20H7a2 2 0 0 1-2-2V5.5a2 2 0 0 1 2-2Z"/><path d="M14 3.5v4h4M8.5 13l2 2 4-4"/>',
-  '<path d="M3.5 9 12 4l8.5 5L12 14 3.5 9Z"/><path d="M7 11.2v4.3c3 2.2 7 2.2 10 0v-4.3M20.5 9v6"/>',
-  '<path d="M5 20V9m5 11V5m5 15v-7m5 7V3"/><path d="M3 20h19"/>',
 ];
-const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación', 'Capacitaciones', 'Datos en tiempo real'];
+const labels = ['Automatización', 'Atención y CRM', 'Fidelización', 'Experiencias de marca', 'Contenido con IA', 'Agentes de IA', 'Documentación'];
 const descriptions = [
   'Conectamos herramientas. Liberamos tu tiempo.',
   'Cada consulta, una conversación que avanza.',
@@ -23,8 +21,6 @@ const descriptions = [
   'Ideas que se convierten en contenido.',
   'Inteligencia que trabaja con tu equipo.',
   'Del archivo al dato que necesitás.',
-  'Tu equipo, preparado para lo que viene.',
-  'La información que necesitás para decidir.',
 ];
 const explanations = [
   'Conectamos ventas, atención y seguimiento para que las tareas repetitivas avancen solas y tu equipo pueda concentrarse en el negocio.',
@@ -34,8 +30,6 @@ const explanations = [
   'Generamos contenido, tarjetas y piezas digitales con inteligencia artificial para mantener tus canales actualizados con menos tareas manuales.',
   'Creamos agentes que analizan el comportamiento y personalizan las acciones de tu negocio para acompañar a tu equipo.',
   'Extraemos datos de documentos y clasificamos archivos para que tu equipo encuentre la información que necesita sin organizarla a mano.',
-  'Capacitamos a tu equipo en inteligencia artificial y automatización para incorporar herramientas útiles en sus tareas de todos los días.',
-  'Reunimos tus datos en tableros que se actualizan automáticamente para consultar métricas, exportar información y tomar decisiones con más contexto.',
 ];
 const pages = import.meta.glob('../pages/servicios/*.astro');
 const entries = services.map((service, i) => ({
@@ -53,8 +47,6 @@ const anchors = [
   { u: 0.565445026, v: 0.528795812, top: 0.254475 },
   { u: 0.916230366, v: 0.570680628, top: 0.277195 },
   { u: 0.225130890, v: 0.204188482, top: 0.289273 },
-  { u: 0.481675393, v: 0.094240838, top: 0.313901 },
-  { u: 0.753926702, v: 0.172774869, top: 0.331807 },
 ];
 const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
 ---

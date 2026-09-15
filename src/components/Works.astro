@@ -16,7 +16,7 @@ import projects from '../data/behance-projects.json';
       </div>
     </div>
 
-    <p id="works-help" class="works-sr-only">Arrastrá con el mouse o deslizá para recorrer los trabajos. También podés usar las flechas izquierda y derecha, Inicio para ir al primero y Fin para ir al último.</p>
+    <p id="works-help" class="works-sr-only">En pantallas pequeñas, recorré los trabajos desplazándote verticalmente. En escritorio, arrastrá el carrusel o usá las flechas izquierda y derecha, Inicio para ir al primero y Fin para ir al último.</p>
     <div id="works-track" class="works-track" data-track tabindex="0" role="region" aria-label="Proyectos en Behance" aria-describedby="works-help">
       <ul class="works-list">
         {projects.map((project) => (
@@ -80,9 +80,17 @@ import projects from '../data/behance-projects.json';
   }
   @media (max-width: 639px) {
     .works { padding-block: 4rem; }
-    .works-heading { margin-bottom: 2rem; }
-    .works-footer { justify-content: flex-start; margin-top: 1.5rem; }
-    .works-caption { opacity: 1; font-size: 13px; }
+    .works-heading { margin-bottom: 1.5rem; }
+    .works-controls { display: none; }
+    .works-track { overflow: visible; scroll-snap-type: none; overscroll-behavior: auto; }
+    .works-list { display: grid; gap: 2.75rem; padding-inline: 24px; }
+    .works-item { width: 100%; min-width: 0; }
+    .works-project { aspect-ratio: auto; overflow: visible; background: transparent; }
+    .works-project img { aspect-ratio: 5 / 4; object-fit: cover; }
+    .works-caption { position: static; align-items: flex-start; padding: 0.9rem 0 0; background: none; color: #111; opacity: 1; font-size: 14px; }
+    .works-external { font-size: 19px; }
+    .works-footer { justify-content: flex-start; margin-top: 2.75rem; }
+    .works-track:focus-visible { outline: none; }
   }
   @media (hover: none) { .works-caption { opacity: 1; } }
   @media (prefers-reduced-motion: reduce) {
@@ -104,6 +112,7 @@ import projects from '../data/behance-projects.json';
 
       const events = new AbortController();
       const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
+      const mobile = window.matchMedia('(max-width: 639px)');
       let frame = 0;
       let drag: { pointerId: number; startX: number; startScroll: number; active: boolean } | undefined;
       let suppressClick = false;
@@ -120,6 +129,12 @@ import projects from '../data/behance-projects.json';
       const move = (direction: number) => {
         const item = track.querySelector<HTMLElement>('.works-item');
         goTo(track.scrollLeft + direction * (item?.getBoundingClientRect().width ?? track.clientWidth));
+      };
+      const syncMode = () => {
+        controls.hidden = mobile.matches;
+        track.tabIndex = mobile.matches ? -1 : 0;
+        if (mobile.matches) delete track.dataset.dragReady;
+        else track.dataset.dragReady = '';
       };
 
       const finishDrag = (event?: PointerEvent, snap = true) => {
@@ -188,8 +203,8 @@ import projects from '../data/behance-projects.json';
       const resize = new ResizeObserver(update);
       resize.observe(track);
       update();
-      controls.hidden = false;
-      track.dataset.dragReady = '';
+      syncMode();
+      mobile.addEventListener('change', syncMode, { signal: events.signal });
       this.cleanup = () => {
         events.abort();
         finishDrag(undefined, false);
