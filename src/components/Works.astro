@@ -86,11 +86,12 @@ const projects = rawProjects as WorkProject[];
     .works-track { height: 100%; }
     .works-list { transform: translate3d(var(--works-translate, 0px), 0, 0); }
     .works-item { flex-basis: 100vw; }
-    .works-project::after { background: linear-gradient(180deg, transparent 48%, rgb(0 0 0 / .68)); }
-    .works-caption { inset: auto clamp(32px, 7vw, 112px) clamp(32px, 7vh, 72px); max-width: min(54rem, 70vw); }
+    .works-project { display: grid; grid-template-rows: 75% 25%; background: #111; }
+    .works-project::after { display: none; }
+    .works-caption { position: relative; inset: auto; align-content: center; padding: clamp(24px, 3vw, 40px) clamp(32px, 7vw, 112px); color: #fff; background: #111; }
     .works-caption-label { font-size: 11px; }
-    .works-caption-title { font-size: clamp(2rem, 4.6vw, 5.2rem); }
-    .works-external { right: auto; left: calc(100% + 28px); bottom: .05em; font-size: 32px; }
+    .works-caption-title { max-width: min(44rem, 72vw); font-size: clamp(1.2rem, 2vw, 1.85rem); line-height: 1.15; letter-spacing: -.025em; }
+    .works-external { top: 50%; right: clamp(32px, 7vw, 112px); bottom: auto; left: auto; transform: translateY(-50%); font-size: 24px; }
     .works-utility { position: absolute; z-index: 2; top: 34px; left: clamp(32px, 7vw, 112px); display: flex; align-items: center; gap: 16px; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .12em; }
     .works-progress { display: block; width: 64px; height: 1px; overflow: hidden; background: rgb(255 255 255 / .35); }
     .works-progress span { display: block; width: 100%; height: 100%; transform: scaleX(var(--works-progress, .111)); transform-origin: left center; background: #fff; }
