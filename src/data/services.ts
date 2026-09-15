@@ -93,9 +93,13 @@ export const featuredServices = services.filter(s => s.featured);
 export function serviceVisual(index: number) {
   const colors = ['#e63946', '#171717', '#ffb703'];
   const angles = [
-    [0.16, -0.3, -0.09], [-0.2, 0.32, 0.08], [0.24, -0.18, -0.12],
-    [-0.12, -0.36, 0.12], [0.2, 0.28, -0.06], [-0.24, -0.2, 0.1],
-    [0.12, 0.36, -0.1], [-0.18, -0.28, 0.06], [0.22, 0.2, 0.12],
+    [0.34, -0.5, -0.16], [-0.38, 0.48, 0.14], [0.42, -0.34, -0.19],
+    [-0.32, -0.52, 0.18], [0.36, 0.44, -0.14], [-0.4, -0.38, 0.17],
+    [0.3, 0.52, -0.16],
   ];
-  return { color: colors[index % colors.length], angle: angles[index % angles.length] };
+  const offsets = [
+    [0.01, -0.03], [-0.045, 0.025], [0.05, -0.015],
+    [-0.035, -0.035], [0.045, 0.03], [-0.05, 0.015], [0.035, -0.025],
+  ];
+  return { color: colors[index % colors.length], angle: angles[index % angles.length], offset: offsets[index % offsets.length] };
 }

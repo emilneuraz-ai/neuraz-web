@@ -62,7 +62,7 @@ import NavbarBrand from './NavbarBrand.astro';
     inset: 0 0 auto;
     z-index: 300;
     isolation: isolate;
-    background-color: #fafafa;
+    background-color: var(--color-bg, #fafafa);
     transform: translateY(0);
     transition: transform 320ms cubic-bezier(.2,.75,.2,1);
     will-change: transform;
@@ -74,7 +74,7 @@ import NavbarBrand from './NavbarBrand.astro';
   .organic-menu-icon svg { display: block; width: 100%; height: 100%; }
   .organic-menu-icon path { stroke: currentColor; stroke-width: 2.25; stroke-linecap: round; stroke-linejoin: round; }
   #mobile-menu {
-    background-color: #fafafa;
+    background-color: var(--color-bg, #fafafa);
     max-height: calc(100dvh - 5rem);
     overflow-y: auto;
     overscroll-behavior: contain;

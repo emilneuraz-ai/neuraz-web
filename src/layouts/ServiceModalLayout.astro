@@ -30,14 +30,14 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     <title>{title}</title>
   </head>
   <body class="bg-black/95 font-sans antialiased">
-    <PageLoader />
+    <PageLoader variant="dark" />
     <!-- Modal container - fullscreen -->
-    <div id="service-modal" class="fixed inset-0 z-50 flex">
+    <div id="service-modal" class="service-modal fixed inset-0 z-50 flex" role="dialog" aria-modal="true" aria-label={title}>
       <!-- Backdrop -->
       <div id="modal-backdrop" class="absolute inset-0 bg-black"></div>
       
       <!-- Modal content - fullscreen -->
-      <div class="relative w-full h-full bg-black overflow-hidden">
+      <div class="service-modal__surface relative w-full h-full bg-black overflow-hidden">
         <!-- Scrollable content -->
         <div class="h-full w-full overflow-y-auto overflow-x-hidden">
           <!-- Close button -->
@@ -68,17 +68,34 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
     </div>
     
     <script>
-      // Handle escape key to close modal
-      document.addEventListener('keydown', (e) => {
-        if (e.key === 'Escape') {
-          window.location.href = '/#servicios';
-        }
+      const modal = document.getElementById('service-modal');
+      const closeButton = document.getElementById('close-modal');
+      let closing = false;
+
+      const closeModal = () => {
+        if (closing) return;
+        closing = true;
+        modal?.setAttribute('data-closing', 'true');
+        const reduceMotion = matchMedia('(prefers-reduced-motion: reduce)').matches;
+        window.setTimeout(() => {
+          let openedFromSite = false;
+          try {
+            openedFromSite = sessionStorage.getItem('serviceModalOpenedFromSite') === 'true';
+            sessionStorage.removeItem('serviceModalOpenedFromSite');
+          } catch { /* Browser storage is optional. */ }
+          if (openedFromSite && history.length > 1) history.back();
+          else window.location.href = '/#servicios';
+        }, reduceMotion ? 0 : 220);
+      };
+
+      closeButton?.addEventListener('click', (event) => {
+        event.preventDefault();
+        closeModal();
       });
-      
-      // Handle backdrop click to close
-      document.getElementById('modal-backdrop')?.addEventListener('click', () => {
-        window.location.href = '/#servicios';
+      document.addEventListener('keydown', (event) => {
+        if (event.key === 'Escape') closeModal();
       });
+      document.getElementById('modal-backdrop')?.addEventListener('click', closeModal);
       
       // Store the service ID in sessionStorage to reopen the accordion
       const serviceSlug = window.location.pathname.split('/').pop();
@@ -97,6 +114,36 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   body {
     font-feature-settings: "cv02", "cv03", "cv04", "cv11";
   }
+
+  .service-modal {
+    background: #050505;
+    animation: service-modal-in 300ms cubic-bezier(.2,.75,.2,1) both;
+  }
+
+  .service-modal__surface {
+    transform-origin: 50% 55%;
+    animation: service-modal-surface-in 420ms cubic-bezier(.2,.75,.2,1) both;
+  }
+
+  .service-modal[data-closing='true'] {
+    pointer-events: none;
+    animation: service-modal-out 220ms ease both;
+  }
+
+  .service-modal[data-closing='true'] .service-modal__surface {
+    animation: service-modal-surface-out 220ms ease both;
+  }
+
+  @keyframes service-modal-in { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes service-modal-out { from { opacity: 1; } to { opacity: 0; } }
+  @keyframes service-modal-surface-in {
+    from { opacity: 0; transform: translateY(18px) scale(.992); }
+    to { opacity: 1; transform: translateY(0) scale(1); }
+  }
+  @keyframes service-modal-surface-out {
+    from { opacity: 1; transform: translateY(0) scale(1); }
+    to { opacity: 0; transform: translateY(10px) scale(.994); }
+  }
   
   /* Custom scrollbar for modal */
   .overflow-y-auto::-webkit-scrollbar {
@@ -114,5 +161,12 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   
   .overflow-y-auto::-webkit-scrollbar-thumb:hover {
     background: rgba(255, 255, 255, 0.3);
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    .service-modal,
+    .service-modal__surface,
+    .service-modal[data-closing='true'],
+    .service-modal[data-closing='true'] .service-modal__surface { animation: none; }
   }
 </style>

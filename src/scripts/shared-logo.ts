@@ -18,7 +18,7 @@ export function installSharedLogo() {
     const clamp = (value: number, min: number, max: number) => Math.min(Math.max(value, min), max);
     const lerp = (from: number, to: number, progress: number) => from + (to - from) * progress;
     let frame = 0;
-    let selection: string | null | undefined;
+    let selection: string | undefined;
     const update = () => {
       frame = 0;
       const homeRect = home.getBoundingClientRect();
@@ -26,7 +26,13 @@ export function installSharedLogo() {
       const content = panel?.querySelector<HTMLElement>('.service-content');
       const slot = panel?.querySelector<HTMLElement>('[data-service-logo-slot]');
       const panelRect = (desktop.matches ? content : panel)?.getBoundingClientRect();
+      const activePin = Array.from(logo.querySelectorAll<HTMLElement>('[data-hero-logo-service]'))
+        .find(pin => pin.dataset.heroLogoService === panel?.dataset.serviceId);
+      const offset = activePin?.dataset.serviceOffset?.split(',').map(Number) || [0, 0];
+      const offsetX = Number.isFinite(offset[0]) ? offset[0] : 0;
+      const offsetY = Number.isFinite(offset[1]) ? offset[1] : 0;
       let inServices: boolean;
+      let transitionProgress = 0;
       let rect: { left: number; top: number; width: number; height: number; bottom: number };
       let renderWidth = 0;
       let bottomClip = 0;
@@ -34,6 +40,7 @@ export function installSharedLogo() {
       if (desktop.matches) {
         const rail = desktopSlot.getBoundingClientRect();
         const sectionRect = services.getBoundingClientRect();
+        const homeOrigin = { left: homeRect.left + scrollX, top: homeRect.top + scrollY, width: homeRect.width };
         const headerBottom = document.querySelector<HTMLElement>('header')?.getBoundingClientRect().bottom || 80;
         const size = rail.width;
         const safeTop = Math.max(96, headerBottom + 18);
@@ -45,45 +52,82 @@ export function installSharedLogo() {
         const linear = clamp((enterStart - sectionTop) / Math.max(1, enterStart - enterEnd), 0, 1);
         const progress = motion.matches ? Number(linear >= .5) : linear * linear * (3 - 2 * linear);
         const pinnedTop = Math.min(fixedTop, sectionRect.bottom - size - 36);
-        const top = lerp(homeRect.top, pinnedTop, progress);
-        const visualWidth = lerp(homeRect.width, size, progress);
+        const targetLeft = rail.left + size * offsetX;
+        const targetTop = pinnedTop + size * offsetY;
+        const top = lerp(homeOrigin.top, targetTop, progress);
+        const visualWidth = lerp(homeOrigin.width, size, progress);
         const scale = visualWidth / size;
-        rect = { left: lerp(homeRect.left, rail.left, progress), top, width: visualWidth, height: visualWidth, bottom: top + visualWidth };
+        rect = { left: lerp(homeOrigin.left, targetLeft, progress), top, width: visualWidth, height: visualWidth, bottom: top + visualWidth };
         renderWidth = size;
-        inServices = linear >= .5;
+        transitionProgress = progress;
+        inServices = linear > .06;
         host.style.left = '0px';
         host.style.top = '0px';
         host.style.transformOrigin = 'top left';
         host.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(${scale})`;
         host.dataset.scrollProgress = progress.toFixed(3);
       } else {
-        inServices = !!(slot && panelRect && panelRect.top < innerHeight * .85 && panelRect.bottom > 100 && homeRect.bottom < innerHeight * .45);
-        rect = (inServices ? slot! : home).getBoundingClientRect();
-        bottomClip = inServices ? Math.max(0, rect.bottom - panelRect!.bottom) : 0;
-        host.style.transform = '';
-        host.style.transformOrigin = '';
-        host.style.left = `${rect.left}px`;
-        host.style.top = `${rect.top}px`;
-        renderWidth = rect.width;
-        delete host.dataset.scrollProgress;
+        const sectionRect = services.getBoundingClientRect();
+        const target = slot?.getBoundingClientRect();
+        if (target && panelRect) {
+          const homeOrigin = { left: homeRect.left + scrollX, top: homeRect.top + scrollY, width: homeRect.width };
+          const enterStart = innerHeight * .72;
+          const linear = clamp((enterStart - sectionRect.top) / Math.max(1, enterStart), 0, 1);
+          const progress = motion.matches ? Number(linear >= .5) : linear * linear * (3 - 2 * linear);
+          const size = target.width;
+          const targetLeft = target.left + size * offsetX;
+          const targetTop = target.top + size * offsetY;
+          const visualWidth = lerp(homeOrigin.width, size, progress);
+          const scale = visualWidth / Math.max(1, size);
+          const top = lerp(homeOrigin.top, targetTop, progress);
+          rect = { left: lerp(homeOrigin.left, targetLeft, progress), top, width: visualWidth, height: visualWidth, bottom: top + visualWidth };
+          renderWidth = size;
+          transitionProgress = progress;
+          inServices = linear > .06;
+          bottomClip = progress >= .98 ? Math.max(0, rect.bottom - panelRect.bottom) : 0;
+          host.style.left = '0px';
+          host.style.top = '0px';
+          host.style.transformOrigin = 'top left';
+          host.style.transform = `translate3d(${rect.left}px, ${rect.top}px, 0) scale(${scale})`;
+          host.dataset.scrollProgress = progress.toFixed(3);
+        } else {
+          inServices = false;
+          rect = homeRect;
+          renderWidth = rect.width;
+          host.style.transform = '';
+          host.style.transformOrigin = '';
+          host.style.left = `${rect.left}px`;
+          host.style.top = `${rect.top}px`;
+          delete host.dataset.scrollProgress;
+        }
       }
 
       const visible = rect.width > 0 && rect.bottom > 80 && rect.top < innerHeight && (desktop.matches || !inServices || panelRect!.height > 30);
       host.hidden = !visible;
       host.dataset.destination = inServices ? 'services' : 'hero';
-      const motionSection = inServices ? services : home.closest<HTMLElement>('section');
-      const sectionVisibility = motionSection
-        ? getComputedStyle(motionSection).getPropertyValue('--section-visibility').trim()
-        : '';
-      host.style.opacity = desktop.matches ? '1' : sectionVisibility || '1';
+      host.dataset.serviceTransition = transitionProgress.toFixed(3);
+      host.style.transition = transitionProgress >= .999
+        ? 'transform 520ms cubic-bezier(.2,.75,.2,1)'
+        : 'none';
+      const heroSection = home.closest<HTMLElement>('section');
+      const readVisibility = (element: Element) => {
+        const raw = getComputedStyle(element).getPropertyValue('--section-visibility').trim();
+        const value = raw === '' ? 1 : Number(raw);
+        return Number.isFinite(value) ? value : 1;
+      };
+      const heroVisibility = readVisibility(heroSection || home);
+      const serviceVisibility = readVisibility(services);
+      host.style.opacity = desktop.matches ? '1' : String(lerp(heroVisibility, serviceVisibility, transitionProgress));
       host.style.width = `${renderWidth}px`;
       host.style.height = `${renderWidth}px`;
-      const topClip = Math.max(0, !desktop.matches ? 80 - rect.top : 0, !desktop.matches && inServices ? panelRect!.top - rect.top : 0);
+      const topClip = Math.max(0, !desktop.matches ? 80 - rect.top : 0, !desktop.matches && inServices && transitionProgress >= .98 ? panelRect!.top - rect.top : 0);
       host.style.clipPath = `inset(${topClip}px 0 ${bottomClip}px 0)`;
       const id = inServices ? panel?.dataset.serviceId || null : null;
-      if (id !== selection) {
-        selection = id;
-        logo.dispatchEvent(new CustomEvent('hero-logo:select', { detail: { id } }));
+      const open = !!id && transitionProgress >= .82;
+      const selectionKey = `${id || ''}:${open}`;
+      if (selectionKey !== selection) {
+        selection = selectionKey;
+        logo.dispatchEvent(new CustomEvent('hero-logo:select', { detail: { id, open } }));
       }
       // The shared scene already includes its own poster while WebGL loads.
       // Hide the separate SVG as soon as the scene takes its place so the two
@@ -106,6 +150,10 @@ export function installSharedLogo() {
     resize.observe(list);
     document.querySelectorAll('.service-content').forEach(el => resize.observe(el));
     update();
+    requestAnimationFrame(() => {
+      selection = undefined;
+      update();
+    });
     disposeCurrent = () => {
       life.abort();
       resize.disconnect();

@@ -37,8 +37,8 @@ export function initHeroLogo(root: HTMLElement): () => void {
   let bubbleWidth = 0;
   let bubbleHeight = 0;
   let copyRight = 0;
-  let badgeWidth = 180;
-  let badgeDiameter = 32;
+  let badgeWidth = 190;
+  let badgeDiameter = 40;
   let badgeDirection: 'left' | 'right' = 'right';
 
   const clamp = (value: number, minimum: number, maximum: number) => Math.min(Math.max(value, minimum), Math.max(minimum, maximum));
@@ -141,8 +141,9 @@ export function initHeroLogo(root: HTMLElement): () => void {
     const padding = 12;
     const leftLimit = clamp(copyRight, padding, width - bubbleWidth - padding);
     const left = clamp(x - bubbleWidth / 2, leftLimit, width - bubbleWidth - padding);
-    const above = y - 31 - bubbleHeight >= padding;
-    const top = clamp(above ? y - 31 - bubbleHeight : y + 31, padding, height - bubbleHeight - padding);
+    const pinGap = active.offsetWidth / 2 + 3;
+    const above = y - pinGap - bubbleHeight >= padding;
+    const top = clamp(above ? y - pinGap - bubbleHeight : y + pinGap, padding, height - bubbleHeight - padding);
     bubble!.style.left = `${left.toFixed(1)}px`;
     bubble!.style.top = `${top.toFixed(1)}px`;
     bubble!.style.setProperty('--arrow-x', `${clamp(x - left, 16, bubbleWidth - 16).toFixed(1)}px`);

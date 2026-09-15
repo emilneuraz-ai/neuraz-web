@@ -73,6 +73,7 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
           data-hero-logo-service={entry.id}
           data-service-color={serviceVisual(index).color}
           data-service-angle={serviceVisual(index).angle.join(",")}
+          data-service-offset={serviceVisual(index).offset.join(",")}
           data-label={entry.label}
           data-explanation={entry.explanation}
           data-href={entry.href}
@@ -126,8 +127,8 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
     z-index: var(--pin-depth-order, 1);
     display: grid;
     place-items: center;
-    width: 44px;
-    height: 44px;
+    width: 52px;
+    height: 52px;
     padding: 0;
     transform: translate(-50%, -50%);
     border: 1px solid transparent;
@@ -143,7 +144,7 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
   .hero-logo-pin[data-available="false"] { visibility: hidden; pointer-events: none; }
   .hero-logo-pin[data-badge-origin="true"] { opacity: 0; pointer-events: none; }
   .hero-logo-pin[data-badge-origin="true"]:focus-visible { opacity: 1; border-color: transparent; background: transparent; color: transparent; }
-  .hero-logo-pin svg { display: block; width: 24px; height: 24px; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.2)); transition: transform .35s ease; }
+  .hero-logo-pin svg { display: block; width: 29px; height: 29px; filter: drop-shadow(0 1px 2px rgb(0 0 0 / 0.2)); transition: transform .35s ease; }
   .hero-logo-pin:hover,
   .hero-logo-pin:focus-visible,
   .hero-logo-pin[aria-expanded="true"],
@@ -195,7 +196,7 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
   .hero-logo a:focus-visible { outline: 2px solid #e63946; outline-offset: 3px; }
   .hero-logo-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0; }
   @media (max-width: 767px) {
-    .hero-logo-pin { width: 32px; height: 32px; }
+    .hero-logo-pin { width: 40px; height: 40px; }
     .hero-logo-pin::after {
       content: '';
       position: absolute;
@@ -205,20 +206,20 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
       height: 44px;
       transform: translate(-50%, -50%);
     }
-    .hero-logo-pin svg { width: 19px; height: 19px; }
+    .hero-logo-pin svg { width: 24px; height: 24px; }
     .hero-logo-bubble {
       display: flex;
       align-items: center;
-      width: 32px;
-      height: 32px;
+      width: 40px;
+      height: 40px;
       padding: 0;
       overflow: clip;
-      border-radius: 16px;
+      border-radius: 20px;
       transition: width .42s cubic-bezier(.2, .8, .2, 1);
       transform: translateY(-50%);
       will-change: width;
     }
-    .hero-logo-bubble[data-open="true"] { width: var(--badge-width, 180px); animation: mercury-badge-form .42s ease-out; }
+    .hero-logo-bubble[data-open="true"] { width: var(--badge-width, 190px); animation: mercury-badge-form .42s ease-out; }
     .hero-logo-bubble[data-open="false"] { transition-duration: .26s; }
     .hero-logo-bubble[data-direction="left"] { flex-direction: row-reverse; transform: translate(-100%, -50%); }
     .hero-logo-bubble::after,
@@ -229,9 +230,9 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
     .hero-logo-bubble-circle {
       display: grid;
       place-items: center;
-      flex: 0 0 30px;
-      width: 30px;
-      height: 30px;
+      flex: 0 0 38px;
+      width: 38px;
+      height: 38px;
       padding: 0;
       border: 0;
       border-radius: 50%;
@@ -240,9 +241,9 @@ const bubbleId = `hero-logo-detail-${crypto.randomUUID()}`;
       cursor: pointer;
     }
     .hero-logo-bubble-circle span { display: grid; place-items: center; }
-    .hero-logo-bubble-circle :global(svg) { display: block; width: 16px; height: 16px; }
+    .hero-logo-bubble-circle :global(svg) { display: block; width: 23px; height: 23px; }
     .hero-logo-bubble-top { flex: 1; min-width: 0; gap: 0; }
-    .hero-logo-bubble-link { display: block; min-height: 30px; padding: 0 15px 0 7px; font-size: 11px; line-height: 30px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+    .hero-logo-bubble-link { display: block; min-height: 38px; padding: 0 15px 0 7px; font-size: 12px; line-height: 38px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .hero-logo-bubble[data-direction="left"] .hero-logo-bubble-link { padding: 0 7px 0 15px; text-align: right; }
     .hero-logo-bubble-circle:focus-visible { outline-offset: -4px; }
     .hero-logo-bubble-link:focus-visible { outline-offset: -3px; border-radius: 18px; }

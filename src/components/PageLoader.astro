@@ -1,8 +1,14 @@
 ---
 import AnimatedLogo from './AnimatedLogo.astro';
+
+interface Props {
+  variant?: 'light' | 'dark';
+}
+
+const { variant = 'light' } = Astro.props;
 ---
 
-<div class="page-loader" data-page-loader data-state="idle" role="status" aria-live="polite" aria-hidden="true" hidden>
+<div class="page-loader" data-page-loader data-state="idle" data-variant={variant} role="status" aria-live="polite" aria-hidden="true" hidden>
   <div class="page-loader__brand">
     <AnimatedLogo size={104} label="" controls={false} class="page-loader__logo" />
     <span class="page-loader__wordmark" aria-hidden="true">NEURAZ</span>
@@ -50,10 +56,11 @@ import AnimatedLogo from './AnimatedLogo.astro';
       else transition = setTimeout(() => { loader.hidden = true; }, 180);
     }
 
-    function start() {
+    function start(requestedVariant) {
       clearTimeout(deadline);
       clearTimeout(transition);
       restoreContent();
+      if (requestedVariant === 'light' || requestedVariant === 'dark') loader.dataset.variant = requestedVariant;
       loader.hidden = false;
       loader.dataset.state = 'loading';
       loader.setAttribute('aria-hidden', 'false');
@@ -72,7 +79,7 @@ import AnimatedLogo from './AnimatedLogo.astro';
       const target = new URL(anchor.href, window.location.href);
       if (target.origin !== window.location.origin || !['http:', 'https:'].includes(target.protocol)) return;
       if (target.pathname === window.location.pathname && target.search === window.location.search) return;
-      start();
+      start(target.pathname.startsWith('/servicios/') ? 'dark' : 'light');
     }, { signal });
 
     window.addEventListener('load', () => finish(), { once: true, signal });
@@ -110,6 +117,9 @@ import AnimatedLogo from './AnimatedLogo.astro';
   }
   .page-loader[hidden] { display: none; }
   .page-loader[data-state='loading'] { opacity: 1; visibility: visible; pointer-events: auto; }
+  .page-loader[data-variant='dark'] { background: #050505; color: #fff; }
+  .page-loader[data-variant='dark'] .page-loader__label { color: rgb(255 255 255 / .56); }
+  .page-loader[data-variant='dark'] .page-loader__logo :global(path) { fill: #fff; }
   .page-loader__brand { display: flex; flex-direction: column; align-items: center; }
   .page-loader__wordmark { margin-top: 27px; padding-left: .23em; font-size: 13px; font-weight: 550; letter-spacing: .23em; }
   .page-loader__label { margin-top: 14px; color: #666; font-size: 11px; letter-spacing: .04em; }
