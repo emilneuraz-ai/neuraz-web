@@ -68,6 +68,8 @@ import NavbarBrand from './NavbarBrand.astro';
     will-change: transform;
   }
   .site-header[data-hidden="true"] { transform: translateY(-100%); }
+  .site-header :global(.navbar-brand__isotipo) { display: none; }
+  .site-header :global(.navbar-brand__link) { gap: 0; }
   #mobile-menu-btn { place-items: center; width: 44px; height: 44px; padding: 0; }
   .organic-menu-icon { display: block; width: 30px; height: 30px; }
   .organic-menu-icon.hidden { display: none; }
@@ -88,8 +90,6 @@ import NavbarBrand from './NavbarBrand.astro';
   @media (max-width: 767px) {
     #mobile-menu-btn { display: grid; }
     .header-inner { padding-inline: clamp(1.75rem, 8vw, 2.5rem); }
-    .site-header :global(.navbar-brand__isotipo) { display: none; }
-    .site-header :global(.navbar-brand__link) { gap: 0; }
   }
   @media (prefers-reduced-motion: reduce) {
     .site-header { transition: none; }
@@ -103,6 +103,7 @@ import NavbarBrand from './NavbarBrand.astro';
   const closeIcon = document.getElementById('close-icon');
   const mobileLinks = document.querySelectorAll('.mobile-link');
   const siteHeader = document.querySelector<HTMLElement>('.site-header');
+  const desktopNavigation = window.matchMedia('(min-width: 768px)');
   let previousScroll = Math.max(window.scrollY, 0);
   let headerFrame = 0;
 
@@ -113,6 +114,13 @@ import NavbarBrand from './NavbarBrand.astro';
   function updateHeader() {
     headerFrame = 0;
     const currentScroll = Math.max(window.scrollY, 0);
+
+    if (desktopNavigation.matches) {
+      previousScroll = currentScroll;
+      showHeader();
+      return;
+    }
+
     const distance = currentScroll - previousScroll;
     const menuOpen = mobileMenuBtn?.getAttribute('aria-expanded') === 'true';
     const headerFocused = !!siteHeader?.contains(document.activeElement);
@@ -149,7 +157,7 @@ import NavbarBrand from './NavbarBrand.astro';
       mobileMenuBtn.focus();
     }
   });
-  window.matchMedia('(min-width: 768px)').addEventListener('change', event => {
+  desktopNavigation.addEventListener('change', event => {
     if (event.matches) setMenuOpen(false);
   });
   siteHeader?.addEventListener('focusin', showHeader);

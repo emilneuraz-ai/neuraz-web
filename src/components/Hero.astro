@@ -7,7 +7,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
   <div class="hero-inner">
     <div class="hero-grid">
       <div class="hero-copy">
-        <p class="hero-eyebrow"><span aria-hidden="true"></span> Tecnología con propósito</p>
         <h1 id="hero-title">
           <span class="hero-outline">Diseñamos</span>
           <span>sistemas</span>
@@ -30,10 +29,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
         <div class="hero-logo-slot" data-hero-logo-slot><img src="/images/isotipo.svg" alt="Neuraz" width="440" height="440" /></div>
       </div>
     </div>
-    <div class="hero-footnote">
-      <p>Herramientas a medida. <span>Para negocios reales.</span></p>
-      <a href="#nosotros">Así trabajamos <span aria-hidden="true">↗</span></a>
-    </div>
   </div>
 </section>
 
@@ -50,7 +45,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
   .hero-logo-slot { width: 100%; aspect-ratio: 1; }
   .hero-logo-slot img { width: 100%; height: 100%; object-fit: contain; padding: 12%; }
   .hero-logo-slot[data-shared-ready="true"] img { visibility: hidden; }
-  .hero-footnote { position: relative; z-index: 30; }
   .hero-inner {
     width: 100%;
     max-width: 1648px;
@@ -74,23 +68,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     pointer-events: none;
   }
   .hero-copy a { pointer-events: auto; }
-  .hero-eyebrow {
-    display: flex;
-    align-items: center;
-    gap: 0.75rem;
-    margin: 0 0 2.25rem;
-    font-size: 10px;
-    font-weight: 500;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: #666;
-  }
-  .hero-eyebrow > span {
-    width: 6px;
-    height: 6px;
-    background: #e63946;
-    flex: none;
-  }
   h1 {
     margin: 0;
     font-size: clamp(4.5rem, 8.1vw, 8rem);
@@ -143,29 +120,20 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     width: 100%;
     margin-left: 0;
   }
-  .hero-footnote {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    border-top: 1px solid #dedede;
-    padding: 1.25rem 0;
-    font-size: 11px;
-    line-height: 1.6;
-  }
-  .hero-footnote p { margin: 0; }
-  .hero-footnote p span { color: #707070; }
-  .hero-footnote a { white-space: nowrap; }
-  .hero-footnote a span { display: inline-block; margin-left: 1.2rem; }
   @media (min-width: 1024px) {
-    .hero-grid { min-height: clamp(600px, calc(100svh - 10rem), 880px); }
+    .hero {
+      min-height: 100svh;
+      padding-top: 5rem;
+    }
+    .hero-inner { flex: 1; }
+    .hero-grid { min-height: 0; padding-bottom: 0; }
     .hero-visual {
       position: absolute;
       grid-column: auto;
       grid-row: auto;
       right: 0;
       top: 50%;
-      width: 58.333%;
+      width: 52.5%;
       transform: translateY(-50%);
     }
   }
@@ -174,7 +142,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     .hero-grid { grid-template-columns: minmax(0, 1fr); }
     .hero-copy { grid-column: 1; grid-row: 1; }
     .hero-visual { grid-column: 1; grid-row: 2; margin-top: -1rem; }
-    .hero-eyebrow { font-size: 9px; margin-bottom: 2rem; }
     h1 { font-size: clamp(3rem, 7.7vw, 5rem); }
     .hero-description { font-size: 13px; max-width: 310px; }
   }
@@ -182,7 +149,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     .hero { --hero-gutter: clamp(1.75rem, 8vw, 2.5rem); padding: 6.5rem var(--hero-gutter) 0; }
     .hero-grid { grid-template-columns: minmax(0, 1fr); gap: 0; padding-bottom: 1.5rem; }
     .hero-copy { grid-column: 1; grid-row: 1; }
-    .hero-eyebrow { display: none; }
     h1 { font-size: clamp(2.35rem, 15.4vw, 9rem); }
     @supports (font-size: 1cqi) {
       .hero-copy { container-type: inline-size; }
@@ -200,7 +166,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
       margin: -1rem 0 0;
       justify-self: center;
     }
-    .hero-footnote { display: none; }
   }
   @media (prefers-reduced-motion: reduce) {
     .hero-link-icon, .hero-link-icon svg { transition: none; }
