@@ -222,3 +222,9 @@ Los proyectos reutilizan las líneas punteadas de Servicios en dirección horizo
 El carrusel horizontal comparte una única capa de fondo. Su color se interpola según la posición real del desplazamiento, sin bordes entre proyectos. Los degradados se desvanecen en los extremos de Hero, Servicios, Trabajos y Nosotros para evitar cortes entre secciones. Se retiró por completo el desenfoque de movimiento solicitado inicialmente; las pantallas y textos permanecen nítidos durante el desplazamiento.
 
 Validación local en el servidor activo 4321: escritorio 1440 × 900, móvil 390 × 844 y ancho estrecho 320 px; sin overflow horizontal ni excepciones de JavaScript. Interpolación de colores, movimiento lateral de las líneas y preferencias de movimiento reducido comprobados. Build de Astro y diff check correctos. Evidencias en `output/playwright/projects-background-blend-*` y `output/playwright/transition-*`.
+
+### Publicación y comprobación pública
+
+Publicado el 10 de octubre de 2026 en el proyecto Vercel `neuraz-web`, deployment `dpl_2BPXoDQ92jJJEqKw4ARh1JEhWu37`, estado Ready. El código publicado corresponde al commit `fe4218e`, subido a `origin/master`. Los dominios `neuraz.ar` y `www.neuraz.ar` apuntan a esta versión; www redirige al dominio principal.
+
+Comprobado directamente en `https://neuraz.ar/`: HTTP 200, ocho proyectos con líneas horizontales, fondo compartido y ausencia del filtro de desenfoque de movimiento. En 1440 × 900 y 390 × 844 se verificaron colores intermedios al deslizar, máscaras suaves en las uniones Servicios/Trabajos y Trabajos/Nosotros, y ausencia de overflow horizontal, excepciones JavaScript y recursos públicos fallidos. Evidencias locales en `output/playwright/production-release-*`, incluido `production-release-validation.json`.
