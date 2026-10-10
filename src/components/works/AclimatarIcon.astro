@@ -1,0 +1,19 @@
+---
+interface Props { name: string; }
+const paths: Record<string,string> = {
+  rain: 'M7 16a5 5 0 1 1 1-10 6 6 0 0 1 11 4 3 3 0 0 1 0 6 M8 15v6 M12 13v7 M16 15v6',
+  wind: 'M3 8h12a3 3 0 1 0-3-3 M2 12h17a3 3 0 1 1-3 3 M5 16h5a3 3 0 1 1-3 3',
+  gauge: 'M4 18a9 9 0 1 1 16 0 M12 13l5-6',
+  drop: 'M12 3S5 11 5 15a7 7 0 0 0 14 0c0-4-7-12-7-12Z',
+  eye: 'M2 12s4-7 10-7 10 7 10 7-4 7-10 7S2 12 2 12Z M15 12a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+  pin: 'M12 22s8-8 8-13A8 8 0 0 0 4 9c0 5 8 13 8 13Z M15 9a3 3 0 1 1-6 0 3 3 0 0 1 6 0',
+  leaf: 'M12 21v-9 M12 16C4 16 3 11 3 6c7 0 9 4 9 10Z M12 12c0-6 3-9 9-9 0 6-3 9-9 9 M7 21h10',
+  info: 'M22 12a10 10 0 1 1-20 0 10 10 0 0 1 20 0 M12 11v6 M12 7h.01',
+  calendar: 'M4 5h16v16H4Z M4 10h16 M8 3v4 M16 3v4 M8 14h.01 M12 14h.01 M16 14h.01 M8 17h.01 M12 17h.01',
+  warning: 'M12 3 2 21h20L12 3Z M12 10v5 M12 18h.01',
+  sun: 'M16 12a4 4 0 1 1-8 0 4 4 0 0 1 8 0 M12 1v3 M12 20v3 M1 12h3 M20 12h3 M4 4l2 2 M18 18l2 2 M4 20l2-2 M18 6l2-2',
+  arrow: 'M9 5l7 7-7 7',
+};
+---
+<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={paths[Astro.props.name] || paths.info}/></svg>
+<style>svg { width:1.2em; height:1.2em; display:inline-block; flex:none; vertical-align:middle; }</style>

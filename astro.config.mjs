@@ -7,6 +7,10 @@ import tailwindcss from '@tailwindcss/vite';
 export default defineConfig({
   site: 'https://neuraz.ar',
   vite: {
-    plugins: [tailwindcss()]
+    plugins: [tailwindcss()],
+    server: {
+      // Files on the external workspace volume can miss native watch events.
+      watch: { usePolling: true, interval: 300 }
+    }
   }
 });

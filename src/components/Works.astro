@@ -1,204 +1,153 @@
 ---
-import rawProjects from '../data/behance-projects.json';
-
-/** Add `internalPath: '/trabajos/nombre'` to migrate any item to an internal case study. */
-type WorkProject = { id: string; title: string; url: string; thumbnail: string; internalPath?: string };
-const projects = rawProjects as WorkProject[];
+import DeviceFrame from './works/DeviceFrame.astro';
+import ScreenCapture from './works/ScreenCapture.astro';
+import WestView from './works/WestView.astro';
+import GestorView from './works/GestorView.astro';
+import DesktopCases from './works/DesktopCases.astro';
+import MobileCases from './works/MobileCases.astro';
+import {gestor,cafe,shell,west,kronos,noticias} from '../data/works/additional-projects';
+import ProjectStory from './works/ProjectStory.astro';
+import EurotechView from './works/EurotechView.astro';
+import AclimatarView from './works/AclimatarView.astro';
+import { aclimatarTanzania } from '../data/works/aclimatar-tanzania';
+import { eurotech } from '../data/works/eurotech';
+const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:GestorView},{project:cafe,View:DesktopCases},{project:aclimatarTanzania,View:AclimatarView},{project:shell,View:MobileCases},{project:west,View:WestView},{project:kronos,View:DesktopCases},{project:noticias,View:MobileCases}].map(({project,View})=>({project:{...project,theme:'light' as const},View}));
 ---
-
 <section id="trabajos" class="works" aria-labelledby="works-title">
-  <works-carousel>
-    <div class="works-heading works-inner"><h2 id="works-title">Trabajos</h2></div>
-
-    <div class="works-stage" data-stage>
-      <p id="works-help" class="works-sr-only">En escritorio, desplazate verticalmente para recorrer los proyectos en horizontal. También podés arrastrar, usar las flechas o las teclas Inicio y Fin. En pantallas pequeñas los proyectos se muestran uno debajo de otro.</p>
-      <div class="works-utility" aria-hidden="true">
-        <span class="works-counter" data-counter>01 / {String(projects.length).padStart(2, '0')}</span>
-        <span class="works-progress"><span data-progress></span></span>
-      </div>
-      <div class="works-controls" data-controls hidden>
-        <button type="button" data-previous aria-label="Ver proyecto anterior" aria-controls="works-track" disabled><span aria-hidden="true">←</span></button>
-        <button type="button" data-next aria-label="Ver proyecto siguiente" aria-controls="works-track"><span aria-hidden="true">→</span></button>
-      </div>
-      <div id="works-track" class="works-track" data-track tabindex="0" role="region" aria-label="Proyectos destacados" aria-describedby="works-help">
-        <ul class="works-list">
-          {projects.map((project) => {
-            const href = project.internalPath ?? project.url;
-            const isExternal = !project.internalPath;
-            const destination = isExternal ? 'ver en Behance (abre en otra pestaña)' : 'ver proyecto';
-            return <li class="works-item">
-              <a class="works-project" href={href} target={isExternal ? '_blank' : undefined} rel={isExternal ? 'noopener noreferrer' : undefined} draggable="false" aria-label={`${project.title} — ${destination}`}>
-                <img src={project.thumbnail} alt={`Portada de ${project.title}`} width="1400" height="1095" loading="eager" decoding="async" draggable="false" />
-                <span class="works-caption"><span class="works-caption-label">Proyecto</span><span class="works-caption-title">{project.title}</span><span class="works-external" aria-hidden="true">↗</span></span>
-              </a>
-            </li>;
-          })}
-        </ul>
-      </div>
+  <h2 id="works-title" class="sr-only">Trabajos seleccionados</h2>
+  <div class="works-viewport" style={`--works-wash:${stories[0].project.accent}`}>
+  <div class="works-background" aria-hidden="true"><div class="works-wash"></div></div>
+  <div class="works-track">
+  {stories.map(({ project, View }, projectIndex) => <ProjectStory project={project} index={projectIndex} projects={stories.map(item=>item.project)}>
+    <div slot="copy" class="scene-copy" data-scene-copy>
+      <p class="scene-eyebrow">{project.category}</p><h4>{project.title}</h4>
+      <p class="scene-description">{project.scenes[0].description}</p>
+      {project.url && <a class="scene-project-link" href={project.url} target="_blank" rel="noopener noreferrer">Ver proyecto en Behance <span aria-hidden="true">↗</span></a>}
     </div>
-    <div class="works-footer works-inner"><a href="https://www.behance.net/emilgonzalez" target="_blank" rel="noopener noreferrer">Ver todos los trabajos en Behance <span aria-hidden="true">↗</span></a></div>
-  </works-carousel>
-</section>
+    {project.scenes.map(scene => <section class:list={['work-scene',{'work-presentation':project.format==='presentation'}]} data-work-scene={scene.id} aria-labelledby={`scene-${project.id}-${scene.id}`}>
+      <div class="scene-visual">
+        <div class="scene-demo" data-scene-demo>{project.format==='presentation' && scene.image ? <ScreenCapture image={scene.image} /> : <DeviceFrame phone={scene.device==='mobile'||project.format==='mobile'} capturedStatus={scene.device==='mobile'} responsive={project.format!=='mobile'&&!scene.image} label={project.title} theme={project.theme || 'dark'}>{scene.image ? <ScreenCapture image={scene.image} scrollable={!!scene.device||project.format==='mobile'} viewport={scene.device || 'mobile'} /> : <View view={scene.id} projectId={project.id} />}</DeviceFrame>}</div>
+      </div>
+      <h4 class="sr-only" id={`scene-${project.id}-${scene.id}`}>{project.title} · {scene.label}</h4>
+    </section>)}
+  </ProjectStory>)}
+  </div></div>
+  <nav class="work-positions" aria-label="Posición entre proyectos" hidden>{stories.map(({project},i)=><a href={`#trabajo-${project.id}`} data-project-jump aria-label={`Proyecto ${i+1}: ${project.title}`}><span></span><span class="work-position-label">{project.title}</span></a>)}</nav>
 
+</section>
 <style>
-  .works { background: #111; scroll-margin-top: 2rem; }
-  works-carousel { display: block; }
-  .works-inner { width: 100%; max-width: 1344px; margin-inline: auto; padding-inline: 24px; }
-  .works-heading { padding-block: 4rem 1.5rem; background: #fafafa; }
-  .works-heading h2 { margin: 0; font-size: clamp(2rem, 5vw, 3.5rem); font-weight: 700; line-height: 1.1; letter-spacing: -.04em; color: #111; }
-  .works-stage { position: relative; background: #111; }
-  .works-track { width: 100%; overflow: hidden; }
-  .works-list { display: flex; margin: 0; padding: 0; list-style: none; will-change: transform; }
-  .works-item { flex: 0 0 100%; min-width: 0; }
-  .works-project { position: relative; display: block; min-height: 28rem; overflow: hidden; background: #202020; }
-  .works-project img { display: block; width: 100%; height: 100%; min-height: 28rem; object-fit: cover; transition: transform 500ms cubic-bezier(.2, .8, .2, 1); }
-  .works-project::after { position: absolute; inset: 0; background: linear-gradient(180deg, transparent 42%, rgb(0 0 0 / .62)); content: ''; pointer-events: none; }
-  .works-caption { position: absolute; z-index: 1; inset: auto 24px 24px; display: grid; gap: 4px; color: #fff; }
-  .works-caption-label { font-size: 10px; font-weight: 600; letter-spacing: .16em; text-transform: uppercase; opacity: .75; }
-  .works-caption-title { max-width: 32ch; font-size: clamp(1.35rem, 4vw, 2.4rem); font-weight: 600; line-height: 1.05; letter-spacing: -.035em; }
-  .works-external { position: absolute; right: 0; bottom: 0; font-size: 24px; line-height: 1; }
-  .works-project:hover img { transform: scale(1.035); }
-  .works-project:focus-visible { z-index: 2; outline: 3px solid #e63946; outline-offset: -3px; }
-  .works-utility, .works-controls { display: none; }
-  .works-footer { display: flex; justify-content: flex-start; padding-block: 2.75rem; background: #fafafa; }
-  .works-footer a { display: inline-flex; align-items: center; gap: 12px; color: #111; font-size: 13px; font-weight: 500; line-height: 1.5; text-decoration: underline; text-decoration-color: #bdbdbd; text-underline-offset: 5px; }
-  .works-footer a:hover { color: #e63946; text-decoration-color: currentColor; }
-  .works-footer a:focus-visible, .works-controls button:focus-visible { outline: 2px solid #e63946; outline-offset: 4px; }
-  .works-sr-only { position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; border: 0; }
-  @media (max-width: 1023px) {
-    .works { background: #fafafa; }
-    .works-stage { background: #fafafa; }
-    .works-track { overflow: visible; }
-    .works-list { display: grid; gap: 2.75rem; padding-inline: 24px; }
-    .works-project { min-height: 0; overflow: visible; background: transparent; }
-    .works-project img { min-height: 0; aspect-ratio: 5 / 4; object-fit: cover; }
-    .works-project::after { display: none; }
-    .works-caption { position: relative; inset: auto; padding-top: .9rem; color: #111; }
-    .works-external { top: .9rem; right: 0; bottom: auto; }
-  }
-  @media (min-width: 640px) { .works-inner { padding-inline: 32px; } }
-  @media (min-width: 1024px) {
-    .works { min-height: 0; height: auto; }
-    works-carousel { height: auto; }
-    .works-heading, .works-footer { display: none; }
-    .works-stage { position: relative; height: auto; overflow: visible; }
-    .works-track { height: auto; overflow-x: auto; scroll-snap-type: x mandatory; scrollbar-width: none; }
-    .works-track::-webkit-scrollbar { display: none; }
-    .works-list { transform: none; }
-    .works-item { flex-basis: 40vw; scroll-snap-align: start; }
-    .works-project { height: auto; min-height: 0; aspect-ratio: 4 / 3; }
-    .works-project img { height: 100%; min-height: 0; }
-    .works-project { display: grid; grid-template-rows: 75% 25%; background: #111; }
-    .works-project::after { display: none; }
-    .works-caption { position: relative; inset: auto; align-content: center; padding: clamp(24px, 3vw, 40px) clamp(32px, 7vw, 112px); color: #fff; background: #111; }
-    .works-caption-label { font-size: 11px; }
-    .works-caption-title { max-width: min(44rem, 72vw); font-size: clamp(1.2rem, 2vw, 1.85rem); line-height: 1.15; letter-spacing: -.025em; }
-    .works-external { top: 50%; right: clamp(32px, 7vw, 112px); bottom: auto; left: auto; transform: translateY(-50%); font-size: 24px; }
-    .works-utility { position: absolute; z-index: 2; top: 34px; left: clamp(32px, 7vw, 112px); display: flex; align-items: center; gap: 16px; color: #fff; font-size: 11px; font-weight: 600; letter-spacing: .12em; }
-    .works-progress { display: block; width: 64px; height: 1px; overflow: hidden; background: rgb(255 255 255 / .35); }
-    .works-progress span { display: block; width: 100%; height: 100%; transform: scaleX(var(--works-progress, .111)); transform-origin: left center; background: #fff; }
-    .works-controls { position: absolute; z-index: 2; top: 24px; right: clamp(32px, 7vw, 112px); display: flex; gap: 8px; }
-    .works-controls[hidden] { display: none; }
-    .works-controls button { display: grid; place-items: center; width: 42px; height: 42px; padding: 0; border: 1px solid rgb(255 255 255 / .45); border-radius: 50%; background: transparent; color: #fff; font-size: 20px; cursor: pointer; transition: background-color 160ms, color 160ms, border-color 160ms; }
-    .works-controls button:hover:not(:disabled) { border-color: #fff; background: #fff; color: #111; }
-    .works-controls button:disabled { opacity: .35; cursor: default; }
-    .works-track[data-drag-ready], .works-track[data-drag-ready] .works-project { cursor: grab; user-select: none; -webkit-user-select: none; }
-    .works-track.is-dragging, .works-track.is-dragging .works-project { cursor: grabbing; }
-    .works-track:focus-visible { outline: 2px solid #e63946; outline-offset: -4px; }
-  }
-  @media (prefers-reduced-motion: reduce) { .works-project img, .works-controls button { transition: none; } }
+.works-background{position:absolute;inset:0;pointer-events:none;overflow:clip;mask-image:linear-gradient(180deg,transparent,#000 22%,#000 78%,transparent)}
+.works-wash{display:none;position:absolute;inset:-12%;pointer-events:none;background:radial-gradient(ellipse at 76% 44%,color-mix(in srgb,var(--works-wash) 15%,transparent) 0%,transparent 52%),radial-gradient(ellipse at 23% 74%,color-mix(in srgb,var(--works-wash) 7%,transparent) 0%,transparent 48%);filter:blur(35px);animation:works-wash-drift 16s ease-in-out infinite alternate;animation-play-state:paused}
+.works[data-horizontal] .works-wash{display:block}.works[data-visible="true"] .works-wash{animation-play-state:running}
+.works[data-horizontal] .works-track{position:relative;z-index:1}
+.works[data-horizontal] .works-track :global(project-story),.works[data-horizontal] .works-track :global(.story-stage){background:transparent}
+.works[data-horizontal] .works-track :global(.story-wash){display:none}
+@keyframes works-wash-drift{from{transform:translate3d(-2%,1%,0) scale(1)}to{transform:translate3d(3%,-3%,0) scale(1.1)}}
+.works[data-horizontal]{height:var(--works-height)}.works[data-horizontal] .works-viewport{position:sticky;top:80px;height:var(--works-viewport-height);overflow:clip}.works[data-horizontal] .works-track{display:flex;width:100%;height:100%;will-change:transform}.works[data-horizontal] .works-track :global(project-story){flex:0 0 100%;min-width:0;width:100%;--story-height:var(--works-viewport-height)}
+.works{position:relative;scroll-margin-top:80px;background:var(--color-bg,#fafafa)}.work-scene{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;min-height:620px;width:100%}.scene-visual{position:relative;width:100%;max-width:1050px;min-width:0;display:flex;align-items:center;justify-content:center}.scene-demo{position:relative;width:100%;transform:scale(var(--demo-scale,1));transform-origin:top center;margin-bottom:calc(var(--demo-natural-height,0px) * (var(--demo-scale,1) - 1))}.scene-copy{width:min(100%,760px);color:var(--work-ink)}.scene-title-row{display:flex;justify-content:space-between;align-items:center;gap:28px}.scene-eyebrow{font-size:9px;letter-spacing:.12em;text-transform:uppercase;line-height:1.5;margin-bottom:6px;color:var(--work-ink)}.scene-copy h4{font-size:26px;letter-spacing:-.04em;line-height:1.15;font-weight:450}.scene-description{font-size:12px;line-height:1.6;max-width:72ch;margin-top:12px;color:var(--work-ink)}:global(project-story[data-enhanced]) .work-scene{height:100%;min-height:0}.work-positions{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:45;display:grid;transition:opacity 180ms;color:var(--position-ink,#000)}.work-positions[hidden]{display:none}.work-positions a{width:28px;height:25px;display:grid;place-items:center;position:relative}.work-positions a>span:first-child{width:4px;height:4px;background:currentColor;opacity:.3;border-radius:50%}.work-positions a[aria-current]>span:first-child{width:6px;height:6px;opacity:1;outline:1px solid currentColor;outline-offset:4px}.work-position-label{position:absolute;right:34px;background:var(--position-bg,#fff);border:1px solid currentColor;padding:5px 9px;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none}.work-positions a:hover .work-position-label,.work-positions a:focus-visible .work-position-label{opacity:1}.work-positions a:focus-visible{outline:1px solid currentColor;outline-offset:3px}
+@media(min-width:768px){.scene-copy{width:100%;max-width:430px}.scene-eyebrow{font-size:12px;letter-spacing:.14em;margin-bottom:20px}.scene-copy h4{font-size:clamp(34px,3.3vw,62px);font-weight:450;line-height:1.05;letter-spacing:-.045em}.scene-description{font-size:clamp(17px,1.35vw,22px);line-height:1.6;margin-top:24px}.scene-project-link{display:inline-flex;gap:20px;align-items:center;margin-top:30px;font-size:13px;border-bottom:1px solid currentColor;padding-bottom:7px}.scene-project-link span{font-size:20px}}
+.scene-project-link{color:var(--work-ink)}
+.work-scene{padding:40px 40px 64px}
+.work-scene.work-presentation{justify-content:center;gap:0;padding:0}.work-presentation .scene-visual{width:min(100%,446px);max-width:446px;flex:none}
+@media(max-width:767px){.scene-copy{width:100%}.scene-copy h4{font-size:28px}.scene-description{font-size:14px;line-height:1.5;margin-top:12px}.scene-eyebrow{font-size:10px}.scene-project-link{display:none}.scene-title-row{gap:10px}.work-positions{right:2px}.work-positions a{width:24px;height:23px}.work-position-label{display:none}}
+@media(prefers-reduced-motion:reduce){.work-positions{transition:none}}
+@media(max-width:767px){.work-scene{padding:24px 20px 44px}}
 </style>
 
 <script>
-  class WorksCarousel extends HTMLElement {
-    private cleanup?: () => void;
-    connectedCallback() {
-      if (this.cleanup) return;
-      const stage = this.querySelector<HTMLElement>('[data-stage]');
-      const track = this.querySelector<HTMLElement>('[data-track]');
-      const list = this.querySelector<HTMLElement>('.works-list');
-      const previous = this.querySelector<HTMLButtonElement>('[data-previous]');
-      const next = this.querySelector<HTMLButtonElement>('[data-next]');
-      const controls = this.querySelector<HTMLElement>('[data-controls]');
-      const counter = this.querySelector<HTMLElement>('[data-counter]');
-      if (!stage || !track || !list || !previous || !next || !controls || !counter) return;
-      const events = new AbortController();
-      const desktop = window.matchMedia('(min-width: 1024px)');
-      const motion = window.matchMedia('(prefers-reduced-motion: reduce)');
-      const total = list.children.length;
-      let frame = 0;
-      let drag: { pointerId: number; startX: number; startScroll: number; active: boolean } | undefined;
-      let suppressClick = false;
-      const clamp = (value: number, min = 0, max = 1) => Math.max(min, Math.min(max, value));
-      const maxX = () => Math.max(0, track.scrollWidth - track.clientWidth);
-      const itemWidth = () => list.querySelector<HTMLElement>('.works-item')?.getBoundingClientRect().width ?? track.clientWidth;
-      const setProgress = () => {
-        const limit = maxX();
-        const safe = limit ? track.scrollLeft / limit : 0;
-        const index = Math.min(total - 1, Math.round(track.scrollLeft / itemWidth()));
-        stage.style.setProperty('--works-progress', String(safe));
-        counter.textContent = `${String(index + 1).padStart(2, '0')} / ${String(total).padStart(2, '0')}`;
-        previous.disabled = safe <= .001;
-        next.disabled = safe >= .999;
-      };
-      const queueSync = () => { if (!frame) frame = requestAnimationFrame(() => { frame = 0; setProgress(); }); };
-      const goTo = (index: number) => {
-        if (!desktop.matches || total < 2) return;
-        track.scrollTo({ left: clamp(index * itemWidth(), 0, maxX()), behavior: motion.matches ? 'auto' : 'smooth' });
-      };
-      const syncMode = () => {
-        controls.hidden = !desktop.matches;
-        track.tabIndex = desktop.matches ? 0 : -1;
-        if (desktop.matches) { track.dataset.dragReady = ''; queueSync(); }
-        else { delete track.dataset.dragReady; stage.style.removeProperty('--works-progress'); }
-      };
-      const finishDrag = (event?: PointerEvent, snap = true) => {
-        if (!drag || (event && event.pointerId !== drag.pointerId)) return;
-        const ended = drag; drag = undefined; track.classList.remove('is-dragging');
-        if (track.hasPointerCapture(ended.pointerId)) track.releasePointerCapture(ended.pointerId);
-        if (ended.active && snap) goTo(Math.round(track.scrollLeft / itemWidth()));
-      };
-      track.addEventListener('pointerdown', (event) => {
-        suppressClick = false;
-        if (!desktop.matches || event.pointerType !== 'mouse' || event.button !== 0 || !event.isPrimary || event.altKey || event.ctrlKey || event.metaKey || event.shiftKey || maxX() === 0) return;
-        drag = { pointerId: event.pointerId, startX: event.clientX, startScroll: track.scrollLeft, active: false };
-      }, { signal: events.signal });
-      window.addEventListener('pointermove', (event) => {
-        if (!drag || event.pointerId !== drag.pointerId) return;
-        if (!(event.buttons & 1)) { finishDrag(event); return; }
-        const distance = event.clientX - drag.startX;
-        if (!drag.active) { if (Math.abs(distance) < 6) return; drag.active = true; suppressClick = true; track.classList.add('is-dragging'); track.setPointerCapture(event.pointerId); }
-        event.preventDefault();
-        track.scrollLeft = clamp(drag.startScroll - distance, 0, maxX());
-      }, { signal: events.signal });
-      window.addEventListener('pointerup', (event) => finishDrag(event), { signal: events.signal });
-      window.addEventListener('pointercancel', (event) => finishDrag(event), { signal: events.signal });
-      track.addEventListener('lostpointercapture', (event) => finishDrag(event), { signal: events.signal });
-      window.addEventListener('blur', () => finishDrag(), { signal: events.signal });
-      track.addEventListener('click', (event) => { if (suppressClick && event.detail !== 0) { event.preventDefault(); event.stopPropagation(); suppressClick = false; } }, { capture: true, signal: events.signal });
-      stage.addEventListener('wheel', (event) => {
-        if (!desktop.matches || event.ctrlKey || maxX() === 0) return;
-        const delta = Math.abs(event.deltaX) > Math.abs(event.deltaY) ? event.deltaX : event.deltaY;
-        if (!delta) return;
-        const target = clamp(track.scrollLeft + delta, 0, maxX());
-        if (target === track.scrollLeft) return;
-        event.preventDefault();
-        track.scrollLeft = target;
-      }, { passive: false, signal: events.signal });
-      previous.addEventListener('click', () => goTo(Math.round(track.scrollLeft / itemWidth()) - 1), { signal: events.signal });
-      next.addEventListener('click', () => goTo(Math.round(track.scrollLeft / itemWidth()) + 1), { signal: events.signal });
-      track.addEventListener('keydown', (event) => {
-        if (event.target !== track || event.altKey || event.ctrlKey || event.metaKey) return;
-        const current = Math.round(track.scrollLeft / itemWidth());
-        if (event.key === 'ArrowLeft') goTo(current - 1); else if (event.key === 'ArrowRight') goTo(current + 1); else if (event.key === 'Home') goTo(0); else if (event.key === 'End') goTo(total - 1); else return;
-        event.preventDefault();
-      }, { signal: events.signal });
-      track.addEventListener('scroll', queueSync, { passive: true, signal: events.signal });
-      const resize = new ResizeObserver(syncMode); resize.observe(track); syncMode();
-      desktop.addEventListener('change', syncMode, { signal: events.signal });
-      this.cleanup = () => { events.abort(); finishDrag(undefined, false); resize.disconnect(); cancelAnimationFrame(frame); delete track.dataset.dragReady; };
-    }
-    disconnectedCallback() { this.cleanup?.(); this.cleanup = undefined; }
-  }
-  if (!customElements.get('works-carousel')) customElements.define('works-carousel', WorksCarousel);
+const works=document.querySelector<HTMLElement>('#trabajos')!;
+const viewport=works.querySelector<HTMLElement>('.works-viewport')!;
+const track=works.querySelector<HTMLElement>('.works-track')!;
+const positionNav=works.querySelector<HTMLElement>('.work-positions')!;
+const projects=Array.from(works.querySelectorAll<HTMLElement>('project-story'));
+const projectColors=projects.map(project=>{
+ const hex=project.style.getPropertyValue('--work-accent').trim();
+ return [1,3,5].map(index=>parseInt(hex.slice(index,index+2),16));
+});
+function blendBackground(position:number){
+ const index=Math.floor(position),blend=position-index;
+ const from=projectColors[index],to=projectColors[Math.min(index+1,projectColors.length-1)];
+ const color=from.map((channel,i)=>Math.round(channel+(to[i]-channel)*blend));
+ viewport.style.setProperty('--works-wash',`rgb(${color.join(',')})`);
+}
+let viewportVisible=false;
+function syncBackgroundVisibility(){works.dataset.visible=String(viewportVisible&&!document.hidden);}
+const backgroundVisibility=new IntersectionObserver(entries=>{viewportVisible=!!entries[0]?.isIntersecting;syncBackgroundVisibility();});
+backgroundVisibility.observe(viewport);
+document.addEventListener('visibilitychange',syncBackgroundVisibility);
+document.addEventListener('astro:before-swap',()=>{backgroundVisibility.disconnect();document.removeEventListener('visibilitychange',syncBackgroundVisibility);},{once:true});
+const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+let step=0, pending=0;
+let settleTimer:ReturnType<typeof setTimeout>|undefined;
+let programmaticUntil=0;
+let touching=false;
+function measure(){
+ const height=Math.max(620,innerHeight-80);
+ step=Math.max(620,innerHeight*.85);
+ works.toggleAttribute('data-horizontal',!reduced.matches);
+ works.style.setProperty('--works-viewport-height',`${height}px`);
+ works.style.setProperty('--works-height',`${height+(projects.length-1)*step}px`);
+ updatePosition();
+}
+function projectTop(index:number){
+ return reduced.matches?projects[index].getBoundingClientRect().top+scrollY-80:works.getBoundingClientRect().top+scrollY-80+index*step;
+}
+works.addEventListener('click',event=>{
+ const link=(event.target as Element).closest<HTMLAnchorElement>('[data-project-jump],.story-close');
+ if(!link)return;const target=document.getElementById(link.hash.slice(1));if(!target)return;
+ event.preventDefault();history.replaceState(null,'',link.hash);
+ clearTimeout(settleTimer);programmaticUntil=performance.now()+1200;
+ const index=projects.indexOf(target);
+ // Focus the persistent navigation while travelling; offscreen project content stays inert.
+ if(index<0){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}
+ window.scrollTo({top:index<0?target.getBoundingClientRect().top+scrollY-80:projectTop(index),behavior:reduced.matches?'instant':'smooth'});
+});
+function updatePosition(){
+ pending=0;
+ const bounds=works.getBoundingClientRect();const midpoint=(innerHeight+80)/2;
+ positionNav.hidden=bounds.top>midpoint||bounds.bottom<midpoint;
+ let active=0;
+ if(!reduced.matches){
+   const progress=Math.max(0,Math.min(projects.length-1,(80-bounds.top)/step));
+   const base=Math.floor(progress),fraction=progress-base;
+   // A short resting interval keeps each project readable before the next horizontal slide.
+   const travel=Math.max(0,Math.min(1,(fraction-.2)/.6));
+   const eased=travel*travel*(3-2*travel);
+   const position=base+eased;
+   blendBackground(position);
+   active=Math.min(projects.length-1,Math.round(position));
+   const offset=-position*viewport.clientWidth;
+   track.style.transform=`translate3d(${offset}px,0,0)`;
+ }else{
+   track.style.transform='';
+   let distance=Infinity;
+   projects.forEach((project,i)=>{const rect=project.getBoundingClientRect();const d=Math.abs(rect.top+rect.height/2-midpoint);if(d<distance){distance=d;active=i;}});
+ }
+ projects.forEach((project,i)=>{project.inert=!reduced.matches&&i!==active;});
+ const dark=projects[active].dataset.theme==='dark';
+ positionNav.style.setProperty('--position-ink',dark?'#fff':'#000');positionNav.style.setProperty('--position-bg',dark?'#000':'#fff');
+ positionNav.querySelectorAll('a').forEach((link,i)=>{if(i===active)link.setAttribute('aria-current','step');else link.removeAttribute('aria-current');});
+}
+const queue=()=>{if(!pending)pending=requestAnimationFrame(updatePosition);};
+function restoreProjectHash(){const index=projects.findIndex(project=>`#${project.id}`===location.hash);if(index>=0)window.scrollTo({top:projectTop(index),behavior:'instant'});}
+function settleProject(){
+ if(reduced.matches||touching||performance.now()<programmaticUntil)return;
+ const progress=(80-works.getBoundingClientRect().top)/step;
+ if(progress<=0||progress>=projects.length-1)return;
+ const index=Math.round(progress);
+ if(Math.abs(progress-index)<.015)return;
+ programmaticUntil=performance.now()+650;
+ window.scrollTo({top:projectTop(index),behavior:'smooth'});
+}
+window.addEventListener('scroll',()=>{queue();clearTimeout(settleTimer);settleTimer=setTimeout(settleProject,180);},{passive:true});
+window.addEventListener('wheel',()=>{programmaticUntil=0;},{passive:true});
+window.addEventListener('touchstart',()=>{touching=true;clearTimeout(settleTimer);programmaticUntil=0;},{passive:true});
+window.addEventListener('touchend',()=>{touching=false;clearTimeout(settleTimer);settleTimer=setTimeout(settleProject,180);},{passive:true});
+window.addEventListener('touchcancel',()=>{touching=false;},{passive:true});
+window.addEventListener('resize',measure,{passive:true});
+window.addEventListener('hashchange',restoreProjectHash);
+reduced.addEventListener('change',measure);
+measure();
+// Wait for the shared page layout to settle before restoring a direct project link.
+window.addEventListener('load',()=>{measure();restoreProjectHash();},{once:true});
 </script>

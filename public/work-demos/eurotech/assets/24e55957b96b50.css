@@ -1,0 +1,202 @@
+.wp-block-eurotech-custom-woo-product-category-cards.ecw-product-category-cards {
+  --ecw-category-card-gap: 24px;
+  --ecw-category-card-cols: 4;
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+}
+
+.ecw-product-category-cards__swiper {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  overflow: hidden;
+}
+
+.ecw-product-category-cards__list {
+  width: 100%;
+  max-width: 100%;
+  min-width: 0;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.ecw-product-category-cards__item {
+  height: auto;
+  box-sizing: border-box;
+  min-width: 0;
+}
+
+.ecw-product-category-cards__card {
+  position: relative;
+  display: block;
+  min-height: 345.6px;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--et-radius-md);
+  background: url("90aab1c3b79a20.webp") center/cover
+    no-repeat;
+  text-decoration: none;
+  isolation: isolate;
+}
+
+.ecw-product-category-cards__gradient {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background: linear-gradient(
+    to top,
+    var(--et-color-brand) 0%,
+    rgba(0, 0, 0, 0) 40%
+  );
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.ecw-product-category-cards__image {
+  position: absolute;
+  left: 0;
+  top: 20px;
+  z-index: 2;
+  width: 100%;
+  height: calc(75% - 20px);
+  object-fit: contain;
+  mask-image: linear-gradient(to bottom, white 20%, rgba(255, 255, 255, 0) 150%);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    white 20%,
+    rgba(255, 255, 255, 0) 150%
+  );
+  pointer-events: none;
+}
+
+.ecw-product-category-cards__info {
+  position: absolute;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  z-index: 3;
+  display: grid;
+  gap: 8px;
+  padding: 20px;
+  text-align: center;
+}
+
+.ecw-product-category-cards__name {
+  color: var(--et-color-white, #fff);
+  font-family: var(--et-font-family-heading, inherit);
+  font-size: var(--et-font-size-h5, 24px);
+  font-weight: 700;
+  line-height: 1.2;
+}
+
+.ecw-product-category-cards__description {
+  color: var(--et-color-white, #fff);
+  font-size: var(--et-font-size-sm, 14px);
+  line-height: 1.5;
+}
+
+.ecw-product-category-cards__controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: 16px;
+}
+
+.ecw-product-category-cards__nav-button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 40px;
+  min-width: 40px;
+  min-height: 40px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: var(--et-color-text-primary);
+  cursor: pointer;
+}
+
+.ecw-product-category-cards__nav-button.swiper-button-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ecw-product-category-cards__nav-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.ecw-product-category-cards__pagination {
+  display: flex;
+  justify-content: center;
+}
+
+.ecw-product-category-cards__pagination .swiper-pagination-bullet {
+  background: var(--et-color-text-primary, #fff);
+  opacity: 0.35;
+}
+
+.ecw-product-category-cards__pagination .swiper-pagination-bullet-active {
+  opacity: 1;
+  background: var(--et-color-brand);
+}
+
+.ecw-product-category-cards__empty-message {
+  margin: 0;
+  color: var(--et-color-text-muted, inherit);
+}
+
+@media (max-width: 1024px) {
+  .ecw-product-category-cards__item {
+    flex: 0 0 calc((100% - 16px) / 2);
+    width: calc((100% - 16px) / 2);
+  }
+}
+
+@media (max-width: 767px) {
+  .ecw-product-category-cards__item {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+}
+
+@media (min-width: 1025px) {
+  .ecw-product-category-cards__list {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: var(--ecw-category-card-gap);
+  }
+
+  .ecw-product-category-cards__item {
+    flex: 0 0
+      calc(
+        (
+            100% -
+              (
+                var(--ecw-category-card-gap) *
+                  (var(--ecw-category-card-cols) - 1)
+              )
+          ) /
+          var(--ecw-category-card-cols)
+      );
+    width: calc(
+      (
+          100% -
+            (var(--ecw-category-card-gap) * (var(--ecw-category-card-cols) - 1))
+        ) /
+        var(--ecw-category-card-cols)
+    );
+  }
+
+  .ecw-product-category-cards__controls {
+    display: none;
+  }
+
+  .ecw-product-category-cards__item--mobile-duplicate {
+    display: none;
+  }
+}

@@ -1,0 +1,9 @@
+---
+import DemoFrame from './DemoFrame.astro';
+interface Props {view:string;}
+const {view}=Astro.props;
+---
+<DemoFrame responsive width={1280} height={800} label={`Eurotech Ecommerce · ${view}`}>
+ <iframe src={`/work-demos/eurotech/${view}.html`} title={`Diseño publicado de Eurotech Uruguay: ${view}`} width="1280" height="800" loading="lazy" sandbox="allow-same-origin" tabindex="-1"></iframe>
+</DemoFrame>
+<style>iframe{display:block;width:100%;height:100%;border:0;pointer-events:none}</style>

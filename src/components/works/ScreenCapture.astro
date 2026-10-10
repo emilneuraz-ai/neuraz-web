@@ -1,0 +1,20 @@
+---
+import type { WorkScene } from '../../data/works/types';
+interface Props { image: NonNullable<WorkScene['image']>; scrollable?: boolean; viewport?: 'desktop' | 'mobile'; }
+const { image, scrollable=false, viewport='mobile' } = Astro.props;
+---
+<div class:list={['screen-capture',{'screen-capture-viewport':scrollable}]} data-capture-viewport={viewport} style={`--capture-ratio:${image.width} / ${image.height}`}>
+  {scrollable ? <div class="screen-capture-scrollable" tabindex="0" role="region" aria-label={image.alt}>
+    <img data-screen-image src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" draggable="false" />
+  </div> : <img data-screen-image src={image.src} alt={image.alt} width={image.width} height={image.height} loading="lazy" decoding="async" draggable="false" />}
+</div>
+<style>
+.screen-capture { width:100%;aspect-ratio:var(--capture-ratio);display:grid;place-items:center}
+.screen-capture img{width:100%;height:100%;min-height:0;object-fit:contain;user-select:none}
+.screen-capture-viewport{position:relative;aspect-ratio:430 / 932;display:block}
+.screen-capture-viewport[data-capture-viewport="desktop"]{aspect-ratio:16 / 10}
+.screen-capture-scrollable{position:absolute;inset:0;overflow-y:auto;scrollbar-width:thin;touch-action:pan-y pinch-zoom}
+.screen-capture-scrollable img{display:block;height:auto}
+.screen-capture-scrollable:focus-visible{outline:2px solid currentColor;outline-offset:-2px}
+
+</style>

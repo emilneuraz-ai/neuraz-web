@@ -1,0 +1,141 @@
+.wp-block-eurotech-custom-woo-associated-categories.ecw-associated-categories {
+  display: grid;
+  gap: var(--et-space-4, 16px);
+}
+
+.ecw-associated-categories__title {
+  color: var(--et-color-text-primary, inherit);
+  font-family: var(--et-font-family-body, inherit);
+  font-size: var(--et-font-size-base, 16px);
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ecw-associated-categories__list,
+.ecw-associated-categories__sublist {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.ecw-associated-categories__list {
+  display: grid;
+  gap: var(--et-space-2, 8px);
+}
+
+.ecw-associated-categories__item {
+  display: grid;
+  gap: 0;
+}
+
+.ecw-associated-categories__trigger,
+.ecw-associated-categories__link {
+  justify-content: space-between;
+  text-align: left;
+}
+
+.ecw-associated-categories__trigger.et-button-secondary-fill {
+  padding-right: 4px;
+}
+
+.ecw-associated-categories__link.et-button-secondary-fill {
+  color: var(--et-color-text-primary, #fff);
+  justify-content: flex-start;
+}
+
+.ecw-associated-categories__list {
+  a.ecw-associated-categories__trigger-link {
+    color: var(--et-color-text-primary);
+    flex: 1 1 auto;
+    min-width: 0;
+    text-decoration: none;
+  }
+  a.ecw-associated-categories__subitem {
+    color: var(--et-color-text-primary);
+    &.is-active {
+      color: var(--et-color-white, #fff);
+    }
+  }
+  .is-open a.ecw-associated-categories__trigger-link {
+    color: var(--et-color-white, #fff);
+  }
+}
+
+.ecw-associated-categories__toggle {
+  align-items: center;
+  align-self: stretch;
+  background: transparent;
+  border: 0;
+  color: inherit;
+  cursor: pointer;
+  display: inline-flex;
+  flex: 0 0 44px;
+  justify-content: center;
+  padding: 0;
+}
+
+.ecw-associated-categories__toggle:focus-visible {
+  outline: 2px solid var(--et-color-brand, #b90b08);
+  outline-offset: -2px;
+}
+
+.ecw-associated-categories__item.is-open > .ecw-associated-categories__trigger,
+.ecw-associated-categories__item.is-active
+  > .ecw-associated-categories__trigger,
+.ecw-associated-categories__link.is-active {
+  background: var(--et-color-brand-100, #b90b08);
+  border-color: var(--et-color-brand-100, #b90b08);
+  color: var(--et-color-white, #fff);
+}
+
+.ecw-associated-categories__chevron {
+  flex: 0 0 18px;
+  height: 18px;
+  transition: transform 150ms ease;
+  width: 18px;
+}
+
+.ecw-associated-categories__toggle[aria-expanded="true"]
+  .ecw-associated-categories__chevron {
+  transform: rotate(180deg);
+}
+
+.ecw-associated-categories__panel {
+  background: var(--et-color-gray-0, #0e0e0e);
+  padding: var(--et-space-2, 8px);
+}
+
+:root[data-theme="light"] .ecw-associated-categories__panel {
+  background: var(--et-color-gray-110, #f1f1f1);
+}
+
+.ecw-associated-categories__sublist {
+  display: grid;
+  gap: var(--et-space-1, 4px);
+}
+
+.ecw-associated-categories__subitem {
+  border-radius: var(--et-radius-sm, 4px);
+  color: var(--et-color-text-primary, inherit);
+  display: block;
+  padding: var(--et-space-2, 8px) var(--et-space-3, 12px);
+  text-decoration: none;
+  transition:
+    background-color 150ms ease,
+    color 150ms ease;
+}
+
+.ecw-associated-categories__subitem:hover,
+.ecw-associated-categories__subitem:focus-visible {
+  background: var(--et-color-background-raised, #2a2a2a);
+}
+
+.ecw-associated-categories__subitem.is-active {
+  background: var(--et-color-brand-100, #b90b08);
+  color: var(--et-color-white, #fff);
+}
+
+.ecw-associated-categories__empty-message {
+  color: var(--et-color-text-secondary, inherit);
+  margin: 0;
+}

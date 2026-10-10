@@ -2,12 +2,14 @@
 interface Props {
   seed: 'hero' | 'services';
   initiallyInactive?: boolean;
+  direction?: 'vertical' | 'horizontal';
+  color?: string;
 }
 
-const { seed, initiallyInactive = false } = Astro.props;
+const { seed, initiallyInactive = false, direction = 'vertical', color } = Astro.props;
 ---
 
-<scroll-air class="scroll-air" data-air-seed={seed} data-active={initiallyInactive ? 'false' : 'true'} aria-hidden="true">
+<scroll-air class="scroll-air" data-air-seed={seed} data-air-direction={direction} data-service-color={color} data-active={initiallyInactive ? 'false' : 'true'} aria-hidden="true">
   <canvas></canvas>
 </scroll-air>
 
@@ -25,6 +27,7 @@ const { seed, initiallyInactive = false } = Astro.props;
     mask-image: linear-gradient(180deg, transparent, #000 12%, #000 88%, transparent);
   }
   .scroll-air[data-active="false"] { opacity: 0; }
+  .scroll-air[data-air-direction="horizontal"] { mask-image: linear-gradient(90deg, transparent, #000 12%, #000 88%, transparent); }
   canvas { display: block; width: 100%; height: 100%; }
   @media (prefers-reduced-motion: reduce) { .scroll-air { display: none; transition: none; } }
 </style>
@@ -60,6 +63,8 @@ const { seed, initiallyInactive = false } = Astro.props;
     private resizeObserver?: ResizeObserver;
     private reducedMotion = matchMedia('(prefers-reduced-motion: reduce)');
 
+    private get horizontal() { return this.dataset.airDirection === 'horizontal'; }
+
     attributeChangedCallback() {
       this.draw();
     }
@@ -73,6 +78,7 @@ const { seed, initiallyInactive = false } = Astro.props;
       this.resizeCanvas();
       this.intersection = new IntersectionObserver(entries => {
         this.visible = !!entries[0]?.isIntersecting;
+        this.dataset.visible = String(this.visible && !document.hidden);
         this.lastScroll = scrollY;
         if (this.visible) this.draw();
       });
@@ -100,14 +106,15 @@ const { seed, initiallyInactive = false } = Astro.props;
     private resizeCanvas = () => {
       if (!this.canvas || !this.context) return;
       const bounds = this.getBoundingClientRect();
-      const width = Math.round(bounds.width);
-      const height = Math.round(bounds.height);
+      // Work in cross-axis / travel-axis coordinates, then rotate the drawing.
+      const width = Math.round(this.horizontal ? bounds.height : bounds.width);
+      const height = Math.round(this.horizontal ? bounds.width : bounds.height);
       if (!width || !height || (width === this.width && height === this.height)) return;
       this.width = width;
       this.height = height;
       const scale = Math.min(devicePixelRatio || 1, 2);
-      this.canvas.width = Math.round(width * scale);
-      this.canvas.height = Math.round(height * scale);
+      this.canvas.width = Math.round((this.horizontal ? height : width) * scale);
+      this.canvas.height = Math.round((this.horizontal ? width : height) * scale);
       this.context.setTransform(scale, 0, 0, scale, 0, 0);
       const random = this.randomizer();
       const count = Math.min(22, Math.max(6, Math.round(width / 78)));
@@ -143,12 +150,13 @@ const { seed, initiallyInactive = false } = Astro.props;
 
     private onMotionChange = () => {
       this.momentum = 0;
-      if (this.reducedMotion.matches && this.context) this.context.clearRect(0, 0, this.width, this.height);
+      if (this.reducedMotion.matches && this.context) this.context.clearRect(0, 0, this.canvas!.width, this.canvas!.height);
       else this.draw();
     };
 
     private onVisibilityChange = () => {
       this.lastScroll = scrollY;
+      this.dataset.visible = String(this.visible && !document.hidden);
       if (!document.hidden) this.draw();
     };
 
@@ -166,7 +174,9 @@ const { seed, initiallyInactive = false } = Astro.props;
     private draw() {
       const context = this.context;
       if (!context || !this.width || !this.height || this.reducedMotion.matches) return;
-      context.clearRect(0, 0, this.width, this.height);
+      context.clearRect(0, 0, this.horizontal ? this.height : this.width, this.horizontal ? this.width : this.height);
+      context.save();
+      if (this.horizontal) context.transform(0, 1, 1, 0, 0, 0);
       const hex = /^#[\da-f]{6}$/i.test(this.dataset.serviceColor || '') ? this.dataset.serviceColor! : '#f57c00';
       const rgb = [1, 3, 5].map(index => parseInt(hex.slice(index, index + 2), 16)).join(',');
       for (const [lineIndex, line] of this.lines.entries()) {
@@ -211,6 +221,7 @@ const { seed, initiallyInactive = false } = Astro.props;
           context.stroke();
         }
       }
+      context.restore();
     }
   }
 

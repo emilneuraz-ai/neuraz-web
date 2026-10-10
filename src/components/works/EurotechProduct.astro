@@ -1,0 +1,13 @@
+---
+import type { eurotechProducts } from '../../data/works/eurotech';
+interface Props { product: (typeof eurotechProducts)[number]; }
+const { product } = Astro.props;
+---
+<div class="et-card" data-product-category={product.category}>
+  <div class="et-card-photo"><img src={`/images/works/eurotech/${product.image}`} alt={product.name} width="300" height="300" loading="lazy" decoding="async"/></div>
+  <div class="et-card-copy"><strong>{product.name}</strong><span class="et-tag">{product.tag}</span><b>$ {product.price}</b><small>Efectivo/transferencia</small><span class="et-cash">$ {product.cash}</span><small>SKU: {product.sku}</small><span class="et-card-action">Añadir al carrito</span></div>
+</div>
+<style>
+  .et-card { border-radius:5px; overflow:hidden; background:#1c1c1c; min-width:0; }.et-card-photo { background:white; aspect-ratio:1; overflow:hidden; }img { width:100%; height:100%; object-fit:contain; padding:5%; }.et-card-copy { padding:10px; display:flex; flex-direction:column; gap:6px; }strong { font-family:'Eurotech Space',sans-serif; font-weight:700; font-size:11px; line-height:1.35; min-height:45px; }.et-tag { align-self:flex-start; border:1px solid #333; border-radius:4px; padding:4px 5px; font-size:8px; font-weight:700; }b { font-size:15px; }small { color:#aaa; font-size:8px; }.et-cash { font-size:12px; }.et-card-action { display:block; text-align:center; background:#303030; border-radius:3px; padding:8px 4px; font-size:8px; font-weight:700; margin-top:4px; }[hidden] { display:none!important; }
+  @media(max-width:767px) { .et-card-copy { padding:7px; gap:5px; }strong { font-size:8px; min-height:43px; }.et-tag { font-size:6px; padding:3px; }b { font-size:12px; }small { font-size:6px; }.et-cash { font-size:10px; }.et-card-action { font-size:6px; } }
+</style>

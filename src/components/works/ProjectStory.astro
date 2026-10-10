@@ -1,0 +1,149 @@
+---
+import type { WorkStory } from '../../data/works/types';
+import ScrollAir from '../ScrollAir.astro';
+interface Props { project: WorkStory; index: number; projects: WorkStory[]; }
+const { project, index, projects } = Astro.props;
+const maxScenes = project.format === 'presentation' && project.scenes.every(scene=>scene.image) ? 12 : project.scenes.every(scene=>scene.image) ? 6 : 4;
+if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Error(`A project story needs between 3 and ${maxScenes} scenes.`);
+---
+<project-story id={`trabajo-${project.id}`} class="project-story" data-theme={project.theme || 'dark'} data-format={project.format || 'desktop'} data-layout={project.format === 'mobile' || project.scenes[0].device === 'mobile' ? 'phone' : 'wide'} style={`--work-accent:${project.accent};--scene-count:${project.scenes.length}`} aria-labelledby={`title-${project.id}`}>
+  <div class="story-stage">
+    <div class="story-background" aria-hidden="true"><div class="story-wash"></div></div>
+    <ScrollAir seed="services" direction="horizontal" color={project.accent} />
+    <header class="story-heading">
+      <div class="story-identity"><span class="story-section-title">Proyectos</span><span class="story-number">{String(index + 1).padStart(2, '0')}</span><h3 id={`title-${project.id}`}>{project.title}</h3><span class="story-category">{project.category}</span></div>
+      <div class="story-actions">{project.url && <a href={project.url} target="_blank" rel="noopener noreferrer" class="story-behance">Ver en Behance <span aria-hidden="true">↗</span></a>}<a class="story-close" href="#nosotros" aria-label="Cerrar proyectos e ir a Nosotros" title="Cerrar proyectos · Ir a Nosotros">×</a></div>
+    </header>
+
+    <div class="story-body">
+      <div class="story-gallery">
+        <div class="story-window"><div class="story-track"><slot /></div></div>
+        <button type="button" class="scene-arrow scene-arrow-prev" data-scene-prev aria-label={`Pantalla anterior de ${project.title}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg></button>
+        <button type="button" class="scene-arrow scene-arrow-next" data-scene-next aria-label={`Pantalla siguiente de ${project.title}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"/></svg></button>
+        <div class="story-carousel-controls"><nav class="story-chapters" aria-label={`Vistas de ${project.title}`}>
+          {project.scenes.map((scene, i) => <button type="button" data-scene-target={i} aria-label={`Ver ${scene.label} de ${project.title}`} aria-current={i === 0 ? 'step' : undefined}><span class="chapter-line"></span><span class="chapter-label"><small>{String(i + 1).padStart(2, '0')}</small>{scene.label}</span></button>)}
+        </nav>
+        <button type="button" class="story-playback" data-carousel-playback aria-label="Pausar presentación automática" aria-pressed="false">Ⅱ</button>
+        <span class="story-count"><span data-scene-counter>01</span> / {String(project.scenes.length).padStart(2, '0')}</span>
+        </div>
+      </div>
+      <slot name="copy" />
+    </div>
+    <footer class="story-footer">
+      <span class="story-instruction"><span aria-hidden="true">↓</span> Scroll al siguiente proyecto</span>
+    </footer>
+    <p class="story-announcement sr-only" aria-live="polite" aria-atomic="true"></p>
+  </div>
+</project-story>
+<style>
+  .project-story { display: block; position: relative; background: var(--work-bg); color: var(--work-ink); --work-bg:#000; --work-ink:#fff; --work-muted:#fff; --work-line:#ffffff20; --work-soft:#ffffff26; scroll-margin-top: 80px; --story-height: max(620px, calc(100svh - 80px)); }
+  .story-stage { min-height: var(--story-height); position: relative; background: var(--work-bg); isolation: isolate; overflow: clip; }
+  .story-background { position: absolute; inset: 0; overflow: clip; pointer-events: none; mask-image: linear-gradient(180deg, transparent, #000 22%, #000 78%, transparent); }
+  .story-wash {
+    position: absolute;
+    inset: -12%;
+    background:
+      radial-gradient(ellipse at 76% 44%, color-mix(in srgb, var(--work-accent) 15%, transparent) 0%, transparent 52%),
+      radial-gradient(ellipse at 23% 74%, color-mix(in srgb, var(--work-accent) 7%, transparent) 0%, transparent 48%);
+    filter: blur(35px);
+    animation: story-wash-drift 16s ease-in-out infinite alternate;
+    animation-play-state: paused;
+    pointer-events: none;
+  }
+  .story-stage:has([data-air-direction="horizontal"][data-visible="true"]) .story-wash { animation-play-state: running; }
+  @keyframes story-wash-drift { from { transform: translate3d(-2%, 1%, 0) scale(1); } to { transform: translate3d(3%, -3%, 0) scale(1.1); } }
+  .story-heading, .story-body, .story-footer { position: relative; z-index: 1; }
+  .story-stage::before { position: absolute; inset: 0; z-index: -1; content: ''; pointer-events: none; background:none; }
+  .story-identity h3,.story-number,.story-category {display:none}.story-stage {will-change:opacity}.story-identity .story-section-title {border:0;padding:0}
+  .story-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 16px clamp(24px, 4vw, 72px); border-bottom: 1px solid var(--work-line); }
+  .story-actions { display:flex; align-items:center; gap:20px; }.story-close { display:grid; place-items:center; width:36px; height:36px; border:1px solid var(--work-line); border-radius:50%; font-size:24px; }.story-section-title { font-size:10px; text-transform:uppercase; letter-spacing:.12em; padding-right:16px; border-right:1px solid var(--work-line); color:var(--work-muted); }
+  .story-identity { display: flex; gap: 18px; align-items: baseline; }
+  .story-number { font-size: 11px; color: var(--work-ink); font-variant-numeric: tabular-nums; }
+  .story-identity h3 { font-size: 18px; font-weight: 500; letter-spacing: -.04em; }
+  .story-category { font-size: 10px; color: var(--work-muted); }
+  .story-behance { display: flex; align-items: center; gap: 18px; font-size: 11px; white-space: nowrap; }
+  .story-behance span { font-size: 22px; }
+  .story-behance:hover { color: var(--work-ink); }
+  .story-body { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:18px 36px 12px; min-height:0; min-width:0; }
+  .story-gallery { position:relative; width:100%; min-width:0; min-height:0; flex:1; padding-inline:24px; align-self:stretch; }
+  .story-body :global(.scene-copy) { flex:0 0 auto; }
+  .scene-arrow { position:absolute; top:50%; transform:translateY(-50%); width:36px; height:44px; display:grid; place-items:center; background:none; border:0; color:var(--work-ink); cursor:pointer; z-index:2; }
+  .scene-arrow-prev { right:calc(50% + var(--visual-half-width,40%) + 8px); }
+  .scene-arrow-next { left:calc(50% + var(--visual-half-width,40%) + 8px); }
+  .scene-arrow svg { width:22px; height:22px; fill:none; stroke:currentColor; stroke-width:1.3; }
+  .scene-arrow:focus-visible { outline:1px solid currentColor; outline-offset:2px; }
+  .story-window { overflow: clip; min-width: 0; }
+  .story-track { display: grid; width: 100%; min-width: 0; }
+  .story-footer { padding: 0 clamp(24px, 4vw, 72px) 12px; display: flex; align-items: center; gap: clamp(20px, 4vw, 60px); border-top: 1px solid var(--work-line); }
+  .story-instruction { font-size: 10px; color: var(--work-muted); white-space: nowrap; }
+  .story-instruction > span { color: var(--work-ink); margin-right: 8px; font-size: 16px; }
+  .story-chapters { display: flex; flex: 1; gap: 14px; }
+  .story-chapters button { min-height: 44px; flex: 1; min-width: 0; text-align: left; cursor: pointer; color: var(--work-muted); }
+  .chapter-line { display: block; height: 2px; background: var(--work-soft); margin-bottom: 12px; position: relative; }
+  .chapter-line::after { position: absolute; inset: 0; content: ''; background: var(--work-ink); transform: scaleX(0); transform-origin: left; transition: transform 240ms; }
+  button[aria-current] .chapter-line::after { transform: scaleX(1); }
+  button[aria-current] { color: var(--work-ink); }
+  .chapter-label { display: flex; gap: 8px; font-size: 10px; }
+  .chapter-label small { font-size: 9px; color: var(--work-muted); }
+  .story-playback {width:32px;height:32px;cursor:pointer;color:var(--work-ink);font-size:15px;background:none;border:0}.story-playback:focus-visible{outline:1px solid currentColor;outline-offset:3px}
+  .story-count { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--work-muted); white-space: nowrap; }
+  .story-count > span { color: var(--work-ink); }
+  .story-heading a:focus-visible, .story-chapters button:focus-visible { outline: 2px solid var(--work-ink); outline-offset: 5px; }
+  .project-story[data-enhanced] { height: var(--story-height); }
+  [data-enhanced] .story-stage { position: relative; height: var(--story-height); min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+  [data-enhanced] .story-window, [data-enhanced] .story-track { height: 100%; }
+  [data-enhanced] .story-track { display: flex; transition: transform 450ms cubic-bezier(.22,.8,.22,1); }
+  .story-track :global(.work-scene) { width: 100%; flex: 0 0 100%; min-width: 0; }
+  .project-story[data-theme="light"] { --work-bg:var(--color-bg,#fafafa); --work-ink:#000; --work-muted:#000; --work-line:#20251e25; --work-soft:#20251e28; }
+  .project-positions { position:absolute; right:10px; top:50%; transform:translateY(-50%); display:grid; z-index:4; }.project-positions a { display:grid; place-items:center; width:24px; height:24px; position:relative; }.project-positions a>span:first-child { width:5px; height:5px; border-radius:50%; background:var(--work-muted); opacity:.4; }.project-positions a[aria-current]>span:first-child { width:8px; height:8px; opacity:1; background:var(--work-ink); outline:1px solid var(--work-ink); outline-offset:4px; }.position-label { position:absolute; right:30px; background:var(--work-bg); border:1px solid var(--work-line); color:var(--work-ink); padding:6px 10px; font-size:10px; white-space:nowrap; opacity:0; pointer-events:none; }.project-positions a:hover .position-label,.project-positions a:focus-visible .position-label { opacity:1; }.project-positions a:focus-visible { outline:2px solid var(--work-ink); }
+  .story-carousel-controls {display:flex;align-items:center;justify-content:center;gap:22px;flex:1}.story-arrow {width:42px;height:42px;display:grid;place-items:center;border:1px solid var(--work-line);border-radius:50%;font-size:22px;cursor:pointer;color:var(--work-ink)}.story-arrow:disabled {opacity:.25;cursor:default}.story-arrow:not(:disabled):hover {background:var(--work-soft)}.story-chapters {flex:none;gap:2px}.story-chapters button {flex:none;width:24px;display:grid;place-items:center;min-height:44px}.chapter-line {width:6px;height:6px;border-radius:50%;margin:0;overflow:hidden}.chapter-label {display:none}.chapter-line::after {transform:scale(0);border-radius:50%}button[aria-current] .chapter-line::after {transform:scale(1)}.story-window {touch-action:pan-y pinch-zoom}.story-arrow:focus-visible {outline:2px solid var(--work-ink);outline-offset:4px}
+  @media (min-width:768px){
+    .story-body { flex-direction:row; gap:clamp(65px,6vw,110px); padding:44px max(76px,calc((100% - 1500px)/2)); }
+    .story-gallery { width:60%; flex:1 1 60%; max-width:950px; padding-inline:44px; }
+    .story-body :global(.scene-copy) { width:34%; flex:0 0 34%; max-width:430px; }
+    .project-story[data-layout="phone"] .story-body { gap:clamp(48px,5vw,88px); }
+    .project-story[data-layout="phone"] .story-gallery { width:440px; flex:0 1 440px; max-width:440px; }
+    .project-story[data-layout="phone"] .story-body :global(.scene-copy) { width:430px; flex:0 1 430px; }
+    .project-story[data-layout="phone"] .story-track :global(.work-scene) { padding-inline:0; }
+    .story-heading{display:none}[data-enhanced] .story-stage{grid-template-rows:minmax(0,1fr) auto}.story-footer{border-top:0;padding-bottom:18px}}
+  @media (max-width: 767px) {
+    .scene-arrow { width:28px; }
+    .scene-arrow svg { width:18px; }
+    .scene-arrow-prev { right:calc(50% + var(--visual-half-width,40%) + 3px); }
+    .scene-arrow-next { left:calc(50% + var(--visual-half-width,40%) + 3px); }
+    .project-story[data-format="presentation"] .story-footer { gap:8px; padding-inline:16px; }
+    .project-story[data-format="presentation"] .story-carousel-controls { min-width:0; }
+    .project-story[data-format="presentation"] .story-chapters { gap:0; flex:1; }
+    .project-story[data-format="presentation"] .story-chapters button { width:auto; flex:1; }
+    .story-section-title { padding:0; border:0; font-size:8px; }.story-identity { flex-wrap:wrap; column-gap:8px; row-gap:3px; }.story-section-title { width:100%; }.story-close { width:30px; height:30px; }.story-actions { gap:8px; }.project-positions { right:0; }.project-positions a { width:24px; height:24px; }.position-label { display:none; }
+    .story-heading { padding: 10px 24px 10px 16px; gap: 12px; }
+    .story-identity { gap: 10px; }
+    .story-identity h3 { font-size: 16px; }
+    .story-category { display: none; }
+    .story-behance { font-size: 10px; gap: 8px; }
+    .story-footer { padding: 10px 20px 14px; gap: 15px; }
+    .story-instruction { display: none; }
+    .story-chapters { gap: 8px; }
+    .chapter-label { justify-content: center; font-size: 8px; }
+    .chapter-label small { display: none; }
+    .chapter-line { margin-bottom: 9px; }
+    .story-playback {width:32px;height:32px;cursor:pointer;color:var(--work-ink);font-size:15px;background:none;border:0}.story-playback:focus-visible{outline:1px solid currentColor;outline-offset:3px}
+  .story-count { font-size: 10px; }
+  }
+  @media (prefers-reduced-motion: reduce) { .chapter-line::after,[data-enhanced] .story-track { transition: none; } .story-wash { animation: none; } }
+
+  [data-enhanced] .story-gallery { display:grid; grid-template-rows:minmax(0,1fr) 56px; }
+  .story-gallery > .story-carousel-controls { width:min(100%,360px); gap:12px; padding:0; flex:none; margin-inline:auto; }
+  [data-enhanced] .story-gallery > .story-carousel-controls { position:absolute; top:var(--visual-bottom,80%); left:50%; transform:translateX(-50%); }
+  .story-carousel-controls .story-chapters { flex:1; min-width:0; gap:0; justify-content:center; }
+  .story-carousel-controls .story-chapters button { flex:1; max-width:24px; width:24px; }
+  .story-carousel-controls .chapter-line { margin:0; }
+  .story-carousel-controls .story-playback,.story-carousel-controls .story-count { flex:none; }
+  @media(max-width:767px) {
+    .story-gallery > .story-carousel-controls { gap:6px; }
+    .story-footer { display:none; }
+  }
+</style>
+<script>
+  import '../../scripts/project-story';
+</script>

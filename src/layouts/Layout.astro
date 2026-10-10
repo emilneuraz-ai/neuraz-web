@@ -69,7 +69,7 @@ const canonicalURL = new URL(Astro.url.pathname, Astro.site);
   }
 
   @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
-    html[data-section-motion="true"] main > section > :not(.section-atmosphere) {
+    html[data-section-motion="true"] main > section:not(#trabajos) > :not(.section-atmosphere) {
       opacity: calc(0.12 + var(--section-visibility, 1) * 0.88);
       transform: translate3d(0, calc((1 - var(--section-visibility, 1)) * 16px), 0);
       will-change: opacity, transform;

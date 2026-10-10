@@ -1,0 +1,158 @@
+.wp-block-eurotech-custom-woo-google-rating.ecw-google-rating {
+  --ecw-google-rating-gold: #fbbc04;
+  background:
+    radial-gradient(circle at 90% 16%, color-mix(in srgb, var(--et-color-brand, #b90b08) 20%, transparent), transparent 32rem),
+    var(--et-color-gray-20, #1b1b1b);
+  border: 1px solid var(--et-color-gray-40, #353535);
+  border-radius: 12px;
+  color: var(--et-color-text-primary, #fff);
+  display: grid;
+  gap: clamp(22px, 3.5vw, 44px);
+  grid-template-columns: minmax(0, 1fr);
+  overflow: hidden;
+  padding: clamp(26px, 4vw, 44px);
+  margin-block-start: clamp(24px, 2vw, 32px);
+}
+
+.is-layout-constrained > .wp-block-eurotech-custom-woo-google-rating.ecw-google-rating {
+  margin-block-start: clamp(24px, 2vw, 32px);
+}
+
+.ecw-google-rating__content {
+  display: grid;
+  gap: 10px;
+  max-width: 620px;
+}
+
+.ecw-google-rating__eyebrow {
+  align-items: center;
+  color: var(--et-color-text-secondary, #d8d8d8);
+  display: inline-flex;
+  font-size: var(--et-font-size-sm, 0.875rem);
+  font-weight: 700;
+  gap: 8px;
+  letter-spacing: 0.04em;
+  margin: 0;
+  text-transform: uppercase;
+}
+
+.ecw-google-rating__google-mark {
+  color: #4285f4;
+  font-family: Arial, sans-serif;
+  font-size: 1.25rem;
+  font-weight: 700;
+  letter-spacing: -0.1em;
+}
+
+.ecw-google-rating__title {
+  color: inherit;
+  font-family: var(--et-font-family-heading, inherit);
+  font-size: clamp(1.5rem, 2.6vw, 2.25rem);
+  line-height: 1.12;
+  margin: 0;
+}
+
+.ecw-google-rating__description {
+  color: var(--et-color-text-secondary, #d8d8d8);
+  font-size: 0.9375rem;
+  line-height: 1.5;
+  margin: 0;
+}
+
+.ecw-google-rating__summary {
+  align-content: center;
+  border-left: 1px solid var(--et-color-gray-40, #353535);
+  display: grid;
+  gap: 8px;
+  justify-items: start;
+  padding-left: clamp(20px, 3vw, 36px);
+}
+
+.ecw-google-rating__score-line {
+  align-items: flex-end;
+  display: flex;
+  gap: 10px;
+}
+
+.ecw-google-rating__score {
+  color: var(--et-color-white, #fff);
+  font-family: var(--et-font-family-heading, inherit);
+  font-size: clamp(3rem, 5vw, 4rem);
+  font-weight: 700;
+  letter-spacing: -0.06em;
+  line-height: 0.85;
+}
+
+.ecw-google-rating__out-of {
+  color: var(--et-color-text-secondary, #d8d8d8);
+  font-size: 1rem;
+  padding-bottom: 4px;
+}
+
+.ecw-google-rating__stars {
+  color: var(--ecw-google-rating-gold);
+  display: flex;
+  font-size: 1.35rem;
+  letter-spacing: 0.12em;
+  line-height: 1;
+}
+
+.ecw-google-rating__business,
+.ecw-google-rating__reviews {
+  margin: 0;
+}
+
+.ecw-google-rating__business {
+  font-weight: 700;
+}
+
+.ecw-google-rating__reviews {
+  color: var(--et-color-text-secondary, #d8d8d8);
+}
+
+.ecw-google-rating__link {
+  align-items: center;
+  color: var(--et-color-white, #fff);
+  display: inline-flex;
+  font-weight: 700;
+  gap: 8px;
+  margin-top: 2px;
+  text-decoration: none;
+}
+
+.ecw-google-rating__link::after {
+  content: "→";
+  font-size: 1.15em;
+  transition: transform 150ms ease;
+}
+
+.ecw-google-rating__link:hover,
+.ecw-google-rating__link:focus-visible {
+  color: var(--et-color-brand-light-100, #ff8d89);
+  text-decoration: underline;
+}
+
+.ecw-google-rating__link:hover::after,
+.ecw-google-rating__link:focus-visible::after {
+  transform: translateX(4px);
+}
+
+.ecw-google-rating__link:focus-visible {
+  outline: 2px solid var(--et-color-white, #fff);
+  outline-offset: 4px;
+}
+
+@media (min-width: 800px) {
+  .wp-block-eurotech-custom-woo-google-rating.ecw-google-rating {
+    grid-template-columns: minmax(0, 3fr) minmax(260px, 2fr);
+  }
+}
+
+@media (max-width: 799px) {
+  .ecw-google-rating__summary {
+    border-left: 0;
+    border-top: 1px solid var(--et-color-gray-40, #353535);
+    padding-left: 0;
+    padding-top: 18px;
+  }
+}

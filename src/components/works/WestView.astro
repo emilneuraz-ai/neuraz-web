@@ -1,0 +1,9 @@
+---
+import DemoFrame from './DemoFrame.astro';
+interface Props {view:string;}
+const {view}=Astro.props;
+---
+<DemoFrame responsive width={1440} height={900} label={`West · ${view}`}>
+ <iframe src={`/work-demos/west/${view}.html`} title={`Interfaz original de West: ${view}`} width="1440" height="900" loading="lazy" sandbox="allow-same-origin" tabindex="-1"></iframe>
+</DemoFrame>
+<style>iframe { display:block; width:100%; height:100%; border:0; pointer-events:none; }</style>

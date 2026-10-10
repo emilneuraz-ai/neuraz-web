@@ -1,0 +1,15 @@
+---
+interface Props { mobile?: boolean; label: string; width?:number; height?:number; responsive?:boolean; }
+const {mobile=false,label,width=mobile?360:960,height=mobile?680:600,responsive=false}=Astro.props;
+---
+<work-demo-frame class:list={['demo-frame',{mobile,responsive}]} data-width={width} data-responsive={responsive?'true':undefined} style={`--canvas-width:${width}px;--canvas-height:${height}px;--frame-ratio:${width} / ${height}`} aria-label={label}>
+  <div class="demo-canvas"><slot /></div>
+</work-demo-frame>
+<style>
+.demo-frame{display:block;position:relative;width:100%;aspect-ratio:var(--frame-ratio);overflow:hidden;border:1px solid #8883;border-radius:10px;background:#fff;box-shadow:0 22px 65px #0002;isolation:isolate}.mobile{width:min(100%,330px);margin-inline:auto;border-radius:24px;box-shadow:0 20px 70px #0002}.demo-canvas{width:var(--canvas-width);height:var(--canvas-height);transform:scale(var(--frame-scale,1));transform-origin:top left;overflow:hidden}.demo-frame :global(button),.demo-frame :global(input),.demo-frame :global(select){font:inherit}.demo-frame :global(button){cursor:pointer}.demo-frame :global(button:focus-visible),.demo-frame :global(input:focus-visible){outline:3px solid #5884e6;outline-offset:3px}
+@media(max-width:767px){.responsive{width:min(100%,360px);--canvas-width:390px!important;--canvas-height:780px!important;--frame-ratio:390 / 780!important;border-radius:18px}}
+</style>
+<script>
+class WorkDemoFrame extends HTMLElement{observer?:ResizeObserver;connectedCallback(){this.observer=new ResizeObserver(()=>{this.style.setProperty('--frame-scale',String(this.clientWidth/(this.dataset.responsive&&matchMedia('(max-width:767px)').matches?390:Number(this.dataset.width))));});this.observer.observe(this);}disconnectedCallback(){this.observer?.disconnect();}}
+if(!customElements.get('work-demo-frame'))customElements.define('work-demo-frame',WorkDemoFrame);
+</script>

@@ -1,0 +1,125 @@
+.wp-block-eurotech-custom-woo-product-carousel.ecw-product-carousel {
+  display: grid;
+  gap: 1.5rem;
+  padding-block: var(--et-space-8, 32px);
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-areas:
+    "top"
+    "carousel"
+    "link";
+}
+
+.ecw-product-carousel__top {
+  grid-area: top;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.ecw-product-carousel__title {
+  margin: 0;
+  padding-left: 16px;
+  border-left: 4px solid var(--et-color-brand, #0b6cff);
+  font-family: var(--et-font-family-heading, inherit);
+  font-size: var(--et-font-size-h3, 2rem);
+  line-height: 1.2;
+}
+
+.ecw-product-carousel__view-all {
+  grid-area: link;
+  justify-self: stretch;
+  text-decoration: none;
+  text-align: center;
+}
+
+.ecw-product-carousel__nav {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin-left: auto;
+}
+
+button.ecw-product-carousel__nav-button {
+  --size: 36px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: var(--size);
+  min-width: var(--size);
+  min-height: var(--size);
+  padding: 0;
+  cursor: pointer;
+}
+
+.ecw-product-carousel__nav-button.swiper-button-disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+.ecw-product-carousel__nav-icon {
+  width: 24px;
+  height: 24px;
+}
+
+.ecw-product-carousel__swiper {
+  grid-area: carousel;
+  width: 100%;
+  overflow: hidden;
+}
+
+.ecw-product-carousel__slide {
+  height: auto;
+}
+
+.ecw-product-carousel__slide .et-product-card {
+  height: 100%;
+}
+
+.ecw-product-carousel__empty-message {
+  margin: 0;
+  color: var(--et-color-text-muted, inherit);
+}
+
+@media (max-width: 767px) {
+  .wp-block-eurotech-custom-woo-product-carousel.ecw-product-carousel {
+    padding-block: var(--et-space-6, 24px);
+  }
+
+  .ecw-product-carousel__top {
+    align-items: flex-start;
+  }
+
+  .ecw-product-carousel__title {
+    padding-left: 8px;
+    font-size: var(--et-font-size-h5, 1.5rem);
+  }
+
+  .ecw-product-carousel__nav {
+    margin-left: auto;
+  }
+}
+
+@media (min-width: 768px) {
+  .wp-block-eurotech-custom-woo-product-carousel.ecw-product-carousel {
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "top link"
+      "carousel carousel";
+    align-items: center;
+  }
+
+  .ecw-product-carousel__view-all {
+    justify-self: end;
+    align-self: center;
+  }
+
+  .ecw-product-carousel__nav {
+    gap: 0.75rem;
+  }
+
+  button.ecw-product-carousel__nav-button {
+    --size: 42px;
+  }
+}

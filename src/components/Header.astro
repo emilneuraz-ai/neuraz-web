@@ -67,6 +67,10 @@ import NavbarBrand from './NavbarBrand.astro';
   }
   .site-header :global(.navbar-brand__isotipo) { display: none; }
   .site-header :global(.navbar-brand__link) { gap: 0; }
+  nav a { position: relative; }
+  nav a[aria-current="location"] { color: #111; }
+  nav a[aria-current="location"]::after { content: ''; position: absolute; left: 0; right: 0; bottom: -8px; height: 2px; background: currentColor; }
+  #mobile-menu nav a[aria-current="location"]::after { left: auto; right: 0; bottom: 50%; width: 6px; height: 6px; border-radius: 50%; }
   #mobile-menu-btn { place-items: center; width: 44px; height: 44px; padding: 0; }
   .organic-menu-icon { display: block; width: 30px; height: 30px; }
   .organic-menu-icon.hidden { display: none; }
@@ -134,4 +138,29 @@ import NavbarBrand from './NavbarBrand.astro';
   window.addEventListener('pageshow', () => {
     showHeader();
   });
+
+  // Track the section under the fixed navigation, including the entire pinned story.
+  const sectionLinks = Array.from(document.querySelectorAll<HTMLAnchorElement>('.site-header nav a[href^="#"]'));
+  const sectionIds = [...new Set(sectionLinks.map(link => link.hash.slice(1)))];
+  const sections = sectionIds.map(id => document.getElementById(id)).filter((section): section is HTMLElement => !!section);
+  let navFrame = 0;
+  const updateActiveSection = () => {
+    navFrame = 0;
+    const marker = 100;
+    let active = '';
+    for (const section of sections) {
+      const rect = section.getBoundingClientRect();
+      if (rect.top <= marker && rect.bottom > 80) active = section.id;
+    }
+    if (innerHeight + scrollY >= document.documentElement.scrollHeight - 3) active = 'contacto';
+    sectionLinks.forEach(link => {
+      if (link.hash === `#${active}`) link.setAttribute('aria-current', 'location');
+      else link.removeAttribute('aria-current');
+    });
+  };
+  const queueActiveSection = () => { if (!navFrame) navFrame = requestAnimationFrame(updateActiveSection); };
+  window.addEventListener('scroll', queueActiveSection, { passive: true });
+  window.addEventListener('resize', queueActiveSection, { passive: true });
+  window.addEventListener('pageshow', queueActiveSection);
+  updateActiveSection();
 </script>
