@@ -1,0 +1,17 @@
+{
+  "version": 1,
+  "width": 384,
+  "height": 384,
+  "frameCount": 96,
+  "fps": 12,
+  "heightScale": 0.5,
+  "bounds": {
+    "xMin": -2.55,
+    "xMax": 2.55,
+    "yMin": -2.55,
+    "yMax": 2.55
+  },
+  "encoding": "signed-inflation-f32-xor-delta",
+  "rowOrder": "bottom-to-top",
+  "sampleConvention": "inclusive-grid"
+}

@@ -1,5 +1,7 @@
 ---
 import { services, serviceVisual } from '../data/services';
+import ScrollAir from './ScrollAir.astro';
+import ServicePreview from './ServicePreview.astro';
 
 const scrollHeight = 100 + Math.max(0, services.length - 1) * 68;
 const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
@@ -13,6 +15,7 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
 >
   <div class="services-sticky">
     <div class="services-wash" aria-hidden="true"></div>
+    <ScrollAir seed="services" />
     <div class="services-inner max-w-7xl mx-auto">
       <div class="services-list" data-services-list>
         {services.map((service, index) => (
@@ -37,6 +40,7 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
                 <span class="service-toggle" aria-hidden="true"><span></span><span></span></span>
               </button>
             </h2>
+            <ServicePreview service={service} index={index} inline />
             <div
               class="service-content"
               id={`service-panel-${service.id}`}
@@ -97,13 +101,15 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
   .services-sticky { position: sticky; top: 0; height: 100svh; min-height: 0; padding: 5rem clamp(1.75rem, 8vw, 2.5rem) 0; overflow: clip; }
   .services-wash {
     position: absolute;
-    inset: 0;
-    overflow: hidden;
+    inset: -12%;
     background:
-      radial-gradient(ellipse at 76% 48%, color-mix(in srgb, var(--service-wash) 7%, transparent) 0%, transparent 58%),
-      linear-gradient(180deg, transparent 0%, color-mix(in srgb, var(--service-wash) 2.5%, transparent) 52%, transparent 100%);
+      radial-gradient(ellipse at 76% 44%, color-mix(in srgb, var(--service-wash) 15%, transparent) 0%, transparent 52%),
+      radial-gradient(ellipse at 23% 74%, color-mix(in srgb, var(--service-wash) 7%, transparent) 0%, transparent 48%);
+    filter: blur(35px);
+    animation: service-wash-drift 16s ease-in-out infinite alternate;
     pointer-events: none;
   }
+  @keyframes service-wash-drift { from { transform: translate3d(-2%, 1%, 0) scale(1); } to { transform: translate3d(3%, -3%, 0) scale(1.1); } }
   .services-inner { position: relative; z-index: 1; height: calc(100svh - 5rem); min-height: 0; }
   .services-list { position: absolute; inset: 0; overflow-anchor: none; }
   .service-item {
@@ -134,7 +140,7 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
   .service-link svg { width: 20px; height: 20px; flex: none; transition: transform 220ms cubic-bezier(.2,.75,.2,1); }
   .service-link:hover { color: var(--service-accent); border-color: currentColor; }
   .service-link:hover svg { transform: scale(1.08); }
-  .service-logo-slot { display: none; width: min(66.666vw, 260px); aspect-ratio: 1; margin: 0 auto 0.25rem; flex: none; }
+  .service-logo-slot { display: none; width: min(52vw, 190px, 24svh); aspect-ratio: 1; margin: 0 auto 0.25rem; flex: none; }
   .service-item[data-expanded="true"] > .service-logo-slot { display: block; }
   .services-logo-anchor { display: none; }
   .services-pagination {
@@ -154,16 +160,27 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
   .service-page[aria-current="true"] span { width: 11px; height: 11px; opacity: 1; box-shadow: 0 0 0 3px #fafafa, 0 0 0 4px color-mix(in srgb, var(--page-color), transparent 58%); }
   .service-page:focus-visible { outline: 2px solid #111; outline-offset: 1px; }
 
+  @media (max-width: 1023px) {
+    .services-sticky { padding-inline: 20px; }
+    .service-name { font-size: clamp(1.65rem, 7vw, 2rem); }
+    .service-link { display: none; }
+    .service-item { gap: 8px; }
+    .service-description { display: none; }
+    .service-header { padding-top: .75rem; padding-bottom: .65rem; }
+    .service-copy { padding-right: 0; }
+    .service-detail { padding-bottom: .5rem; }
+  }
+
   @media (max-width: 374px) {
-    .service-logo-slot { width: min(64vw, 240px); }
+    .service-logo-slot { width: min(52vw, 190px, 24svh); }
     .service-header { padding-top: 1rem; padding-bottom: 0.8rem; }
     .service-description { margin-bottom: 1rem; }
   }
 
   @media (max-width: 420px) and (max-height: 850px) {
-    .service-logo-slot { width: min(58vw, 225px); }
+    .service-logo-slot { width: min(52vw, 190px, 24svh); }
     .service-header { padding-top: 0.8rem; padding-bottom: 0.7rem; }
-    .service-name { font-size: clamp(2rem, 9vw, 2.35rem); }
+    .service-name { font-size: clamp(1.65rem, 7vw, 2rem); }
     .service-detail { padding-bottom: 0.5rem; }
     .service-description { margin-bottom: 0.85rem; font-size: 0.9375rem; line-height: 1.5; }
     .service-link { min-height: 42px; font-size: 0.8125rem; }
@@ -196,7 +213,8 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
     .service-detail { padding: 0; }
     .service-description { font-size: 1.125rem; }
     .service-copy { position: relative; z-index: 3; padding-right: 0; }
-    .service-logo-slot { display: none; }
+    .service-link { width: fit-content; min-width: 12rem; }
+    .service-item[data-expanded="true"] > .service-logo-slot { display: none; }
     .services-logo-anchor { display: block; position: absolute; top: 50%; right: -2%; width: min(52%, 700px, calc(100svh - 190px)); aspect-ratio: 1; transform: translateY(-50%); pointer-events: none; }
     .services-pagination {
       position: absolute;
@@ -227,12 +245,14 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
   }
 
   @media (prefers-reduced-motion: reduce) {
+    .services-wash { animation: none; }
     .services-section, .service-item, .service-content, .service-name, .service-toggle, .service-toggle span, .service-link, .service-link svg, .service-page span { transition: none; }
   }
 </style>
 
 <script>
   const section = document.querySelector<HTMLElement>('#servicios')!;
+  const air = section.querySelector<HTMLElement>('scroll-air')!;
   const items = Array.from(section.querySelectorAll<HTMLElement>('.service-item'));
   const triggers = items.map(item => item.querySelector<HTMLButtonElement>('.service-header')!);
   const contents = items.map(item => item.querySelector<HTMLElement>('.service-content')!);
@@ -259,6 +279,8 @@ const mobileScrollHeight = 100 + Math.max(0, services.length - 1) * 34;
 
   function select(index: number) {
     const safeIndex = Math.min(Math.max(index, 0), items.length - 1);
+    air.dataset.active = 'true';
+    air.setAttribute('data-service-color', items[safeIndex].style.getPropertyValue('--service-accent').trim());
     if (safeIndex === expandedIndex && items[safeIndex].dataset.position === 'current') {
       items.forEach((item, i) => { item.inert = i !== safeIndex; });
       return;

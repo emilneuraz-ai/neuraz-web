@@ -5,6 +5,7 @@ import MercuryLogo from '../../components/MercuryLogo.astro';
 import SphericalLogo from '../../components/SphericalLogo.astro';
 import NavbarBrand from '../../components/NavbarBrand.astro';
 import PageLoader from '../../components/PageLoader.astro';
+import { services, serviceVisual } from '../../data/services';
 ---
 
 <!DOCTYPE html>
@@ -13,7 +14,7 @@ import PageLoader from '../../components/PageLoader.astro';
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
     <meta name="robots" content="noindex, nofollow" />
-    <meta name="description" content="Versiones del logo de Neuraz: animación vectorial en negro plano, negro mate con perspectiva en 3D y render de mercurio metalizado." />
+    <meta name="description" content="Logo biomórfico de Neuraz: volumen satinado, animación 3D, colores por servicio y PNG transparente para descargar." />
     <meta name="theme-color" content="#fafafa" />
     <link rel="icon" type="image/svg+xml" href="/images/isotipo.svg" />
     <title>Logo animado — Neuraz</title>
@@ -33,6 +34,28 @@ import PageLoader from '../../components/PageLoader.astro';
           <h1>Logo animado<span class="title-dot">.</span></h1>
           <p class="intro-copy">Una forma que conecta, se transforma y vuelve a ser Neuraz.</p>
         </div>
+
+        <section class="biomorphic-resource" aria-labelledby="biomorphic-title" data-biomorphic-resource>
+          <header class="specimen-heading"><span class="specimen-number">NUEVO</span><h2 id="biomorphic-title">Biomórfico satinado</h2><span class="format-label">3D · PNG</span></header>
+          <div class="biomorphic-grid">
+            <div class="biomorphic-stage">
+              <MercuryLogo finish="resin" view="front" reducedMotion="static" controls={true} label="Logo biomórfico de Neuraz, con volumen satinado y colores por servicio" />
+            </div>
+            <div class="biomorphic-copy">
+              <p>La silueta de la referencia en 3D: las ramas se unen, se separan y vuelven a su forma, con volumen redondeado, superficie lisa y reflejos suaves. Naranja en la portada, un color propio para cada servicio.</p>
+              <div class="color-options" role="group" aria-label="Color del logo por servicio">
+                {services.map((service, index) => <button type="button" data-logo-color={serviceVisual(index).color} aria-pressed={String(index === 0)} style={`--swatch: ${serviceVisual(index).color}`}><span aria-hidden="true"></span>{service.name}</button>)}
+              </div>
+              <div class="render-downloads">
+                <a class="download-link" href="/images/neuraz-biomorphic/logo-naranja-transparente.png" download>Descargar PNG sin fondo ↗</a>
+                <a class="download-link" href="/models/neuraz-biomorphic.glb" download>Descargar modelo biomórfico GLB ↗</a>
+                <a class="download-link" href="/images/neuraz-biomorphic/referencia-naranja.png" download>Descargar referencia original ↗</a>
+                <a class="download-link" href="/models/neuraz-logo-web.zip" download>Descargar recurso web animado ↗</a>
+              </div>
+              <figure class="transparent-preview"><img src="/images/neuraz-biomorphic/logo-naranja-transparente.png" alt="Versión naranja del emblema biomórfico sin fondo" width="1254" height="1254" loading="lazy" /><figcaption>PNG con transparencia</figcaption></figure>
+            </div>
+          </div>
+        </section>
 
         <div class="specimens">
           <section class="specimen" aria-labelledby="flat-title">
@@ -109,14 +132,41 @@ import PageLoader from '../../components/PageLoader.astro';
       </main>
 
       <footer class="page-footer">
-        <p>NEURAZ <span aria-hidden="true">/</span> Tecnología con propósito.</p>
+        <p>NEURAZ <span aria-hidden="true">/</span> Diseñamos sistemas inteligentes.</p>
         <a href="/">Volver al sitio <span aria-hidden="true">↗</span></a>
       </footer>
     </div>
   </body>
 </html>
 
+<script>
+  document.querySelectorAll<HTMLElement>('[data-biomorphic-resource]').forEach(section => {
+    const viewer = section.querySelector<HTMLElement>('neuraz-mercury');
+    section.querySelectorAll<HTMLButtonElement>('[data-logo-color]').forEach(button => {
+      button.addEventListener('click', () => {
+        if (!viewer) return;
+        viewer.dataset.color = button.dataset.logoColor;
+        viewer.dispatchEvent(new Event('mercury:color'));
+        section.querySelectorAll('[data-logo-color]').forEach(option => option.setAttribute('aria-pressed', String(option === button)));
+      });
+    });
+  });
+</script>
+
 <style>
+  .biomorphic-resource { border-top: 1px solid #111; margin-bottom: 72px; }
+  .biomorphic-grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(24px, 5vw, 72px); align-items: center; }
+  .biomorphic-stage { min-width: 0; }
+  .biomorphic-copy > p { font-size: 16px; line-height: 1.7; color: #595959; max-width: 440px; }
+  .color-options { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 24px; }
+  .color-options button { display: inline-flex; align-items: center; gap: 8px; min-height: 44px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 20px; background: transparent; color: #333; font: inherit; font-size: 11px; text-align: left; cursor: pointer; }
+  .color-options button[aria-pressed='true'] { border-color: #111; background: #fff; }
+  .color-options button:focus-visible { outline: 2px solid #111; outline-offset: 3px; }
+  .color-options button span { width: 12px; height: 12px; border-radius: 50%; background: var(--swatch); flex: none; }
+  .transparent-preview { display: flex; align-items: center; gap: 16px; margin: 24px 0 0; font-size: 11px; color: #595959; }
+  .transparent-preview img { width: 88px; height: 88px; object-fit: contain; background: repeating-conic-gradient(#e7e7e7 0% 25%, #fafafa 0% 50%) 50% / 16px 16px; }
+  @media (max-width: 620px) { .biomorphic-grid { grid-template-columns: 1fr; gap: 16px; } .biomorphic-resource { margin-bottom: 48px; } }
+
   .sphere-resource { margin-top: 64px; border-top: 1px solid #ddd; padding-top: 24px; }
   .sphere-resource :global(.spherical-logo) { max-width: 700px; margin: 0 auto 24px; }
   :global(body) {

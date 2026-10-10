@@ -5,13 +5,13 @@
 Neuraz es una empresa de desarrollo de software especializada en inteligencia artificial aplicada a negocios. Diseñamos sistemas inteligentes para crear, documentar y automatizar procesos empresariales.
 
 **Website:** https://neuraz.io  
-**Contacto:** contacto@neuraz.io
+**Contacto:** contacto@neuraz.ar
 
 ---
 
 ## Servicios
 
-### 1. Agentes de IA
+### 1. Agentes
 **Categoría:** Inteligencia Artificial
 
 Diseñamos asistentes inteligentes personalizados para tu negocio. No son bots que siguen un menú fijo. Son sistemas que entienden lo que la gente pide, se adaptan a cada situación y toman decisiones por su cuenta — siempre dentro de los límites que vos definas.
@@ -43,10 +43,10 @@ Eliminamos tareas repetitivas, errores y cuellos de botella. Flujos automáticos
 
 ---
 
-### 3. CRM con Atención Automática
+### 3. Atención Automática
 **Categoría:** Automatización
 
-CRM con atención automática, consultas a financieras y respuestas inteligentes vía WhatsApp y redes sociales.
+Centralizamos consultas, hacemos seguimiento y damos respuestas inteligentes vía WhatsApp y redes sociales.
 
 **Funcionalidades:**
 - Responde consultas al instante: Precios, disponibilidad, formas de pago, horarios.
@@ -110,7 +110,7 @@ Extracción automática de datos, clasificación de documentos y organización i
 
 ---
 
-### 7. Generación Automática de Contenido con IA
+### 7. Generación Automática de Contenido
 **Categoría:** Inteligencia Artificial
 
 Creación automática de contenido periodístico, widgets estadísticos, tarjetas digitales e invitaciones interactivas.
@@ -162,7 +162,7 @@ Formación en IA, automatización y herramientas de productividad para equipos y
 
 ## Contacto
 
-- **Email:** contacto@neuraz.io
+- **Email:** contacto@neuraz.ar
 - **Teléfono:** +54 9 11 1234-5678
 - **Ubicación:** Buenos Aires, Argentina
 - **Web:** https://neuraz.io
@@ -175,10 +175,10 @@ Formación en IA, automatización y herramientas de productividad para equipos y
 - Automatización de procesos
 - Desarrollo Web (Astro, React, Node.js)
 - Integraciones con WhatsApp Business API
-- Sistemas de CRM personalizados
+- Sistemas de atención automática
 - Gamificación y sistemas de fidelización
 - Procesamiento de documentos con OCR
-- Generación de contenido con IA
+- Generación automática de contenido
 
 ---
 

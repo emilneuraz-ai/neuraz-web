@@ -63,11 +63,8 @@ import NavbarBrand from './NavbarBrand.astro';
     z-index: 300;
     isolation: isolate;
     background-color: var(--color-bg, #fafafa);
-    transform: translateY(0);
-    transition: transform 320ms cubic-bezier(.2,.75,.2,1);
-    will-change: transform;
+
   }
-  .site-header[data-hidden="true"] { transform: translateY(-100%); }
   .site-header :global(.navbar-brand__isotipo) { display: none; }
   .site-header :global(.navbar-brand__link) { gap: 0; }
   #mobile-menu-btn { place-items: center; width: 44px; height: 44px; padding: 0; }
@@ -104,35 +101,8 @@ import NavbarBrand from './NavbarBrand.astro';
   const mobileLinks = document.querySelectorAll('.mobile-link');
   const siteHeader = document.querySelector<HTMLElement>('.site-header');
   const desktopNavigation = window.matchMedia('(min-width: 768px)');
-  let previousScroll = Math.max(window.scrollY, 0);
-  let headerFrame = 0;
-
   function showHeader() {
     siteHeader?.removeAttribute('data-hidden');
-  }
-
-  function updateHeader() {
-    headerFrame = 0;
-    const currentScroll = Math.max(window.scrollY, 0);
-
-    if (desktopNavigation.matches) {
-      previousScroll = currentScroll;
-      showHeader();
-      return;
-    }
-
-    const distance = currentScroll - previousScroll;
-    const menuOpen = mobileMenuBtn?.getAttribute('aria-expanded') === 'true';
-    const headerFocused = !!siteHeader?.contains(document.activeElement);
-
-    if (currentScroll < 80 || menuOpen || headerFocused || distance < -6) showHeader();
-    else if (distance > 6) siteHeader?.setAttribute('data-hidden', 'true');
-
-    if (Math.abs(distance) > 3) previousScroll = currentScroll;
-  }
-
-  function scheduleHeaderUpdate() {
-    if (!headerFrame) headerFrame = requestAnimationFrame(updateHeader);
   }
 
   function setMenuOpen(open: boolean) {
@@ -161,9 +131,7 @@ import NavbarBrand from './NavbarBrand.astro';
     if (event.matches) setMenuOpen(false);
   });
   siteHeader?.addEventListener('focusin', showHeader);
-  window.addEventListener('scroll', scheduleHeaderUpdate, { passive: true });
   window.addEventListener('pageshow', () => {
-    previousScroll = Math.max(window.scrollY, 0);
     showHeader();
   });
 </script>

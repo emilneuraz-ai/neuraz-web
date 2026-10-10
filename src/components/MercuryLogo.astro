@@ -6,7 +6,7 @@ interface Props {
   label?: string;
   modelSrc?: string;
   posterSrc?: string;
-  finish?: 'black' | 'mercury' | 'porcelain';
+  finish?: 'black' | 'mercury' | 'porcelain' | 'resin';
   view?: 'front' | 'isometric';
   fluid?: boolean;
   fluidSrc?: string;
@@ -27,21 +27,21 @@ const {
   class: className,
   id,
   label = 'Isotipo Neuraz tridimensional',
-  modelSrc = '/models/neuraz-mercury.glb',
-  posterSrc = '/images/neuraz-mercury-poster.png',
   finish = 'black',
+  modelSrc = finish === 'resin' ? '/models/neuraz-biomorphic.glb' : '/models/neuraz-mercury.glb',
+  posterSrc = finish === 'resin' ? '/images/neuraz-biomorphic/logo-naranja-transparente.png' : '/images/neuraz-mercury-poster.png',
   view = 'front',
   fluid = true,
-  fluidSrc = '/models/neuraz-mercury-fluid.bin.gz',
-  fluidMetadataSrc = '/models/neuraz-mercury-fluid.json',
+  fluidSrc = finish === 'resin' ? '/models/neuraz-biomorphic-fluid.bin.gz' : '/models/neuraz-mercury-fluid.bin.gz',
+  fluidMetadataSrc = finish === 'resin' ? '/models/neuraz-biomorphic-fluid.json' : '/models/neuraz-mercury-fluid.json',
   interactive = true,
   autoplay = true,
   controls = false,
   loading = 'lazy',
   reducedMotion = 'poster',
   aspectRatio = 1,
-  exposure = finish === 'black' ? 1 : 1.1,
-  environmentIntensity = finish === 'black' ? 0.5 : finish === 'porcelain' ? 0.8 : 1.3,
+  exposure = finish === 'black' || finish === 'resin' ? 1 : 1.1,
+  environmentIntensity = finish === 'black' ? 0.5 : finish === 'resin' ? 0.6 : finish === 'porcelain' ? 0.8 : 1.3,
   maxDpr = 1.75,
   framing = 1.05,
 } = Astro.props;

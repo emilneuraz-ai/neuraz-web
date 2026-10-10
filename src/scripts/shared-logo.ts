@@ -1,3 +1,5 @@
+import { services as serviceDefinitions, serviceVisual } from '../data/services';
+
 /** One persistent scene travels from the hero to an independent desktop service rail. */
 let disposeCurrent: (() => void) | undefined;
 let installed = false;
@@ -26,9 +28,8 @@ export function installSharedLogo() {
       const content = panel?.querySelector<HTMLElement>('.service-content');
       const slot = panel?.querySelector<HTMLElement>('[data-service-logo-slot]');
       const panelRect = (desktop.matches ? content : panel)?.getBoundingClientRect();
-      const activePin = Array.from(logo.querySelectorAll<HTMLElement>('[data-hero-logo-service]'))
-        .find(pin => pin.dataset.heroLogoService === panel?.dataset.serviceId);
-      const offset = activePin?.dataset.serviceOffset?.split(',').map(Number) || [0, 0];
+      const serviceIndex = serviceDefinitions.findIndex(service => service.id === panel?.dataset.serviceId);
+      const offset = serviceIndex >= 0 ? serviceVisual(serviceIndex).offset : [0, 0];
       const offsetX = Number.isFinite(offset[0]) ? offset[0] : 0;
       const offsetY = Number.isFinite(offset[1]) ? offset[1] : 0;
       let inServices: boolean;
@@ -75,8 +76,8 @@ export function installSharedLogo() {
           const linear = clamp((enterStart - sectionRect.top) / Math.max(1, enterStart), 0, 1);
           const progress = motion.matches ? Number(linear >= .5) : linear * linear * (3 - 2 * linear);
           const size = target.width;
-          const targetLeft = target.left + size * offsetX;
-          const targetTop = target.top + size * offsetY;
+          const targetLeft = target.left;
+          const targetTop = target.top;
           const visualWidth = lerp(homeOrigin.width, size, progress);
           const scale = visualWidth / Math.max(1, size);
           const top = lerp(homeOrigin.top, targetTop, progress);

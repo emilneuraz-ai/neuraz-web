@@ -1,75 +1,112 @@
 ---
-// src/components/About.astro - Bauhaus minimal
 import SectionAtmosphere from './SectionAtmosphere.astro';
 ---
 
-<section id="nosotros" class="ambient-section py-24 px-6 sm:px-8 bg-[#fafafa]">
+<section id="nosotros" class="about-section ambient-section" aria-labelledby="about-title" data-about>
   <SectionAtmosphere variant="contours" />
-  <div class="max-w-7xl mx-auto">
-    
-    <div class="grid lg:grid-cols-12 gap-12">
-      <!-- Left column -->
-      <div class="lg:col-span-5">
-        <div class="mb-6">
-          <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">Nosotros</span>
-        </div>
-
-        <h2 class="text-[clamp(1.75rem,4vw,2.5rem)] font-bold leading-[1.15] tracking-[-0.04em] text-black mb-12">
-          Facilitamos herramientas tecnológicas
-        </h2>
-
-        <div class="space-y-6">
-          <p class="text-base text-black/60 leading-relaxed">
-            No somos una empresa de software genérico ni vendemos soluciones enlatadas. 
-            Diseñamos, construimos e implementamos herramientas digitales a medida.
-          </p>
-
-          <p class="text-base text-black/60 leading-relaxed">
-            Trabajamos con negocios reales, explicamos en lenguaje simple, 
-            y construimos cosas que duran.
-          </p>
-        </div>
+  <div class="about-sticky">
+    <div class="about-inner">
+      <div class="about-copy">
+        <span class="about-eyebrow"><span class="about-mark" aria-hidden="true"></span> Nosotros / Equipo</span>
+        <h2 id="about-title">Pensamos, diseñamos y hacemos que funcione.</h2>
+        <p class="about-lead">Combinamos formación técnica y una mirada creativa para construir herramientas digitales a medida.</p>
       </div>
 
-      <!-- Right column - Values -->
-      <div class="lg:col-span-6 lg:col-start-7">
-        <div class="grid gap-px bg-black/10">
-          
-          <div class="bg-[#fafafa] p-6 flex items-start gap-6">
-            <span class="text-3xl font-light text-[#e63946]">01</span>
-            <div>
-              <h3 class="text-base font-medium text-black mb-1">Negocios reales</h3>
-              <p class="text-sm text-black/50">Trabajamos con casos reales, no de laboratorio.</p>
-            </div>
+      <div id="equipo" class="about-team" aria-label="Integrantes del equipo">
+        <article class="person person-emil">
+          <div class="person-photo"><img src="/images/team/emil-2026.png" alt="Retrato de Emil R. González" width="1254" height="1254" loading="lazy" decoding="async" /></div>
+          <div class="person-meta">
+            <div><h3>Emil R. González</h3><p>Diseñador y Desarrollador</p></div>
+            <a href="https://www.behance.net/emilgonzalez" target="_blank" rel="noopener noreferrer" aria-label="Behance de Emil R. González (abre en otra pestaña)">↗</a>
           </div>
-
-          <div class="bg-[#fafafa] p-6 flex items-start gap-6">
-            <span class="text-3xl font-light text-black">02</span>
-            <div>
-              <h3 class="text-base font-medium text-black mb-1">Lenguaje simple</h3>
-              <p class="text-sm text-black/50">Sin tecnicismos innecesarios.</p>
-            </div>
+        </article>
+        <article class="person person-romina">
+          <div class="person-photo"><img src="/images/team/romina-2026.png" alt="Retrato de Romina Lescano" width="1254" height="1254" loading="lazy" decoding="async" /></div>
+          <div class="person-meta">
+            <div><h3>Romina Lescano</h3><p>Desarrolladora Web · Lic. en Sistemas</p></div>
+            <a href="https://www.linkedin.com/in/romina-lescano/" target="_blank" rel="noopener noreferrer" aria-label="LinkedIn de Romina Lescano (abre en otra pestaña)">↗</a>
           </div>
-
-          <div class="bg-[#fafafa] p-6 flex items-start gap-6">
-            <span class="text-3xl font-light text-black">03</span>
-            <div>
-              <h3 class="text-base font-medium text-black mb-1">Soluciones duraderas</h3>
-              <p class="text-sm text-black/50">Cosas que el equipo puede usar sin depender de nosotros.</p>
-            </div>
-          </div>
-
-          <div class="bg-[#fafafa] p-6 flex items-start gap-6">
-            <span class="text-3xl font-light text-[#e63946]">04</span>
-            <div>
-              <h3 class="text-base font-medium text-black mb-1">Impacto real</h3>
-              <p class="text-sm text-black/50">Nos importa el resultado, no solo entregar código.</p>
-            </div>
-          </div>
-        </div>
+        </article>
       </div>
     </div>
-
-
+    <div class="about-footer" aria-hidden="true"><span>NEURAZ / PERSONAS + IDEAS</span><span class="about-rule"></span><span>01 — 02</span></div>
   </div>
 </section>
+
+<style>
+  .about-section { position: relative; min-height: 100svh; background: #fafafa; scroll-margin-top: 80px; }
+  .about-sticky { position: relative; display: flex; min-height: 100svh; flex-direction: column; justify-content: center; padding: 7rem clamp(1.75rem, 8vw, 2.5rem) 2rem; overflow: hidden; }
+  .about-inner { position: relative; z-index: 1; display: grid; width: 100%; max-width: 1648px; margin: auto; gap: clamp(2.5rem, 6vw, 7rem); align-items: center; }
+  .about-copy { max-width: 570px; }
+  .about-eyebrow { display: inline-flex; align-items: center; gap: .75rem; margin-bottom: clamp(1.75rem, 4vh, 3rem); color: #6f6f6f; font-size: .66rem; font-weight: 650; letter-spacing: .18em; text-transform: uppercase; }
+  .about-mark { width: 7px; height: 7px; border-radius: 50%; background: #777; }
+  h2 { margin: 0 0 clamp(1.5rem, 4vh, 2.75rem); color: #111; font-size: clamp(3rem, 5vw, 5.6rem); font-weight: 450; line-height: 1.08; letter-spacing: -.065em; }
+  .about-lead { max-width: 34rem; margin: 0; color: #252525; font-size: clamp(1.05rem, 1.4vw, 1.3rem); line-height: 1.5; letter-spacing: -.015em; }
+  .about-team { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); align-items: start; gap: clamp(.75rem, 1.5vw, 1.5rem); min-width: 0; scroll-margin-top: 100px; }
+  .person { min-width: 0; }
+  .person-romina { margin-top: clamp(2.5rem, 7vh, 5.25rem); }
+  .person-photo { position: relative; aspect-ratio: .79; overflow: hidden; background: #25262b; }
+  .person-photo::after { position: absolute; inset: 0; border: 1px solid rgb(255 255 255 / .08); content: ''; pointer-events: none; }
+  .person-photo img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: center; transition: transform 700ms cubic-bezier(.2,.75,.2,1); }
+  .person-emil .person-photo img { object-position: center 34%; }
+  .person-romina .person-photo img { object-position: center 30%; }
+  .person:hover .person-photo img { transform: scale(1.045); }
+  .person-meta { display: flex; justify-content: space-between; gap: .5rem; padding-top: 1rem; border-top: 2px solid #151515; }
+  .person-meta h3 { margin: 0 0 .25rem; color: #171717; font-size: clamp(.96rem, 1.2vw, 1.2rem); font-weight: 650; letter-spacing: -.03em; }
+  .person-meta p { margin: 0; color: #777; font-size: clamp(.72rem, .9vw, .87rem); line-height: 1.45; }
+  .person-meta a { flex: none; display: grid; place-items: center; width: 34px; height: 34px; margin-top: -.2rem; border: 1px solid #bbb; border-radius: 50%; color: #111; font-size: 1.1rem; text-decoration: none; transition: background-color 180ms, color 180ms, border-color 180ms; }
+  .person-meta a:hover { border-color: #e63946; background: #777; color: white; }
+  .person-meta a:focus-visible { outline: 2px solid #e63946; outline-offset: 3px; }
+  .about-footer { position: relative; z-index: 1; display: none; width: 100%; max-width: 1648px; margin: 0 auto; align-items: center; gap: 1.5rem; color: #777; font-size: .62rem; font-weight: 600; letter-spacing: .18em; }
+  .about-rule { flex: 1; height: 1px; background: #c9c9c9; }
+  @media (min-width: 1024px) {
+    .about-section { height: 165svh; }
+    .about-sticky { position: sticky; top: 80px; height: calc(100svh - 80px); min-height: 0; padding: clamp(2rem, 5vh, 4rem) clamp(2rem, 6vw, 7.5rem) 1.5rem; }
+    .about-inner { grid-template-columns: minmax(0, .85fr) minmax(0, 1.15fr); }
+    .about-team { transform: translateY(calc((.5 - var(--about-progress, 0)) * 32px)); }
+    .about-footer { display: flex; }
+    .person-photo { max-height: min(53svh, 550px); }
+  }
+  @media (max-width: 1023px) {
+    .about-inner, .about-team { max-width: 720px; }
+    .person-photo { aspect-ratio: .86; }
+  }
+  @media (max-width: 560px) {
+    .about-sticky { padding-top: 7rem; }
+    h2 { font-size: clamp(2.9rem, 12vw, 4.2rem); }
+    .about-team { gap: .8rem; }
+    .person-romina { margin-top: 2.5rem; }
+    .person-meta { gap: .25rem; }
+    .person-meta a { width: 30px; height: 30px; font-size: 1rem; }
+  }
+  @media (max-width: 767px) and (prefers-reduced-motion: no-preference) {
+    :global(html[data-section-motion="true"]) .about-section > .about-sticky { opacity: 1 !important; transform: none !important; }
+  }
+  @media (min-width: 1024px) and (max-height: 680px) {
+    h2 { font-size: clamp(2.5rem, 4vw, 4.25rem); margin-bottom: 1.25rem; }
+    .about-eyebrow { margin-bottom: 1.5rem; }
+    .person-photo { max-height: 48svh; }
+    .person-romina { margin-top: 2rem; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .about-team { transform: none; }
+    .person-photo img, .person-meta a { transition: none; }
+  }
+</style>
+
+<script>
+  const about = document.querySelector<HTMLElement>('[data-about]');
+  if (about && !window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+    let frame = 0;
+    const update = () => {
+      frame = 0;
+      const distance = about.offsetHeight - window.innerHeight;
+      const progress = distance > 0 ? Math.min(1, Math.max(0, -about.getBoundingClientRect().top / distance)) : 0;
+      about.style.setProperty('--about-progress', progress.toFixed(3));
+    };
+    const schedule = () => { if (!frame) frame = requestAnimationFrame(update); };
+    window.addEventListener('scroll', schedule, { passive: true });
+    window.addEventListener('resize', schedule, { passive: true });
+    update();
+  }
+</script>

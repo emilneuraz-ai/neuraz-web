@@ -25,8 +25,8 @@ export const services: Service[] = [
   },
   {
     id: "crm-automatico",
-    name: "CRM con Atención Automática",
-    description: "CRM con atención automática, consultas a financieras y respuestas inteligentes vía WhatsApp y redes sociales.",
+    name: "Atención Automática",
+    description: "Centralizamos consultas, hacemos seguimiento y damos respuestas inteligentes vía WhatsApp y redes sociales.",
     benefit: "Gestión de clientes centralizada con respuestas en tiempo real sin intervención manual.",
     category: "Automatización",
     featured: false,
@@ -55,7 +55,7 @@ export const services: Service[] = [
   },
   {
     id: "contenido-ia",
-    name: "Generación Automática de Contenido con IA",
+    name: "Generación Automática de Contenido",
     description: "Creación automática de contenido periodístico, widgets estadísticos, tarjetas digitales e invitaciones interactivas generadas con IA.",
     benefit: "Contenido fresco y personalizado generado sin intervención humana.",
     category: "Inteligencia Artificial",
@@ -65,7 +65,7 @@ export const services: Service[] = [
   },
   {
     id: "agentes-ia",
-    name: "Agentes de IA",
+    name: "Agentes",
     description: "Análisis de comportamiento, personalización en tiempo real y toma de decisiones automática. La IA decide qué premio dar y optimiza la experiencia continuamente.",
     benefit: "El sistema aprende y mejora solo. Cuanto más se usa, mejor funciona.",
     category: "Inteligencia Artificial",
@@ -91,7 +91,7 @@ export const featuredServices = services.filter(s => s.featured);
 
 /** Shared by the service markers and the 3D scene. Angles are in radians. */
 export function serviceVisual(index: number) {
-  const colors = ['#e63946', '#171717', '#ffb703'];
+  const colors = ['#f57c00', '#3478db', '#e7ac16', '#df4c85', '#8b5bd6', '#209c83', '#df5140'];
   const angles = [
     [0.34, -0.5, -0.16], [-0.38, 0.48, 0.14], [0.42, -0.34, -0.19],
     [-0.32, -0.52, 0.18], [0.36, 0.44, -0.14], [-0.4, -0.38, 0.17],

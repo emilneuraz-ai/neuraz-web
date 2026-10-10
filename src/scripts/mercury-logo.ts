@@ -1,3 +1,4 @@
+import { services as serviceDefinitions, serviceVisual } from '../data/services';
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
@@ -27,6 +28,9 @@ interface FluidSurface {
 }
 
 function finishParameters(finish: string | undefined) {
+  if (finish === 'resin') {
+    return { color: 0xff7800, metalness: 0, roughness: 0.36, clearcoat: 0.08, clearcoatRoughness: 0.36, specularIntensity: 0.8 };
+  }
   if (finish === 'porcelain') {
     return { color: 0xf5f4ef, metalness: 0, roughness: 0.36, clearcoat: 0.12, clearcoatRoughness: 0.32, specularIntensity: 0.55 };
   }
@@ -38,6 +42,9 @@ function finishParameters(finish: string | undefined) {
 /** Smooth occupancy sampled by the geometric contour, never used as alpha. */
 function createFluidCoverage(metadata: FluidMetadata, buffer: ArrayBuffer, streamlined = false) {
   const { width, height, frameCount } = metadata;
+  if (metadata.encoding === 'signed-inflation-f32-xor-delta') {
+    return Uint8Array.from(new Float32Array(buffer), value => value > 0 ? 255 : 0);
+  }
   const count = width * height;
   const words = new Uint32Array(buffer);
   const coverage = new Uint8Array(count * frameCount);
@@ -94,7 +101,7 @@ async function loadFluidCache(root: HTMLElement, signal: AbortSignal) {
     || !Number.isFinite(heightScale) || heightScale <= 0 || heightScale > 10
     || !bounds || ![bounds.xMin, bounds.xMax, bounds.yMin, bounds.yMax].every(Number.isFinite)
     || bounds.xMax <= bounds.xMin || bounds.yMax <= bounds.yMin
-    || (metadata.encoding && metadata.encoding !== 'rg-top16-ba-bottom16-xor-delta')
+    || (metadata.encoding && !['rg-top16-ba-bottom16-xor-delta', 'signed-inflation-f32-xor-delta'].includes(metadata.encoding))
     || (metadata.rowOrder && metadata.rowOrder !== 'bottom-to-top')
     || (metadata.sampleConvention && metadata.sampleConvention !== 'inclusive-grid')) {
     throw new Error('The fluid animation cache format is invalid.');
@@ -127,15 +134,18 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
   const boundsWidth = bounds.xMax - bounds.xMin;
   const boundsHeight = bounds.yMax - bounds.yMin;
   const bytesPerFrame = width * height * 4;
+  const signedInflation = metadata.encoding === 'signed-inflation-f32-xor-delta';
   const streamlined = !root.dataset.finish || root.dataset.finish === 'black';
   const visualHeightScale = heightScale * (streamlined ? 0.92 : 1);
   let buffer: ArrayBuffer | undefined = source;
   let coverage: Uint8Array | undefined = createFluidCoverage(metadata, source, streamlined);
   let disposed = false;
-  const frameData = (index: number) => new Uint8Array(buffer!, index * bytesPerFrame, bytesPerFrame);
+  const frameData = (index: number) => signedInflation
+    ? new Float32Array(buffer!, index * bytesPerFrame, width * height)
+    : new Uint8Array(buffer!, index * bytesPerFrame, bytesPerFrame);
   const coverageData = (index: number) => coverage!.subarray(index * width * height, (index + 1) * width * height);
   const texture = (index: number, mask = false) => {
-    const result = new THREE.DataTexture(mask ? coverageData(index) : frameData(index), width, height, mask ? THREE.RedFormat : THREE.RGBAFormat, THREE.UnsignedByteType);
+    const result = new THREE.DataTexture(mask ? coverageData(index) : frameData(index), width, height, mask || signedInflation ? THREE.RedFormat : THREE.RGBAFormat, !mask && signedInflation ? THREE.FloatType : THREE.UnsignedByteType);
     result.minFilter = THREE.LinearFilter;
     result.magFilter = THREE.LinearFilter;
     result.generateMipmaps = false;
@@ -180,14 +190,17 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     }
     float mercuryCoverage(vec2 gridUv) {
       vec2 sampleUv = mercurySampleUv(gridUv);
-      return mix(texture2D(mercuryCoverageA, sampleUv).r, texture2D(mercuryCoverageB, sampleUv).r, mercuryMix);
+      ${signedInflation
+        ? 'return 0.5 + mix(texture2D(mercuryFrameA, sampleUv).r, texture2D(mercuryFrameB, sampleUv).r, mercuryMix);'
+        : 'return mix(texture2D(mercuryCoverageA, sampleUv).r, texture2D(mercuryCoverageB, sampleUv).r, mercuryMix);'}
     }
     float mercuryHeight(vec2 gridUv) {
       vec2 sampleUv = mercurySampleUv(gridUv);
       vec4 sampled = mix(texture2D(mercuryFrameA, sampleUv), texture2D(mercuryFrameB, sampleUv), mercuryMix);
+      ${signedInflation ? 'return sqrt(max(sampled.r, 0.0));' : `
       vec2 bytes = mercurySide > 0.0 ? sampled.rg : sampled.ba;
       float height = dot(bytes, vec2(256.0, 1.0)) * (mercuryHeightScale / 257.0);
-      return height * pow(smoothstep(0.5, mercuryBevelEnd, mercuryCoverage(gridUv)), 0.25);
+      return height * pow(smoothstep(0.5, mercuryBevelEnd, mercuryCoverage(gridUv)), 0.25);`}
     }
     attribute vec2 mercuryTriangleA;
     attribute vec2 mercuryTriangleB;
@@ -257,7 +270,7 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     const result = new THREE.MeshPhysicalMaterial({
       ...(outline ? { color: 0x090909, metalness: 0, roughness: 1, clearcoat: 0, specularIntensity: 0 } : finishParameters(root.dataset.finish)), side: culling,
     });
-    result.customProgramCacheKey = () => `neuraz-fluid-closed-contour-v4-${side}-${outline}-${streamlined}`;
+    result.customProgramCacheKey = () => `neuraz-fluid-closed-contour-v4-${side}-${outline}-${streamlined}-${signedInflation}`;
     result.onBeforeCompile = shader => {
       Object.assign(shader.uniforms, uniforms, { mercurySide: { value: side }, mercuryOutlineWidth: { value: outline ? 0.013 : 0 } });
       shader.vertexShader = 'uniform float mercuryOutlineWidth;\n' + shaderFunctions + '\n' + shader.vertexShader;
@@ -269,9 +282,16 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
         mercuryClipTriangle(position.x, mercurySurfaceUv, mercuryBoundary, mercuryActive);
         if (mercuryActive > 0.5) {
         vec2 normalStep = mercuryGridStep * 1.75;
+        ${signedInflation ? `
+        // For z² = field(x,y), the analytic gradient stays finite at the rim.
+        float slopeX = (mercuryCoverage(mercurySurfaceUv + vec2(normalStep.x, 0.0)) - mercuryCoverage(mercurySurfaceUv - vec2(normalStep.x, 0.0))) / (2.0 * normalStep.x * mercurySize.x);
+        float slopeY = (mercuryCoverage(mercurySurfaceUv + vec2(0.0, normalStep.y)) - mercuryCoverage(mercurySurfaceUv - vec2(0.0, normalStep.y))) / (2.0 * normalStep.y * mercurySize.y);
+        objectNormal = normalize(vec3(-mercurySide * slopeX, -mercurySide * slopeY, 2.0 * mercuryHeight(mercurySurfaceUv)));
+        ` : `
         float slopeX = (mercuryHeight(mercurySurfaceUv + vec2(normalStep.x, 0.0)) - mercuryHeight(mercurySurfaceUv - vec2(normalStep.x, 0.0))) / (2.0 * normalStep.x * mercurySize.x);
         float slopeY = (mercuryHeight(mercurySurfaceUv + vec2(0.0, normalStep.y)) - mercuryHeight(mercurySurfaceUv - vec2(0.0, normalStep.y))) / (2.0 * normalStep.y * mercurySize.y);
         objectNormal = normalize(vec3(-mercurySide * slopeX, -mercurySide * slopeY, 1.0));
+        `}
         if (mercuryBoundary > 0.5) {
           vec2 inward = vec2(
             mercuryCoverage(mercurySurfaceUv + vec2(normalStep.x, 0.0)) - mercuryCoverage(mercurySurfaceUv - vec2(normalStep.x, 0.0)),
@@ -296,7 +316,7 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
     };
     return result;
   };
-  const detail = root.getBoundingClientRect().width >= (streamlined ? 420 : 700) ? 2 : 1;
+  const detail = !signedInflation && root.getBoundingClientRect().width >= (streamlined ? 420 : 700) ? 2 : 1;
   const occupied = new Uint8Array(width * height);
   for (let index = 0; index < coverage.length; index++) {
     if (coverage[index] > 127) occupied[index % occupied.length] = 1;
@@ -374,12 +394,12 @@ function createFluidSurface(metadata: FluidMetadata, source: ArrayBuffer, root: 
       for (let corner = 0; corner < 4; corner++) {
         const index = ids[corner];
         const contribution = weights[corner] * weight;
-        sampledHeight += (heights[index * 4] * 256 + heights[index * 4 + 1]) * (visualHeightScale / 65535) * contribution;
-        sampledCoverage += mask[index] / 255 * contribution;
+        sampledHeight += (signedInflation ? heights[index] : (heights[index * 4] * 256 + heights[index * 4 + 1]) * (visualHeightScale / 65535)) * contribution;
+        sampledCoverage += (signedInflation ? .5 + heights[index] : mask[index] / 255) * contribution;
       }
     }
     const rim = THREE.MathUtils.smoothstep(sampledCoverage, 0.5, uniforms.mercuryBevelEnd.value);
-    return { u, v, height: sampledHeight * Math.pow(rim, 0.25), coverage: sampledCoverage };
+    return { u, v, height: signedInflation ? Math.sqrt(Math.max(sampledHeight, 0)) : sampledHeight * Math.pow(rim, 0.25), coverage: sampledCoverage };
   };
   const sampleTop = (u: number, v: number, target: THREE.Vector3) => {
     if (disposed || !buffer || !Number.isFinite(u) || !Number.isFinite(v) || u < 0 || u > 1 || v < 0 || v > 1) return false;
@@ -526,6 +546,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
   const finePointer = window.matchMedia('(hover: hover) and (pointer: fine)');
   const interactive = root.dataset.interactive !== 'false';
   const isometric = root.dataset.view === 'isometric';
+  const resin = root.dataset.finish === 'resin';
   const heroFront = !isometric && !!root.closest('[data-hero-logo]');
   const maxDpr = numberOption(root.dataset.maxDpr, 1.75, 1, 1.75);
   const framing = numberOption(root.dataset.framing, 1.05, 1, 2);
@@ -540,6 +561,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
   let renderer: THREE.WebGLRenderer | undefined;
   let environment: THREE.WebGLRenderTarget | undefined;
   let fluidSurface: FluidSurface | undefined;
+  let fluidBounds: FluidMetadata['bounds'] | undefined;
   let fluidEpoch = 0;
   let assets: THREE.Object3D[] = [];
   let resizeObserver: ResizeObserver | undefined;
@@ -623,7 +645,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     if (isometric) camera.up.set(0, 0, 1);
     const pivot = new THREE.Group();
     // Match the upright reference: the native surface is 30 degrees clockwise.
-    const restRotationZ = heroFront ? -Math.PI / 6 : 0;
+    const restRotationZ = resin ? 0 : heroFront ? -Math.PI / 6 : 0;
     pivot.rotation.z = restRotationZ;
     const centered = new THREE.Group();
     centered.add(gltf.scene);
@@ -633,6 +655,20 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     const nativeCenter = bounds.getCenter(new THREE.Vector3());
     gltf.scene.position.sub(nativeCenter);
     const scale = 4 / Math.max(size.x, size.y, size.z);
+    // Project each marker onto the new, closed reference mesh once. Its point
+    // then follows exactly the same pivot/scale as the animated sculpture.
+    const referencePins = new Map<HTMLElement, THREE.Vector3>();
+    if (resin) {
+      gltf.scene.updateMatrixWorld(true);
+      const ray = new THREE.Raycaster();
+      for (const pin of pins) {
+        const x = THREE.MathUtils.lerp(bounds.min.x, bounds.max.x, pin.u) - nativeCenter.x;
+        const y = THREE.MathUtils.lerp(bounds.min.y, bounds.max.y, pin.v) - nativeCenter.y;
+        ray.set(new THREE.Vector3(x, y, size.z + 1), new THREE.Vector3(0, 0, -1));
+        const hit = ray.intersectObject(gltf.scene, true)[0];
+        if (hit) referencePins.set(pin.element, hit.point.clone().add(nativeCenter));
+      }
+    }
     centered.scale.setScalar(scale);
     pivot.add(centered);
     scene.add(pivot);
@@ -674,26 +710,50 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     renderer.toneMapping = THREE.AgXToneMapping;
     const matte = root.dataset.finish !== 'mercury';
     const porcelain = root.dataset.finish === 'porcelain';
+    if (resin) renderer.toneMapping = THREE.NeutralToneMapping;
     renderer.toneMappingExposure = numberOption(root.dataset.exposure, matte ? 1 : 1.1, 0.2, 3);
     renderer.shadowMap.enabled = false;
-    const room = new RoomEnvironment();
     const pmrem = new THREE.PMREMGenerator(renderer);
-    try {
-      environment = pmrem.fromScene(room, 0.025, 0.1, 100, { size: 256 });
-    } finally {
-      room.dispose();
-      pmrem.dispose();
+    if (resin) {
+      // Two broad photographic softboxes. A room map creates thin rectangular
+      // streaks, unlike the round satin highlights of the approved reference.
+      const w = 256, h = 128;
+      const pixels = new Float32Array(w * h * 4);
+      const primary = new THREE.Vector3(-.3, .65, .8).normalize();
+      const secondary = new THREE.Vector3(.8, .25, .55).normalize();
+      const direction = new THREE.Vector3();
+      for (let y = 0; y < h; y++) for (let x = 0; x < w; x++) {
+        const latitude = ((y + .5) / h - .5) * Math.PI;
+        const longitude = ((x + .5) / w - .5) * Math.PI * 2;
+        direction.set(Math.cos(latitude) * Math.cos(longitude), Math.sin(latitude), Math.cos(latitude) * Math.sin(longitude));
+        const radiance = .13 + .14 * Math.max(direction.y, 0)
+          + 12 * Math.exp((direction.dot(primary) - 1) * 24)
+          + 2 * Math.exp((direction.dot(secondary) - 1) * 12);
+        const offset = (y * w + x) * 4;
+        pixels[offset] = pixels[offset + 1] = pixels[offset + 2] = radiance;
+        pixels[offset + 3] = 1;
+      }
+      const studio = new THREE.DataTexture(pixels, w, h, THREE.RGBAFormat, THREE.FloatType);
+      studio.mapping = THREE.EquirectangularReflectionMapping;
+      studio.needsUpdate = true;
+      try { environment = pmrem.fromEquirectangular(studio); }
+      finally { studio.dispose(); pmrem.dispose(); }
+    } else {
+      const room = new RoomEnvironment();
+      try { environment = pmrem.fromScene(room, 0.025, 0.1, 100, { size: 256 }); }
+      finally { room.dispose(); pmrem.dispose(); }
     }
     scene.environment = environment.texture;
     scene.environmentIntensity = numberOption(root.dataset.environmentIntensity, porcelain ? 0.8 : matte ? 0.5 : 1.3, 0, 5);
-    scene.environmentRotation.set(0, 0.35, 0);
-    const key = new THREE.DirectionalLight(matte ? 0xffffff : 0xfff5e9, matte ? 2 : 2.5);
+    scene.environmentRotation.set(0, resin ? 0 : 0.35, 0);
+    const key = new THREE.DirectionalLight(matte ? 0xffffff : 0xfff5e9, resin ? 1.8 : matte ? 2 : 2.5);
     key.position.set(-3, 4, 6);
-    const rim = new THREE.DirectionalLight(matte ? 0xffffff : 0xdfe9ff, matte ? 1 : 1.8);
+    const rim = new THREE.DirectionalLight(matte ? 0xffffff : 0xdfe9ff, resin ? 0.4 : matte ? 1 : 1.8);
     rim.position.set(4, 1, 2);
-    const fill = new THREE.DirectionalLight(0xffffff, 0.65);
+    const fill = new THREE.DirectionalLight(0xffffff, resin ? 0.15 : 0.65);
     fill.position.set(-1, -4, 3);
     scene.add(key, rim, fill);
+    if (resin) scene.add(new THREE.AmbientLight(0xffffff, 0.32));
     // Service selection changes the actual material and camera-facing pose.
     const heroLogo = root.closest<HTMLElement>('[data-hero-logo]');
     const baseColor = new THREE.Color(finishParameters(root.dataset.finish).color);
@@ -714,14 +774,15 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     collectMaterials(centered);
     const syncService = () => {
       const inServices = heroLogo?.closest<HTMLElement>('[data-shared-logo-host]')?.dataset.destination === 'services';
-      const selected = inServices ? pins.find(pin => pin.element.dataset.heroLogoService === heroLogo?.dataset.activeService)?.element : undefined;
-      serviceColor.set(selected?.dataset.serviceColor || baseColor);
-      const angle = selected?.dataset.serviceAngle?.split(',').map(Number);
+      const selectedIndex = inServices ? serviceDefinitions.findIndex(service => service.id === heroLogo?.dataset.activeService) : -1;
+      const selected = selectedIndex >= 0 ? serviceVisual(selectedIndex) : undefined;
+      serviceColor.set(selected?.color || root.dataset.color || baseColor);
+      const angle = selected?.angle;
       serviceAngle.set(angle?.[0] || 0, angle?.[1] || 0, angle?.[2] || 0);
-      root.dataset.serviceColor = selected?.dataset.serviceColor || '';
+      root.dataset.serviceColor = selected?.color || '';
       root.dataset.serviceAngle = angle?.join(',') || '0,0,0';
-      // A dark glyph remains legible on the yellow material.
-      heroLogo?.style.setProperty('--service-glyph', selected?.dataset.serviceColor === '#ffb703' ? '#241900' : '#f4f1eb');
+      const luminance = serviceColor.r * 0.2126 + serviceColor.g * 0.7152 + serviceColor.b * 0.0722;
+      heroLogo?.style.setProperty('--service-glyph', luminance > 0.32 ? '#241900' : '#fffaf4');
       requestDraw();
     };
     const pinPosition = new THREE.Vector3();
@@ -731,7 +792,15 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       if (!pins.length) return;
       for (const pin of pins) {
         let onSurface = Number.isFinite(pin.u) && Number.isFinite(pin.v) && pin.u >= 0 && pin.u <= 1 && pin.v >= 0 && pin.v <= 1;
-        if (onSurface && fluidSurface) onSurface = fluidSurface.sampleTop(pin.u, pin.v, pinPosition);
+        if (resin) {
+          const point = referencePins.get(pin.element);
+          onSurface = !!point;
+          if (point && fluidSurface && fluidBounds) {
+            onSurface = fluidSurface.sampleTop(
+              (point.x - fluidBounds.xMin) / (fluidBounds.xMax - fluidBounds.xMin),
+              (point.y - fluidBounds.yMin) / (fluidBounds.yMax - fluidBounds.yMin), pinPosition);
+          } else if (point) pinPosition.copy(point);
+        } else if (onSurface && fluidSurface) onSurface = fluidSurface.sampleTop(pin.u, pin.v, pinPosition);
         else pinPosition.set((pin.u - 0.5) * 5.1, (pin.v - 0.5) * 5.1, pin.top);
         if (!onSurface) { pin.element.dataset.visible = 'false'; continue; }
         pinPosition.z += pin.offset;
@@ -772,7 +841,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       lastTime = time;
       if (autoMotion()) elapsed += delta;
       // Keep the hero's chosen angle stable while the material keeps flowing.
-      const phase = reducedMotion || heroFront ? 0 : elapsed;
+      const phase = reducedMotion || (heroFront && !resin) ? 0 : elapsed;
       const targetX = serviceAngle.x + manual.x - hover.y * 0.075 + Math.sin(phase * 0.53) * 0.018;
       const targetY = serviceAngle.y + manual.y + hover.x * 0.11 + Math.sin(phase * 0.37) * 0.035;
       const targetZ = restRotationZ + serviceAngle.z + Math.sin(phase * 0.29) * 0.007;
@@ -783,7 +852,8 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       const colorDamping = reducedMotion ? 1 : 1 - Math.exp(-dampingDelta * 5);
       currentColor.lerp(serviceColor, colorDamping);
       coloredMaterials.forEach(material => material.color.copy(currentColor));
-      pivot.position.y = Math.sin(phase * 0.58) * 0.035;
+      pivot.position.y = Math.sin(phase * 0.58) * 0.025;
+      if (resin) pivot.scale.setScalar(1 + Math.sin(phase * 0.7) * 0.006);
       fluidSurface?.setTime(elapsed - fluidEpoch);
       renderer.render(scene, camera);
       projectPins();
@@ -823,7 +893,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       const distance = (Math.max(2, 2 / camera.aspect) / Math.tan(THREE.MathUtils.degToRad(camera.fov * 0.5)) * framing + size.z * scale * 0.5) * 1.03;
       // Rx(-PI/2) lays the native XY logo on XZ. Instead of rotating its data,
       // rotate the maze's original camera/up back into native coordinates.
-      camera.position.set(...(isometric ? [10, -13, 13] as const : heroFront ? [0, 0, 1] as const : [0.35, 0.25, 1] as const)).normalize().multiplyScalar(distance);
+      camera.position.set(...(isometric ? [10, -13, 13] as const : heroFront || resin ? [0, 0, 1] as const : [0.35, 0.25, 1] as const)).normalize().multiplyScalar(distance);
       camera.far = distance + 30;
       camera.lookAt(0, 0, 0);
       camera.updateProjectionMatrix();
@@ -919,6 +989,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     };
     const eventOptions = { signal: listeners.signal };
     heroLogo?.addEventListener('hero-logo:change', syncService, eventOptions);
+    root.addEventListener('mercury:color', syncService, eventOptions);
     syncService();
     document.addEventListener('visibilitychange', onVisibility, eventOptions);
     window.addEventListener('resize', measure, eventOptions);
@@ -965,6 +1036,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
         surface.object.scale.setScalar(scale);
         surface.object.position.copy(nativeCenter).multiplyScalar(-scale);
         fluidSurface = surface;
+        fluidBounds = metadata.bounds;
         pivot.add(surface.object);
         collectMaterials(surface.object);
         centered.visible = false;
@@ -978,7 +1050,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
         root.dataset.fluidState = 'fallback';
         root.dispatchEvent(new CustomEvent('mercury:fluid-error', { detail: { error } }));
       });
-    } else root.dataset.fluidState = reducedMotion ? 'reduced-motion' : 'disabled';
+    } else root.dataset.fluidState = reducedMotion ? 'reduced-motion' : resin ? 'sculpted' : 'disabled';
     return dispose;
   } catch (error) {
     dispose();

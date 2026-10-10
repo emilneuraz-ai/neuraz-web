@@ -1,0 +1,86 @@
+---
+import ServiceIllustration from './ServiceIllustration.astro';
+import type { ServiceDetail } from '../data/serviceDetails';
+interface Props { title: string; detail: ServiceDetail; slug: string; }
+const { title, detail, slug } = Astro.props;
+const icons = [
+  'M12 3v4m0 10v4M3 12h4m10 0h4M5.6 5.6l2.8 2.8m7.2 7.2 2.8 2.8M5.6 18.4l2.8-2.8m7.2-7.2 2.8-2.8',
+  'm13 2-9 12h7l-1 8 10-13h-7l1-7Z',
+  'm12 3 9 5-9 5-9-5 9-5Zm-9 9 9 5 9-5M3 16l9 5 9-5',
+];
+---
+
+<div class="service-overview">
+  <section class="service-hero">
+    <div class="service-hero__copy">
+      <p class="eyebrow">Tecnología aplicada a tu negocio</p>
+      <h1 id="service-title">{title}</h1>
+      <p id="service-intro">{detail.intro}</p>
+    </div>
+    <div class="service-flow">
+      <p class="flow-caption">Así funciona</p>
+      <ServiceIllustration slug={slug} steps={detail.flow} />
+    </div>
+  </section>
+
+  <section class="service-features" aria-label="Qué podés hacer">
+    {detail.features.map((feature, index) => (
+      <div class="service-feature">
+        <span class="service-feature__icon" aria-hidden="true">
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d={icons[index]} /></svg>
+        </span>
+        <h2>{feature.title}</h2>
+        <p>{feature.text}</p>
+      </div>
+    ))}
+  </section>
+
+  <footer class="service-footer">
+    <p><span>Pensado para</span>{detail.audience}</p>
+    <a href="/#contacto" class="service-cta">Hablemos de tu proyecto <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a>
+  </footer>
+</div>
+
+<style>
+  .service-hero { display: grid; grid-template-columns: 1.1fr 1fr; align-items: center; gap: 40px; }
+  .service-hero__copy { min-width: 0; padding-block: 12px; }
+  .eyebrow { margin-bottom: 18px; color: #656565; font-size: 10px; font-weight: 500; letter-spacing: .1em; text-transform: uppercase; }
+  h1 { margin: 0 0 20px; font-size: clamp(2rem, 3.4vw, 2.9rem); font-weight: 650; line-height: 1.06; letter-spacing: -.055em; text-wrap: balance; overflow-wrap: break-word; }
+  #service-intro { max-width: 36ch; color: #5b5b5b; font-size: 16px; line-height: 1.6; }
+  .service-flow { position: relative; isolation: isolate; overflow: hidden; margin: 0; padding: 24px 30px 30px; border: 1px solid color-mix(in srgb, var(--service-accent) 20%, white); border-radius: 18px; background: color-mix(in srgb, var(--service-accent) 9%, #fafafa); }
+  .flow-caption { margin-bottom: 18px; color: #525252; font-size: 10px; font-weight: 600; letter-spacing: .12em; text-transform: uppercase; }
+  .service-features { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 28px; margin-top: 32px; padding-block: 24px 28px; border-top: 1px solid #dedede; }
+  .service-feature__icon { display: grid; place-items: center; width: 34px; height: 34px; margin-bottom: 12px; border-radius: 10px; background: color-mix(in srgb, var(--service-accent) 13%, white); color: color-mix(in srgb, var(--service-accent) 55%, #171717); }
+  .service-feature__icon svg { width: 20px; height: 20px; }
+  .service-feature h2 { margin: 0 0 6px; font-size: 14px; font-weight: 600; letter-spacing: -.02em; }
+  .service-feature p { margin: 0; color: #626262; font-size: 12px; line-height: 1.6; max-width: 28ch; }
+  .service-footer { display: flex; align-items: center; justify-content: space-between; gap: 24px; border-top: 1px solid #dedede; padding-top: 24px; }
+  .service-footer p { max-width: 44ch; color: #5b5b5b; font-size: 12px; line-height: 1.6; }
+  .service-footer p span { display: block; margin-bottom: 4px; color: #222; font-size: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: .07em; }
+  .service-cta { display: inline-flex; align-items: center; justify-content: space-between; gap: 20px; flex: none; min-height: 48px; padding: 14px 20px; border-radius: 28px; background: #202020; color: white; font-size: 12px; font-weight: 500; text-decoration: none; transition: background 180ms, transform 180ms; }
+  .service-cta:hover { background: color-mix(in srgb, var(--service-accent) 35%, #171717); transform: translateY(-2px); }
+  .service-cta:focus-visible { outline: 2px solid #222; outline-offset: 4px; }
+  @media (max-width: 800px) {
+    .service-hero { gap: 24px; }
+    .service-flow { padding: 20px; }
+    .service-features { gap: 16px; }
+    .service-footer { gap: 16px; }
+  }
+  @media (max-width: 640px) {
+    .service-hero { grid-template-columns: 1fr; gap: 24px; }
+    .service-hero__copy { padding: 0; }
+    .eyebrow { margin-bottom: 14px; font-size: 9px; }
+    h1 { font-size: clamp(1.9rem, 8.5vw, 2.6rem); margin-bottom: 14px; }
+    #service-intro { font-size: 14px; line-height: 1.55; max-width: none; }
+    .service-flow { padding: 18px; }
+    .flow-caption { margin-bottom: 12px; }
+    .service-features { grid-template-columns: 1fr; gap: 18px; margin-top: 24px; padding-block: 22px; }
+    .service-feature { display: grid; grid-template-columns: 34px 1fr; column-gap: 12px; }
+    .service-feature__icon { grid-row: span 2; margin: 0; }
+    .service-feature h2 { font-size: 13px; margin-bottom: 3px; }
+    .service-feature p { max-width: none; }
+    .service-footer { flex-direction: column; align-items: stretch; padding-top: 20px; }
+    .service-cta { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .service-cta { transition: none; } .service-cta:hover { transform: none; } }
+</style>

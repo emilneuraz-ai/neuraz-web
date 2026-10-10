@@ -1,76 +1,76 @@
 ---
-// src/components/Contact.astro - From Notion/official site
-import SectionAtmosphere from './SectionAtmosphere.astro';
+// Contact destinations from the existing official-site content.
 ---
-
-<section id="contacto" class="ambient-section py-24 px-6 sm:px-8 bg-[#fafafa] border-t border-black/10">
-  <SectionAtmosphere variant="closing" />
-  <div class="max-w-7xl mx-auto">
-    
-    <div class="grid lg:grid-cols-2 gap-16">
-      <!-- Left -->
-      <div>
-        <div class="mb-6">
-          <span class="text-[10px] font-medium tracking-[0.2em] text-black/40 uppercase">Contacto</span>
-        </div>
-
-        <h2 class="text-[clamp(2rem,5vw,3.5rem)] font-light leading-[1.05] tracking-tight text-black mb-6">
-          Hablemos
-        </h2>
-
-        <p class="text-base text-black/50 leading-relaxed max-w-md mb-8">
-          Si tenés una idea, una pregunta o simplemente querés saber si lo que hacemos 
-          puede ayudar a tu negocio, escribinos. La primera consulta no tiene costo ni compromiso.
-        </p>
-
-        <p class="text-sm text-black/40 leading-relaxed max-w-md">
-          Nos tomamos el tiempo para entender bien qué necesitás antes de proponer cualquier cosa.
-        </p>
+<section id="contacto" class="contact-section" aria-labelledby="contact-title">
+  <div class="contact-glow" aria-hidden="true"></div>
+  <div class="contact-inner">
+    <div class="contact-topline"><span>Contacto / El próximo paso</span><span>Santiago del Estero, Argentina</span></div>
+    <div class="contact-main">
+      <div class="contact-copy">
+        <h2 id="contact-title">Una idea.<br />Una charla.<br /><span>Algo nuevo.</span></h2>
+        <p>Contanos qué tenés en mente.<br />Le damos forma, juntos.</p>
       </div>
-
-      <!-- Right - Contact info -->
-      <div class="flex flex-col justify-center">
-        <div class="space-y-8">
-          <div>
-            <p class="text-[10px] font-medium tracking-[0.15em] text-black/40 uppercase mb-2">Ubicación</p>
-            <p class="text-lg font-light text-black">Santiago del Estero, Argentina</p>
-          </div>
-
-          <div>
-            <p class="text-[10px] font-medium tracking-[0.15em] text-black/40 uppercase mb-2">Email</p>
-            <a href="mailto:contacto@neuraz.com" class="text-lg font-light text-black hover:text-[#e63946] transition-colors">
-              contacto@neuraz.com
-            </a>
-          </div>
-
-          <div>
-            <p class="text-[10px] font-medium tracking-[0.15em] text-black/40 uppercase mb-2">WhatsApp</p>
-            <a href="https://wa.me/543855963936" class="text-lg font-light text-black hover:text-[#e63946] transition-colors">
-              +54 3855 963936
-            </a>
-          </div>
-
-          <div class="pt-4 flex gap-6">
-            <a 
-              href="https://www.behance.net/emilgonzalez" 
-              target="_blank"
-              rel="noopener"
-              class="text-[11px] font-medium tracking-[0.1em] text-black/40 hover:text-black transition-colors uppercase"
-            >
-              Behance →
-            </a>
-            
-            <a 
-              href="https://www.linkedin.com/in/romina-lescano/" 
-              target="_blank"
-              rel="noopener"
-              class="text-[11px] font-medium tracking-[0.1em] text-black/40 hover:text-black transition-colors uppercase"
-            >
-              LinkedIn →
-            </a>
-          </div>
-        </div>
+      <div class="contact-actions">
+        <span class="contact-invitation">Todo empieza con un hablemos.</span>
+        <a class="contact-whatsapp" href="https://wa.me/543855963936">
+          <span class="contact-link-label"><small>Conversemos por WhatsApp</small><span>Hablemos de tu idea</span></span>
+          <span class="contact-arrow" aria-hidden="true">↗</span>
+        </a>
+        <a class="contact-email" href="mailto:contacto@neuraz.ar"><span><small>O escribinos a</small>contacto@neuraz.ar</span><span aria-hidden="true">↗</span></a>
+        <p class="contact-note">La primera consulta no tiene costo ni compromiso.</p>
       </div>
     </div>
+    <footer class="contact-bottomline">
+      <p>Personas reales.<br />Ideas que se hacen.</p>
+      <div class="contact-socials"><a href="https://www.behance.net/emilgonzalez" target="_blank" rel="noopener noreferrer">Behance <span aria-hidden="true">↗</span></a><a href="https://www.linkedin.com/in/romina-lescano/" target="_blank" rel="noopener noreferrer">LinkedIn <span aria-hidden="true">↗</span></a></div>
+      <a class="contact-phone" href="https://wa.me/543855963936">+54 3855 963936</a>
+    </footer>
   </div>
 </section>
+<style>
+  .contact-section { position: relative; isolation: isolate; overflow: clip; min-height: 100svh; padding: 48px clamp(2rem, 6vw, 7.5rem) 32px; background: #171c1b; color: #f1f4f1; scroll-margin-top: 80px; }
+  .contact-inner { position: relative; z-index: 1; display: flex; flex-direction: column; min-height: calc(100svh - 80px); max-width: 1648px; margin-inline: auto; }
+  .contact-glow { position: absolute; inset: -20%; pointer-events: none; background: radial-gradient(ellipse at 80% 60%, #8da89426, transparent 47%), radial-gradient(ellipse at 0% 95%, #506d5b26, transparent 40%); filter: blur(40px); animation: contact-drift 22s ease-in-out infinite alternate; }
+  .contact-topline { display: flex; align-items: center; justify-content: space-between; gap: 20px; padding-bottom: 24px; border-bottom: 1px solid #ffffff21; font-size: 10px; line-height: 1.5; letter-spacing: .14em; text-transform: uppercase; color: #b8c0bc; }
+  .contact-main { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(2rem, 7vw, 7rem); align-items: center; flex: 1; padding-block: clamp(70px, 10vh, 140px); }
+  h2 { margin: 0; font-size: clamp(3.8rem, 7.3vw, 8rem); font-weight: 400; line-height: .99; letter-spacing: -.065em; }
+  h2 span { color: #b8cabf; }
+  .contact-copy p { margin-top: 30px; color: #bec6c2; font-size: clamp(1rem, 1.35vw, 1.3rem); line-height: 1.6; }
+  .contact-actions { min-width: 0; }
+  .contact-invitation { display: block; margin-bottom: 24px; color: #b8c0bc; font-size: 12px; }
+  .contact-whatsapp { display: flex; align-items: center; justify-content: space-between; gap: 20px; min-height: 140px; padding: 30px; border-radius: 20px; background: #dfe8df; color: #202a23; text-decoration: none; transition: background 180ms ease, transform 180ms ease; }
+  .contact-link-label { display: grid; gap: 14px; }
+  .contact-link-label small { font-size: 10px; letter-spacing: .06em; text-transform: uppercase; }
+  .contact-link-label > span { font-size: clamp(1.2rem, 1.9vw, 1.9rem); line-height: 1.1; letter-spacing: -.04em; }
+  .contact-arrow { display: grid; place-items: center; flex: none; width: 48px; height: 48px; border: 1px solid #253c3533; border-radius: 50%; font-size: 25px; transition: transform 180ms ease; }
+  .contact-whatsapp:hover { background: #edf3ed; transform: translateY(-3px); }
+  .contact-whatsapp:hover .contact-arrow { transform: rotate(45deg); }
+  .contact-email { display: flex; justify-content: space-between; align-items: center; gap: 12px; min-height: 105px; padding: 24px 4px; border-bottom: 1px solid #ffffff30; font-size: clamp(1rem, 1.6vw, 1.5rem); letter-spacing: -.025em; text-decoration: none; }
+  .contact-email small { display: block; margin-bottom: 8px; color: #b8c0bc; font-size: 11px; letter-spacing: 0; }
+  .contact-email > span:last-child { font-size: 26px; }
+  .contact-note { margin-top: 22px; color: #aeb9b2; font-size: 11px; line-height: 1.6; }
+  .contact-bottomline { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding-top: 26px; border-top: 1px solid #ffffff21; color: #bac4be; font-size: 11px; line-height: 1.6; }
+  .contact-bottomline p { margin: 0; }
+  .contact-socials { display: flex; gap: 28px; }
+  .contact-socials a { display: flex; gap: 20px; align-items: center; }
+  .contact-socials a, .contact-phone { padding-block: 12px; text-decoration: none; }
+  a:focus-visible { outline: 2px solid #dfe8df; outline-offset: 6px; }
+  .contact-whatsapp:focus-visible { outline-color: #fff; }
+  @keyframes contact-drift { to { transform: translate3d(-4%, -2%, 0) scale(1.1); } }
+  @media (max-width: 767px) {
+    .contact-section { padding: 32px 26px; }
+    .contact-inner { min-height: calc(100svh - 64px); }
+    .contact-topline { font-size: 9px; align-items: start; }
+    .contact-topline span:last-child { text-align: right; max-width: 120px; letter-spacing: .04em; }
+    .contact-main { grid-template-columns: 1fr; gap: 44px; padding-block: 60px; }
+    h2 { font-size: clamp(3.4rem, 13vw, 6rem); }
+    .contact-copy p { margin-top: 24px; }
+    .contact-invitation { margin-bottom: 16px; }
+    .contact-whatsapp { padding: 23px; min-height: 120px; }
+    .contact-bottomline { flex-wrap: wrap; align-items: center; gap: 18px; }
+    .contact-socials { gap: 20px; }
+    .contact-socials a { gap: 9px; }
+    .contact-phone { width: 100%; }
+  }
+  @media (prefers-reduced-motion: reduce) { .contact-glow { animation: none; } .contact-whatsapp, .contact-arrow { transition: none; } .contact-whatsapp:hover { transform: none; } }
+</style>
