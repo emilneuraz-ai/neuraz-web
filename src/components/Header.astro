@@ -89,7 +89,7 @@ import NavbarBrand from './NavbarBrand.astro';
     padding-inline: clamp(2rem, 6vw, 7.5rem);
   }
   @media (max-width: 767px) {
-    .site-header[data-projects-active="true"] { visibility:hidden; pointer-events:none; transform:translateY(-100%); }
+    .site-header[data-projects-active="true"], .site-header[data-hidden="true"] { visibility:hidden; pointer-events:none; transform:translateY(-100%); }
     #mobile-menu-btn { display: grid; }
     .header-inner { padding-inline: clamp(1.75rem, 8vw, 2.5rem); }
   }
@@ -106,8 +106,17 @@ import NavbarBrand from './NavbarBrand.astro';
   const mobileLinks = document.querySelectorAll('.mobile-link');
   const siteHeader = document.querySelector<HTMLElement>('.site-header');
   const desktopNavigation = window.matchMedia('(min-width: 768px)');
+  let lastScrollY = Math.max(0, scrollY);
+  let directionOrigin = lastScrollY;
+  let scrollDirection = 0;
+  let scrollHidden = false;
   function showHeader() {
+    scrollHidden = false;
+    lastScrollY = Math.max(0, scrollY);
+    directionOrigin = lastScrollY;
+    scrollDirection = 0;
     siteHeader?.removeAttribute('data-hidden');
+    if (siteHeader && siteHeader.dataset.projectsActive !== 'true') siteHeader.inert = false;
   }
 
   function setMenuOpen(open: boolean) {
@@ -147,11 +156,21 @@ import NavbarBrand from './NavbarBrand.astro';
   let navFrame = 0;
   const updateActiveSection = () => {
     navFrame = 0;
+    const position = Math.max(0, Math.min(scrollY, document.documentElement.scrollHeight - innerHeight));
+    const delta = position - lastScrollY;
+    const direction = Math.sign(delta);
+    if (direction && direction !== scrollDirection) { directionOrigin = lastScrollY; scrollDirection = direction; }
+    if (direction && Math.abs(position - directionOrigin) >= 12) scrollHidden = direction > 0;
+    if (position <= 80 || desktopNavigation.matches || mobileMenuBtn?.getAttribute('aria-expanded') === 'true') scrollHidden = false;
+    lastScrollY = position;
     const projectsBounds = document.getElementById('trabajos')?.getBoundingClientRect();
     const projectsActive = !desktopNavigation.matches && !!projectsBounds && projectsBounds.top <= 1 && projectsBounds.bottom >= innerHeight - 1;
     if (siteHeader) {
       siteHeader.dataset.projectsActive = String(projectsActive);
-      siteHeader.inert = projectsActive;
+      const hidden = !desktopNavigation.matches && scrollHidden;
+      if (hidden) siteHeader.dataset.hidden = 'true';
+      else siteHeader.removeAttribute('data-hidden');
+      siteHeader.inert = projectsActive || hidden;
     }
     if (projectsActive && mobileMenuBtn?.getAttribute('aria-expanded') === 'true') setMenuOpen(false);
     const marker = 100;

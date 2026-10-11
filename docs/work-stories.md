@@ -288,3 +288,11 @@ En móvil el navbar se oculta durante el tramo de Proyectos y sus controles qued
 Behance pasa de la parte inferior a la esquina superior derecha de cada proyecto, con el texto “Ver en Behance”. Solo aparece cuando existe una URL. Se elimina el pie anterior y se reserva una fila superior dentro de los divisores; la franja de salida hacia Nosotros queda libre al final. El ajuste de las pantallas aprovecha el espacio recuperado y conserva los textos completos.
 
 Build y diff check correctos. Validación local de los ocho proyectos en 320×740, 393×852, 1440×900 y 393×852 con movimiento reducido: texto completo, enlace superior, navbar oculto únicamente en los proyectos móviles y sin overflow ni errores de navegador. Gestos horizontales y salidas a ambas secciones comprobados; navbar visible después de cada salida. Enlace directo a Café abre el carrusel desde el borde superior de la pantalla. Evidencia en `output/playwright/project-fullscreen-check.json` y captura `project-fullscreen-cafe.png`. Cambios locales.
+
+### Chevrones, navbar al desplazar y enlaces del equipo — 11 de octubre de 2026
+
+Las franjas externas de Proyectos muestran solo botones circulares de 28 px con un chevrón hacia arriba para Servicios y hacia abajo para Nosotros. Se mantienen las etiquetas accesibles, enlaces y gestos en toda la franja.
+
+Fuera del carrusel, el navbar móvil se oculta al bajar y reaparece al subir, con un umbral de 12 px para evitar cambios por pequeños movimientos. Permanece visible con el menú abierto y al comienzo de la página; en Proyectos sigue oculto durante todo el tramo. En escritorio permanece visible. Los enlaces del equipo usan círculos de 24 px e iconos de 12 px en móvil, y 28/14 px en escritorio.
+
+Build y diff check correctos. Comprobado en 320, 393 y 1440 px: navbar según la dirección, menú y Escape operativos, chevrones con etiquetas accesibles, salidas por toque y gesto hacia ambas secciones, y enlaces del equipo más pequeños. Sin overflow ni errores de navegador. Evidencia en `output/playwright/mobile-chevron-header-check.json` y capturas `mobile-chevron-*`. Cambios locales.

@@ -31,8 +31,8 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
     </section>)}
   </ProjectStory>)}
   </div>
-  <a class="works-exit works-exit-before" href="#servicios" data-works-exit aria-label="Volver a Servicios. También podés deslizar hacia abajo aquí."><span aria-hidden="true">↓</span> Volver a Servicios</a>
-  <a class="works-exit works-exit-after" href="#nosotros" data-works-exit aria-label="Continuar a Nosotros. También podés deslizar hacia arriba aquí.">Continuar a Nosotros <span aria-hidden="true">↑</span></a>
+  <a class="works-exit works-exit-before" href="#servicios" data-works-exit aria-label="Volver a Servicios. También podés deslizar hacia abajo aquí."><span class="works-exit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 14 7-7 7 7" /></svg></span></a>
+  <a class="works-exit works-exit-after" href="#nosotros" data-works-exit aria-label="Continuar a Nosotros. También podés deslizar hacia arriba aquí."><span class="works-exit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 10 7 7 7-7" /></svg></span></a>
   </div>
   <nav class="work-positions" aria-label="Posición entre proyectos" hidden>{stories.map(({project},i)=><a href={`#trabajo-${project.id}`} data-project-jump aria-label={`Proyecto ${i+1}: ${project.title}`}><span></span><span class="work-position-label">{project.title}</span></a>)}</nav>
 
@@ -56,6 +56,7 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
 @media(max-width:767px){.work-scene{padding:24px 24px 28px}}
 
 .works-exit{display:none}
+.works-exit-icon{display:grid;place-items:center;width:28px;height:28px;border:1px solid #00000026;border-radius:50%}.works-exit-icon svg{width:14px;height:14px;fill:none;stroke:currentColor;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
 @media(max-width:767px){.works{--works-nav-offset:0px}.works-exit{position:absolute;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px;height:40px;color:#111;font-size:10px;letter-spacing:.04em;touch-action:none}.works-exit-before{top:0}.works-exit-after{bottom:0}.works-exit:focus-visible{outline:2px solid currentColor;outline-offset:-3px}}
 </style>
 
