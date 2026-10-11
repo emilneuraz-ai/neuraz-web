@@ -312,3 +312,9 @@ Build y diff check correctos. Validación del build local en navegador a 1440×9
 Publicado el commit `4ec96cacbae69ec2a6b4df893979acf4ad696244`, subido a `origin/master`, desde una copia limpia de sus archivos versionados. Vercel: deployment `dpl_7UgYYyWgNRUuApaCCLexES2PR6eL`, producción, estado Ready; alias `neuraz.ar` y `www.neuraz.ar` confirmados.
 
 Comprobación pública en navegador a 1440×900, 393×852 y 320×740: menú unificado, un único destino de sección, dos integrantes y navegación operativa desde el menú y la salida móvil de Proyectos. En escritorio, terminada la animación de desplazamiento, la sección comienza a 80 px y El equipo queda marcado como activo. Sin overflow horizontal, excepciones JavaScript ni respuestas HTTP fallidas; www redirige al dominio principal. Capturas en `output/playwright/team-unify-production-*`.
+
+## Dominio institucional — 11 de octubre de 2026
+
+Se actualizaron cuatro referencias al dominio anterior: las dos URLs de sitio en `public/mcp.md` y los metadatos Theme URI y Author URI del CSS público de la demo Eurotech. Todas apuntan ahora a `https://neuraz.ar/`; la configuración de Astro y el correo de contacto ya usaban el dominio vigente.
+
+Revisión completa de los 1271 archivos versionados, incluidos archivos binarios, y del contenido de los ZIP públicos: ninguna referencia al dominio anterior tras la corrección. El build también queda libre de esas referencias. Build y diff check correctos.

@@ -4,7 +4,7 @@
 
 Neuraz es una empresa de desarrollo de software especializada en inteligencia artificial aplicada a negocios. Diseñamos sistemas inteligentes para crear, documentar y automatizar procesos empresariales.
 
-**Website:** https://neuraz.io  
+**Website:** https://neuraz.ar\
 **Contacto:** contacto@neuraz.ar
 
 ---
@@ -165,7 +165,7 @@ Formación en IA, automatización y herramientas de productividad para equipos y
 - **Email:** contacto@neuraz.ar
 - **Teléfono:** +54 9 11 1234-5678
 - **Ubicación:** Buenos Aires, Argentina
-- **Web:** https://neuraz.io
+- **Web:** https://neuraz.ar
 
 ---
 
