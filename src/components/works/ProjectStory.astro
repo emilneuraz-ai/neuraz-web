@@ -13,11 +13,12 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
     <div class="story-body">
       <div class="story-gallery">
         <div class="story-window"><div class="story-track"><slot /></div></div>
+        <div class="story-carousel-controls">
         <button type="button" class="scene-arrow scene-arrow-prev" data-scene-prev aria-label={`Pantalla anterior de ${project.title}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m14 5-7 7 7 7"/></svg></button>
         <button type="button" class="scene-arrow scene-arrow-next" data-scene-next aria-label={`Pantalla siguiente de ${project.title}`}><svg viewBox="0 0 24 24" aria-hidden="true"><path d="m10 5 7 7-7 7"/></svg></button>
-        <div class="story-carousel-controls"><nav class="story-chapters" aria-label={`Vistas de ${project.title}`}>
-          {project.scenes.map((scene, i) => <button type="button" data-scene-target={i} aria-label={`Ver ${scene.label} de ${project.title}`} aria-current={i === 0 ? 'step' : undefined}><span class="chapter-line"></span><span class="chapter-label"><small>{String(i + 1).padStart(2, '0')}</small>{scene.label}</span></button>)}
-        </nav>
+        <div class="story-chapters" role="group" aria-label={`Vistas de ${project.title}`}>
+          {project.scenes.map((scene, i) => <span class="story-dot" data-scene-target={i} role="img" aria-label={scene.label} aria-current={i === 0 ? 'step' : undefined}><span class="chapter-line"></span></span>)}
+        </div>
         <button type="button" class="story-playback" data-carousel-playback aria-label="Pausar presentación automática" aria-pressed="false">Ⅱ</button>
         <span class="story-count"><span data-scene-counter>01</span> / {String(project.scenes.length).padStart(2, '0')}</span>
         </div>
@@ -124,14 +125,22 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
     .story-footer { display:flex; justify-content:center; border:0; margin-bottom:40px; padding:0 24px; min-height:44px; }
   }
   @media(max-width:767px) {
-    .story-body { justify-content:center; gap:12px; padding:48px 28px 8px 16px; border-block:1px solid var(--work-line); }
+    [data-enhanced] .story-stage { grid-template-rows:40px minmax(0,1fr) auto; }
+    .story-body { grid-row:2; justify-content:center; gap:12px; padding:12px 24px; border-block:1px solid var(--work-line); }
+    .story-footer { grid-row:3; min-height:60px; padding:12px 24px; }
     [data-enhanced] .story-gallery { flex:none; padding:0; display:grid; grid-template-rows:var(--mobile-preview-height,320px) 44px; }
     [data-enhanced] .story-gallery > .story-carousel-controls { position:static; transform:none; width:100%; }
     .scene-arrow { top:calc(var(--mobile-preview-height,320px) / 2); }
     .scene-arrow-prev { left:-10px; right:auto; }
     .scene-arrow-next { right:-10px; left:auto; }
-    .story-behance { min-height:44px; font-size:12px; gap:10px; }
+    .story-behance { min-height:36px; font-size:11px; padding-inline:16px; gap:8px; }
   }
+  .story-gallery .scene-arrow { position:static; transform:none; width:28px; height:44px; flex:none; }
+  .story-gallery .scene-arrow svg { width:14px; height:14px; }
+  .story-carousel-controls .story-chapters { gap:0; flex:1; justify-content:center; }
+  .story-dot { display:grid; place-items:center; width:12px; height:44px; flex:none; }
+  .story-dot[aria-current] .chapter-line::after { transform:scale(1); }
+  .story-carousel-controls .story-playback { width:24px; }
 </style>
 <script>
   import '../../scripts/project-story';

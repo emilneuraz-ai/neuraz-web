@@ -1,4 +1,4 @@
-/** One project per section. Horizontal views never capture vertical scrolling. */
+/** Screen previews use explicit controls; horizontal gestures belong to the project carousel. */
 class ProjectStory extends HTMLElement {
   private cleanup?: () => void;
   connectedCallback() {
@@ -8,7 +8,7 @@ class ProjectStory extends HTMLElement {
     const gallery = this.querySelector<HTMLElement>('.story-gallery')!;
     const windowEl = this.querySelector<HTMLElement>('.story-window')!;
     const scenes = Array.from(this.querySelectorAll<HTMLElement>('[data-work-scene]'));
-    const buttons = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-scene-target]'));
+    const indicators = Array.from(this.querySelectorAll<HTMLElement>('[data-scene-target]'));
     const previous = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-scene-prev]'));
     const next = Array.from(this.querySelectorAll<HTMLButtonElement>('[data-scene-next]'));
     const counter = this.querySelector<HTMLElement>('[data-scene-counter]')!;
@@ -21,15 +21,13 @@ class ProjectStory extends HTMLElement {
     let paused = reducedMotion.matches;
     let visible = false;
     let timer: ReturnType<typeof setTimeout> | undefined;
-    let pointer: {x:number;y:number;id:number;dx:number;dragging:boolean} | undefined;
-    let suppressClick = false;
     const stopAuto = () => { clearTimeout(timer); timer = undefined; };
     const scheduleAuto = () => {
       stopAuto();
       playback.setAttribute('aria-pressed', String(paused));
       playback.setAttribute('aria-label', paused ? 'Reanudar presentación automática' : 'Pausar presentación automática');
       playback.textContent = paused ? '▷' : 'Ⅱ';
-      if (paused || !visible || document.hidden || pointer || this.querySelector(':focus-visible')) return;
+      if (paused || !visible || document.hidden || this.querySelector(':focus-visible')) return;
       timer = setTimeout(() => { active = (active + 1) % scenes.length; render(); scheduleAuto(); }, slideDuration);
     };
     this.setAttribute('data-enhanced', '');
@@ -43,7 +41,7 @@ class ProjectStory extends HTMLElement {
       const mobile = matchMedia('(max-width:767px)').matches;
       const copy = this.querySelector<HTMLElement>('[data-scene-copy]');
       const footer = this.querySelector<HTMLElement>('.story-footer');
-      const budget = stage.clientHeight - (copy?.offsetHeight || 0) - (footer?.offsetHeight || 0) - 140;
+      const budget = stage.clientHeight - (copy?.offsetHeight || 0) - (footer?.offsetHeight || 0) - 164;
       const mobileHeight = Math.max(140, Math.min(460, budget));
       if (!mobile) gallery.style.removeProperty('--mobile-preview-height');
       const fits = scenes.map(scene => {
@@ -81,11 +79,11 @@ class ProjectStory extends HTMLElement {
       this.dataset.layout = scenes[active].querySelector('.device-frame.phone') ? 'phone' : 'wide';
       track.style.transform = `translate3d(${-active * windowEl.clientWidth}px,0,0)`;
       scenes.forEach((scene,i)=>{scene.inert=i!==active;scene.toggleAttribute('data-active',i===active);scene.style.setProperty('--scene-focus',i===active?'1':'0');});
-      buttons.forEach((button,i)=>{if(i===active)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
+      indicators.forEach((indicator,i)=>{if(i===active)indicator.setAttribute('aria-current','step');else indicator.removeAttribute('aria-current');});
       previous.forEach(button=>button.disabled=false);next.forEach(button=>button.disabled=false);
       counter.textContent=String(active+1).padStart(2,'0');
       fitViews();
-      if(announce)announcement.textContent=buttons[active].getAttribute('aria-label')||'';
+      if(announce)announcement.textContent=indicators[active].getAttribute('aria-label')||'';
     };
     const goTo=(index:number)=>{
       active=(index+scenes.length)%scenes.length;render(true);
@@ -93,12 +91,11 @@ class ProjectStory extends HTMLElement {
     };
     previous.forEach(button=>button.addEventListener('click',()=>goTo(active-1),{signal:abort.signal}));
     next.forEach(button=>button.addEventListener('click',()=>goTo(active+1),{signal:abort.signal}));
-    buttons.forEach((button,i)=>button.addEventListener('click',()=>goTo(i),{signal:abort.signal}));
     this.querySelector('.story-carousel-controls')?.addEventListener('keydown',event=>{
       const key=(event as KeyboardEvent).key;
       if(!['ArrowLeft','ArrowRight','Home','End'].includes(key))return;
       event.preventDefault();goTo(key==='Home'?0:key==='End'?scenes.length-1:active+(key==='ArrowRight'?1:-1));
-      buttons[active].focus({preventScroll:true});
+      (key==='ArrowLeft'||key==='Home'?previous[0]:next[0]).focus({preventScroll:true});
     },{signal:abort.signal});
     playback.addEventListener('click', () => { paused = !paused; scheduleAuto(); }, {signal:abort.signal});
     document.addEventListener('visibilitychange', scheduleAuto, {signal:abort.signal});
@@ -110,38 +107,7 @@ class ProjectStory extends HTMLElement {
       scheduleAuto();
     }, {threshold:[0,.6,1]});
     visibility.observe(stage);
-    windowEl.addEventListener('pointerdown',event=>{
-      if (!event.isPrimary || event.button !== 0 || (event.target as Element).closest('button,a,input,select,textarea,summary')) return;
-      pointer={x:event.clientX,y:event.clientY,id:event.pointerId,dx:0,dragging:false};
-      stopAuto();
-    },{passive:true,signal:abort.signal});
-    windowEl.addEventListener('pointermove',event=>{
-      if(!pointer || pointer.id!==event.pointerId)return;
-      const dx=event.clientX-pointer.x,dy=event.clientY-pointer.y;
-      if(!pointer.dragging && Math.abs(dy)>10 && Math.abs(dy)>Math.abs(dx)) {pointer=undefined;scheduleAuto();return;}
-      if(!pointer.dragging && Math.abs(dx)>8 && Math.abs(dx)>Math.abs(dy)*1.3){
-        pointer.dragging=true;windowEl.setPointerCapture(event.pointerId);track.style.transition='none';
-      }
-      if(!pointer.dragging)return;
-      pointer.dx=dx;
-      track.style.transform=`translate3d(${-active*windowEl.clientWidth+dx}px,0,0)`;
-    },{passive:true,signal:abort.signal});
-    const finishSwipe=(event:PointerEvent,cancelled=false)=>{
-      if(!pointer || pointer.id!==event.pointerId)return;
-      const {dx,dragging}=pointer;pointer=undefined;
-      track.style.transition='';
-      if(windowEl.hasPointerCapture(event.pointerId))windowEl.releasePointerCapture(event.pointerId);
-      suppressClick=dragging;
-      if(!cancelled && dragging && Math.abs(dx)>Math.min(65,windowEl.clientWidth*.12))goTo(active+(dx<0?1:-1));
-      else {render();scheduleAuto();}
-      // Suppress the synthetic click after dragging, but not a later intentional tap.
-      setTimeout(()=>{suppressClick=false;},0);
-    };
-    windowEl.addEventListener('pointerup',event=>finishSwipe(event),{signal:abort.signal});
-    windowEl.addEventListener('pointercancel',event=>finishSwipe(event,true),{signal:abort.signal});
-    windowEl.addEventListener('lostpointercapture',event=>finishSwipe(event,true),{signal:abort.signal});
     windowEl.addEventListener('dragstart',event=>event.preventDefault(),{signal:abort.signal});
-    windowEl.addEventListener('click',event=>{if(suppressClick){event.preventDefault();event.stopPropagation();}},{capture:true,signal:abort.signal});
     const sync=()=>{render();};
     const resize=new ResizeObserver(sync);resize.observe(stage);resize.observe(windowEl);
     scenes.forEach(scene=>{const demo=scene.querySelector('[data-scene-demo]');if(demo)resize.observe(demo);});
