@@ -266,3 +266,11 @@ El swipe horizontal sobre la zona de pantallas cambia de proyecto mediante la na
 En móvil, una fila superior de 40 px queda fuera de la zona delimitada por las líneas; los enlaces de salida cubren todo el ancho. Cualquier gesto vertical o scroll sobre la franja superior lleva a Servicios, y la franja inferior o el pie del proyecto llevan a Nosotros. Los bordes de la zona central tienen los mismos extremos y el contenido usa márgenes laterales iguales. Behance baja a 36 px de alto, con texto de 11 px y 12 px de separación respecto de la línea; el ajuste de escala reserva el espacio adicional.
 
 Validación en 4321 con eventos táctiles nativos de Chromium: swipe sobre los renders Kronos → Noticias → Kronos sin cambiar las pantallas internas, flechas siguiente/anterior operativas, salida superior con gesto y rueda, y salida inferior con gesto. Ocho proyectos comprobados a 320, 393 y 1440 px: texto completo, pies fuera de la zona delimitada y sin overflow. Build y diff check correctos; sin errores de navegador. Evidencia en `output/playwright/project-gestures-check.json`, `project-borders-check.json` y capturas `project-gestures-*`. Cambios locales.
+
+### Flechas, marcos de navegador y Behance — 11 de octubre de 2026
+
+Los tres enlaces del Hero usan la misma flecha hacia la derecha. Los marcos de navegador se compactan a 30 px de alto en escritorio y 20 px en móvil; se reducen en proporción los puntos de ventana, el campo de dirección, la etiqueta y el menú.
+
+Behance queda dentro de la zona delimitada: el borde inferior pasa al final del pie, con 12 px de espacio alrededor del botón. El pie participa del swipe horizontal entre proyectos; las franjas externas de Servicios y Nosotros conservan los gestos de salida. Esto reemplaza la ubicación de Behance fuera de los divisores de la revisión anterior.
+
+Build y diff check correctos. Ocho proyectos verificados a 320, 393 y 1440 px: botón dentro de los bordes, texto completo, barras compactas y sin overflow ni errores de navegador. Gesto táctil sobre el pie de Kronos comprobado hacia West. Evidencia en `output/playwright/project-frame-refinements-check.json` y captura `project-frame-refinements-cafe.png`. Cambios locales.

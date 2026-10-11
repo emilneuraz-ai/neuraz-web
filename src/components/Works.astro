@@ -113,8 +113,8 @@ viewport.addEventListener('touchstart',event=>{
  gesture=undefined;
  if(event.touches.length!==1)return;
  const target=event.target as Element;
- const zone=target.closest<HTMLAnchorElement>('[data-works-exit]')||(target.closest('.story-footer')?works.querySelector<HTMLAnchorElement>('.works-exit-after'):null);
- if(!zone&&(!target.closest('.story-body')||target.closest('.story-carousel-controls')))return;
+ const zone=target.closest<HTMLAnchorElement>('[data-works-exit]');
+ if(!zone&&(!target.closest('.story-body,.story-footer')||target.closest('.story-carousel-controls')))return;
  const touch=event.touches[0];gesture={x:touch.clientX,y:touch.clientY,zone,horizontal:false};
 },{passive:true});
 viewport.addEventListener('touchmove',event=>{
@@ -137,7 +137,7 @@ viewport.addEventListener('touchend',event=>{
 viewport.addEventListener('touchcancel',()=>{gesture=undefined;},{passive:true});
 viewport.addEventListener('wheel',event=>{
  const target=event.target as Element;
- const zone=target.closest<HTMLAnchorElement>('[data-works-exit]')||(target.closest('.story-footer')?works.querySelector<HTMLAnchorElement>('.works-exit-after'):null);
+ const zone=target.closest<HTMLAnchorElement>('[data-works-exit]');
  if(!zone||getComputedStyle(zone).display==='none'||Math.abs(event.deltaY)<Math.abs(event.deltaX)||!event.deltaY)return;
  event.preventDefault();event.stopPropagation();zone.click();
 },{passive:false});

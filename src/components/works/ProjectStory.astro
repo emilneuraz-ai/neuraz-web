@@ -126,8 +126,8 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   }
   @media(max-width:767px) {
     [data-enhanced] .story-stage { grid-template-rows:40px minmax(0,1fr) auto; }
-    .story-body { grid-row:2; justify-content:center; gap:12px; padding:12px 24px; border-block:1px solid var(--work-line); }
-    .story-footer { grid-row:3; min-height:60px; padding:12px 24px; }
+    .story-body { grid-row:2; justify-content:center; gap:12px; padding:12px 24px; border-top:1px solid var(--work-line); }
+    .story-footer { grid-row:3; min-height:60px; padding:12px 24px; border-bottom:1px solid var(--work-line); }
     [data-enhanced] .story-gallery { flex:none; padding:0; display:grid; grid-template-rows:var(--mobile-preview-height,320px) 44px; }
     [data-enhanced] .story-gallery > .story-carousel-controls { position:static; transform:none; width:100%; }
     .scene-arrow { top:calc(var(--mobile-preview-height,320px) / 2); }
