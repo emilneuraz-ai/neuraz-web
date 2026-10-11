@@ -50,7 +50,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .story-body, .story-footer { position: relative; z-index: 1; }
   .story-stage::before { position: absolute; inset: 0; z-index: -1; content: ''; pointer-events: none; background:none; }
   .story-behance { display:inline-flex; align-items:center; justify-content:center; gap:14px; min-height:44px; padding:0 20px; border:1px solid var(--work-line); border-radius:999px; font-size:12px; white-space:nowrap; }
-  .story-behance span { font-size: 22px; }
+  .story-behance span { font-size: 14px; line-height:1; }
   .story-behance:hover { color: var(--work-ink); }
   .story-body { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:18px 36px 12px; min-height:0; min-width:0; }
   .story-gallery { position:relative; width:100%; min-width:0; min-height:0; flex:1; padding-inline:24px; align-self:stretch; }
@@ -124,7 +124,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
     .story-footer { display:flex; justify-content:center; border:0; margin-bottom:40px; padding:0 24px; min-height:44px; }
   }
   @media(max-width:767px) {
-    .story-body { justify-content:center; gap:12px; padding:48px 28px 8px 16px; }
+    .story-body { justify-content:center; gap:12px; padding:48px 28px 8px 16px; border-block:1px solid var(--work-line); }
     [data-enhanced] .story-gallery { flex:none; padding:0; display:grid; grid-template-rows:var(--mobile-preview-height,320px) 44px; }
     [data-enhanced] .story-gallery > .story-carousel-controls { position:static; transform:none; width:100%; }
     .scene-arrow { top:calc(var(--mobile-preview-height,320px) / 2); }
