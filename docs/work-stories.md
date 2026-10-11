@@ -296,3 +296,9 @@ Las franjas externas de Proyectos muestran solo botones circulares de 28 px con 
 Fuera del carrusel, el navbar móvil se oculta al bajar y reaparece al subir, con un umbral de 12 px para evitar cambios por pequeños movimientos. Permanece visible con el menú abierto y al comienzo de la página; en Proyectos sigue oculto durante todo el tramo. En escritorio permanece visible. Los enlaces del equipo usan círculos de 24 px e iconos de 12 px en móvil, y 28/14 px en escritorio.
 
 Build y diff check correctos. Comprobado en 320, 393 y 1440 px: navbar según la dirección, menú y Escape operativos, chevrones con etiquetas accesibles, salidas por toque y gesto hacia ambas secciones, y enlaces del equipo más pequeños. Sin overflow ni errores de navegador. Evidencia en `output/playwright/mobile-chevron-header-check.json` y capturas `mobile-chevron-*`. Cambios locales.
+
+## Publicación de proyectos a pantalla completa y navbar móvil — 11 de octubre de 2026
+
+Los commits `e736b5f` y `e0bff28` se subieron a `origin/master`. Se desplegó una copia limpia de los archivos versionados de `e0bff2838b58f53a75503f4dc67617f0c4ffd5f9` en Vercel: deployment `dpl_G7rRWc2akfUfhy6ncNFVUpYS1nnM`, producción, estado Ready. Los alias `neuraz.ar` y `www.neuraz.ar` apuntan a esta versión.
+
+Verificación pública en navegador a 320×740, 393×852 y 1440×900: navbar móvil oculto al bajar y visible al subir, menú operativo y navbar de escritorio visible. En 393 px, Proyectos ocupa los 852 px completos desde el borde superior; “Ver en Behance” aparece arriba a la derecha y no existe el pie anterior. Ambos chevrones navegan por toque y gesto a Servicios y Nosotros. Los enlaces del equipo conservan sus etiquetas accesibles con círculos e iconos reducidos. Sin overflow horizontal, errores de JavaScript ni recursos fallidos. Evidencia en `output/playwright/production-chevron-header-check.json` y capturas `production-chevron-project.png` y `production-chevron-team.png`.
