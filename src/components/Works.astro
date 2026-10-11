@@ -45,8 +45,8 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
 .works[data-horizontal] .works-track :global(project-story),.works[data-horizontal] .works-track :global(.story-stage){background:transparent}
 .works[data-horizontal] .works-track :global(.story-wash){display:none}
 @keyframes works-wash-drift{from{transform:translate3d(-2%,1%,0) scale(1)}to{transform:translate3d(3%,-3%,0) scale(1.1)}}
-.works[data-horizontal]{height:var(--works-height)}.works[data-horizontal] .works-viewport{position:sticky;top:80px;height:var(--works-viewport-height);overflow:clip}.works[data-horizontal] .works-track{display:flex;width:100%;height:100%;will-change:transform}.works[data-horizontal] .works-track :global(project-story){flex:0 0 100%;min-width:0;width:100%;--story-height:var(--works-viewport-height)}
-.works{position:relative;scroll-margin-top:80px;background:var(--color-bg,#fafafa)}.work-scene{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;min-height:620px;width:100%}.scene-visual{position:relative;width:100%;max-width:1050px;min-width:0;display:flex;align-items:center;justify-content:center}.scene-demo{position:relative;width:100%;transform:scale(var(--demo-scale,1));transform-origin:top center;margin-bottom:calc(var(--demo-natural-height,0px) * (var(--demo-scale,1) - 1))}.scene-copy{width:min(100%,760px);color:var(--work-ink)}.scene-title-row{display:flex;justify-content:space-between;align-items:center;gap:28px}.scene-eyebrow{font-size:9px;letter-spacing:.12em;text-transform:uppercase;line-height:1.5;margin-bottom:6px;color:var(--work-ink)}.scene-copy h4{font-size:26px;letter-spacing:-.04em;line-height:1.15;font-weight:450}.scene-description{font-size:12px;line-height:1.6;max-width:72ch;margin-top:12px;color:var(--work-ink)}:global(project-story[data-enhanced]) .work-scene{height:100%;min-height:0}.work-positions{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:45;display:grid;transition:opacity 180ms;color:var(--position-ink,#000)}.work-positions[hidden]{display:none}.work-positions a{width:28px;height:25px;display:grid;place-items:center;position:relative}.work-positions a>span:first-child{width:4px;height:4px;background:currentColor;opacity:.3;border-radius:50%}.work-positions a[aria-current]>span:first-child{width:6px;height:6px;opacity:1;outline:1px solid currentColor;outline-offset:4px}.work-position-label{position:absolute;right:34px;background:var(--position-bg,#fff);border:1px solid currentColor;padding:5px 9px;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none}.work-positions a:hover .work-position-label,.work-positions a:focus-visible .work-position-label{opacity:1}.work-positions a:focus-visible{outline:1px solid currentColor;outline-offset:3px}
+.works[data-horizontal]{height:var(--works-height)}.works[data-horizontal] .works-viewport{position:sticky;top:var(--works-nav-offset);height:var(--works-viewport-height);overflow:clip}.works[data-horizontal] .works-track{display:flex;width:100%;height:100%;will-change:transform}.works[data-horizontal] .works-track :global(project-story){flex:0 0 100%;min-width:0;width:100%;--story-height:var(--works-viewport-height)}
+.works{--works-nav-offset:80px;position:relative;scroll-margin-top:var(--works-nav-offset);background:var(--color-bg,#fafafa)}.work-scene{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:0;padding:0;min-height:620px;width:100%}.scene-visual{position:relative;width:100%;max-width:1050px;min-width:0;display:flex;align-items:center;justify-content:center}.scene-demo{position:relative;width:100%;transform:scale(var(--demo-scale,1));transform-origin:top center;margin-bottom:calc(var(--demo-natural-height,0px) * (var(--demo-scale,1) - 1))}.scene-copy{width:min(100%,760px);color:var(--work-ink)}.scene-title-row{display:flex;justify-content:space-between;align-items:center;gap:28px}.scene-eyebrow{font-size:9px;letter-spacing:.12em;text-transform:uppercase;line-height:1.5;margin-bottom:6px;color:var(--work-ink)}.scene-copy h4{font-size:26px;letter-spacing:-.04em;line-height:1.15;font-weight:450}.scene-description{font-size:12px;line-height:1.6;max-width:72ch;margin-top:12px;color:var(--work-ink)}:global(project-story[data-enhanced]) .work-scene{height:100%;min-height:0}.work-positions{position:fixed;right:14px;top:50%;transform:translateY(-50%);z-index:45;display:grid;transition:opacity 180ms;color:var(--position-ink,#000)}.work-positions[hidden]{display:none}.work-positions a{width:28px;height:25px;display:grid;place-items:center;position:relative}.work-positions a>span:first-child{width:4px;height:4px;background:currentColor;opacity:.3;border-radius:50%}.work-positions a[aria-current]>span:first-child{width:6px;height:6px;opacity:1;outline:1px solid currentColor;outline-offset:4px}.work-position-label{position:absolute;right:34px;background:var(--position-bg,#fff);border:1px solid currentColor;padding:5px 9px;font-size:10px;white-space:nowrap;opacity:0;pointer-events:none}.work-positions a:hover .work-position-label,.work-positions a:focus-visible .work-position-label{opacity:1}.work-positions a:focus-visible{outline:1px solid currentColor;outline-offset:3px}
 @media(min-width:768px){.scene-copy{width:100%;max-width:430px}.scene-eyebrow{font-size:12px;letter-spacing:.14em;margin-bottom:20px}.scene-copy h4{font-size:clamp(34px,3.3vw,62px);font-weight:450;line-height:1.05;letter-spacing:-.045em}.scene-description{font-size:clamp(17px,1.35vw,22px);line-height:1.6;margin-top:24px}.scene-project-link{display:inline-flex;gap:20px;align-items:center;margin-top:30px;font-size:13px;border-bottom:1px solid currentColor;padding-bottom:7px}.scene-project-link span{font-size:20px}}
 .scene-project-link{color:var(--work-ink)}
 .work-scene{padding:40px 40px 64px}
@@ -56,7 +56,7 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
 @media(max-width:767px){.work-scene{padding:24px 24px 28px}}
 
 .works-exit{display:none}
-@media(max-width:767px){.works-exit{position:absolute;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px;height:40px;color:#111;font-size:10px;letter-spacing:.04em;touch-action:none}.works-exit-before{top:0}.works-exit-after{bottom:0}.works-exit:focus-visible{outline:2px solid currentColor;outline-offset:-3px}}
+@media(max-width:767px){.works{--works-nav-offset:0px}.works-exit{position:absolute;left:0;right:0;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px;height:40px;color:#111;font-size:10px;letter-spacing:.04em;touch-action:none}.works-exit-before{top:0}.works-exit-after{bottom:0}.works-exit:focus-visible{outline:2px solid currentColor;outline-offset:-3px}}
 </style>
 
 <script>
@@ -82,12 +82,13 @@ backgroundVisibility.observe(viewport);
 document.addEventListener('visibilitychange',syncBackgroundVisibility);
 document.addEventListener('astro:before-swap',()=>{backgroundVisibility.disconnect();document.removeEventListener('visibilitychange',syncBackgroundVisibility);},{once:true});
 const reduced=matchMedia('(prefers-reduced-motion:reduce)');
+const navigationOffset=()=>matchMedia('(max-width:767px)').matches?0:80;
 let step=0, pending=0;
 let settleTimer:ReturnType<typeof setTimeout>|undefined;
 let programmaticUntil=0;
 let touching=false;
 function measure(){
- const height=Math.max(620,innerHeight-80);
+ const height=Math.max(620,innerHeight-navigationOffset());
  step=Math.max(620,innerHeight*.85);
  works.toggleAttribute('data-horizontal',!reduced.matches);
  works.style.setProperty('--works-viewport-height',`${height}px`);
@@ -95,7 +96,7 @@ function measure(){
  updatePosition();
 }
 function projectTop(index:number){
- return reduced.matches?projects[index].getBoundingClientRect().top+scrollY-80:works.getBoundingClientRect().top+scrollY-80+index*step;
+ return reduced.matches?projects[index].getBoundingClientRect().top+scrollY-navigationOffset():works.getBoundingClientRect().top+scrollY-navigationOffset()+index*step;
 }
 works.addEventListener('click',event=>{
  const link=(event.target as Element).closest<HTMLAnchorElement>('[data-project-jump],[data-works-exit]');
@@ -114,7 +115,7 @@ viewport.addEventListener('touchstart',event=>{
  if(event.touches.length!==1)return;
  const target=event.target as Element;
  const zone=target.closest<HTMLAnchorElement>('[data-works-exit]');
- if(!zone&&(!target.closest('.story-body,.story-footer')||target.closest('.story-carousel-controls')))return;
+ if(!zone&&(!target.closest('.story-body,.story-heading')||target.closest('.story-carousel-controls')))return;
  const touch=event.touches[0];gesture={x:touch.clientX,y:touch.clientY,zone,horizontal:false};
 },{passive:true});
 viewport.addEventListener('touchmove',event=>{
@@ -143,11 +144,11 @@ viewport.addEventListener('wheel',event=>{
 },{passive:false});
 function updatePosition(){
  pending=0;
- const bounds=works.getBoundingClientRect();const midpoint=(innerHeight+80)/2;
+ const bounds=works.getBoundingClientRect();const midpoint=(innerHeight+navigationOffset())/2;
  positionNav.hidden=bounds.top>midpoint||bounds.bottom<midpoint;
  let active=0;
  if(!reduced.matches){
-   const progress=Math.max(0,Math.min(projects.length-1,(80-bounds.top)/step));
+   const progress=Math.max(0,Math.min(projects.length-1,(navigationOffset()-bounds.top)/step));
    const base=Math.floor(progress),fraction=progress-base;
    // A short resting interval keeps each project readable before the next horizontal slide.
    const travel=Math.max(0,Math.min(1,(fraction-.2)/.6));
@@ -171,7 +172,7 @@ const queue=()=>{if(!pending)pending=requestAnimationFrame(updatePosition);};
 function restoreProjectHash(){const index=projects.findIndex(project=>`#${project.id}`===location.hash);if(index>=0)window.scrollTo({top:projectTop(index),behavior:'instant'});}
 function settleProject(){
  if(reduced.matches||touching||performance.now()<programmaticUntil)return;
- const progress=(80-works.getBoundingClientRect().top)/step;
+ const progress=(navigationOffset()-works.getBoundingClientRect().top)/step;
  if(progress<=0||progress>=projects.length-1)return;
  const index=Math.round(progress);
  if(Math.abs(progress-index)<.015)return;

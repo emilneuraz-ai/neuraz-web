@@ -89,6 +89,7 @@ import NavbarBrand from './NavbarBrand.astro';
     padding-inline: clamp(2rem, 6vw, 7.5rem);
   }
   @media (max-width: 767px) {
+    .site-header[data-projects-active="true"] { visibility:hidden; pointer-events:none; transform:translateY(-100%); }
     #mobile-menu-btn { display: grid; }
     .header-inner { padding-inline: clamp(1.75rem, 8vw, 2.5rem); }
   }
@@ -146,6 +147,13 @@ import NavbarBrand from './NavbarBrand.astro';
   let navFrame = 0;
   const updateActiveSection = () => {
     navFrame = 0;
+    const projectsBounds = document.getElementById('trabajos')?.getBoundingClientRect();
+    const projectsActive = !desktopNavigation.matches && !!projectsBounds && projectsBounds.top <= 1 && projectsBounds.bottom >= innerHeight - 1;
+    if (siteHeader) {
+      siteHeader.dataset.projectsActive = String(projectsActive);
+      siteHeader.inert = projectsActive;
+    }
+    if (projectsActive && mobileMenuBtn?.getAttribute('aria-expanded') === 'true') setMenuOpen(false);
     const marker = 100;
     let active = '';
     for (const section of sections) {

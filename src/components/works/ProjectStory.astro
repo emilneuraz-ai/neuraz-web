@@ -10,6 +10,9 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   <div class="story-stage">
     <div class="story-background" aria-hidden="true"><div class="story-wash"></div></div>
     <ScrollAir seed="services" direction="horizontal" color={project.accent} />
+    <header class="story-heading">
+      {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer" class="story-behance">Ver en Behance <span aria-hidden="true">↗</span></a>}
+    </header>
     <div class="story-body">
       <div class="story-gallery">
         <div class="story-window"><div class="story-track"><slot /></div></div>
@@ -25,9 +28,6 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
       </div>
       <slot name="copy" />
     </div>
-    <footer class="story-footer">
-      {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer" class="story-behance">Ver proyecto en Behance <span aria-hidden="true">↗</span></a>}
-    </footer>
     <p class="story-announcement sr-only" aria-live="polite" aria-atomic="true"></p>
   </div>
 </project-story>
@@ -48,7 +48,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   }
   .story-stage:has([data-air-direction="horizontal"][data-visible="true"]) .story-wash { animation-play-state: running; }
   @keyframes story-wash-drift { from { transform: translate3d(-2%, 1%, 0) scale(1); } to { transform: translate3d(3%, -3%, 0) scale(1.1); } }
-  .story-body, .story-footer { position: relative; z-index: 1; }
+  .story-body, .story-heading { position: relative; z-index: 1; }
   .story-stage::before { position: absolute; inset: 0; z-index: -1; content: ''; pointer-events: none; background:none; }
   .story-behance { display:inline-flex; align-items:center; justify-content:center; gap:14px; min-height:44px; padding:0 20px; border:1px solid var(--work-line); border-radius:999px; font-size:12px; white-space:nowrap; }
   .story-behance span { font-size: 14px; line-height:1; }
@@ -63,7 +63,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .scene-arrow:focus-visible { outline:1px solid currentColor; outline-offset:2px; }
   .story-window { overflow: clip; min-width: 0; }
   .story-track { display: grid; width: 100%; min-width: 0; }
-  .story-footer { padding: 0 clamp(24px, 4vw, 72px) 12px; display: flex; align-items: center; gap: clamp(20px, 4vw, 60px); justify-content:center; }
+  .story-heading { position:absolute; top:18px; right:24px; z-index:2; display:flex; align-items:center; justify-content:flex-end; }
   .story-chapters { display: flex; flex: 1; gap: 14px; }
   .story-chapters button { min-height: 44px; flex: 1; min-width: 0; text-align: left; cursor: pointer; color: var(--work-muted); }
   .chapter-line { display: block; height: 2px; background: var(--work-soft); margin-bottom: 12px; position: relative; }
@@ -77,7 +77,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .story-count > span { color: var(--work-ink); }
   .story-behance:focus-visible, .story-chapters button:focus-visible { outline: 2px solid var(--work-ink); outline-offset: 5px; }
   .project-story[data-enhanced] { height: var(--story-height); }
-  [data-enhanced] .story-stage { position: relative; height: var(--story-height); min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
+  [data-enhanced] .story-stage { position: relative; height: var(--story-height); min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr); }
   [data-enhanced] .story-window, [data-enhanced] .story-track { height: 100%; }
   [data-enhanced] .story-track { display: flex; transition: transform 450ms cubic-bezier(.22,.8,.22,1); }
   .story-track :global(.work-scene) { width: 100%; flex: 0 0 100%; min-width: 0; }
@@ -92,18 +92,16 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
     .project-story[data-layout="phone"] .story-gallery { width:440px; flex:0 1 440px; max-width:440px; }
     .project-story[data-layout="phone"] .story-body :global(.scene-copy) { width:430px; flex:0 1 430px; }
     .project-story[data-layout="phone"] .story-track :global(.work-scene) { padding-inline:0; }
-    [data-enhanced] .story-stage{grid-template-rows:minmax(0,1fr) auto}.story-footer{border-top:0;padding-bottom:18px}}
+    [data-enhanced] .story-stage{grid-template-rows:minmax(0,1fr)}}
   @media (max-width: 767px) {
     .scene-arrow { width:28px; }
     .scene-arrow svg { width:18px; }
     .scene-arrow-prev { right:calc(50% + var(--visual-half-width,40%) + 3px); }
     .scene-arrow-next { left:calc(50% + var(--visual-half-width,40%) + 3px); }
-    .project-story[data-format="presentation"] .story-footer { gap:8px; padding-inline:16px; }
     .project-story[data-format="presentation"] .story-carousel-controls { min-width:0; }
     .project-story[data-format="presentation"] .story-chapters { gap:0; flex:1; }
     .project-story[data-format="presentation"] .story-chapters button { width:auto; flex:1; }
     .story-behance { font-size: 10px; gap: 8px; }
-    .story-footer { padding: 10px 20px 14px; gap: 15px; }
     .story-chapters { gap: 8px; }
     .chapter-label { justify-content: center; font-size: 8px; }
     .chapter-label small { display: none; }
@@ -122,18 +120,18 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .story-carousel-controls .story-playback,.story-carousel-controls .story-count { flex:none; }
   @media(max-width:767px) {
     .story-gallery > .story-carousel-controls { gap:6px; }
-    .story-footer { display:flex; justify-content:center; border:0; margin-bottom:40px; padding:0 24px; min-height:44px; }
   }
   @media(max-width:767px) {
-    [data-enhanced] .story-stage { grid-template-rows:40px minmax(0,1fr) auto; }
-    .story-body { grid-row:2; justify-content:center; gap:12px; padding:12px 24px; border-top:1px solid var(--work-line); }
-    .story-footer { grid-row:3; min-height:60px; padding:12px 24px; border-bottom:1px solid var(--work-line); }
+    [data-enhanced] .story-stage { grid-template-rows:40px auto minmax(0,1fr); }
+    .project-story { --story-height:max(620px,100svh); scroll-margin-top:0; }
+    .story-heading { position:relative; top:auto; right:auto; grid-row:2; min-height:49px; padding:8px 24px; border-top:1px solid var(--work-line); }
+    .story-body { grid-row:3; justify-content:center; gap:12px; padding:12px 24px; margin-bottom:40px; border-bottom:1px solid var(--work-line); }
     [data-enhanced] .story-gallery { flex:none; padding:0; display:grid; grid-template-rows:var(--mobile-preview-height,320px) 44px; }
     [data-enhanced] .story-gallery > .story-carousel-controls { position:static; transform:none; width:100%; }
     .scene-arrow { top:calc(var(--mobile-preview-height,320px) / 2); }
     .scene-arrow-prev { left:-10px; right:auto; }
     .scene-arrow-next { right:-10px; left:auto; }
-    .story-behance { min-height:36px; font-size:11px; padding-inline:16px; gap:8px; }
+    .story-behance { min-height:32px; font-size:11px; padding-inline:16px; gap:8px; }
   }
   .story-gallery .scene-arrow { position:static; transform:none; width:28px; height:44px; flex:none; }
   .story-gallery .scene-arrow svg { width:14px; height:14px; }

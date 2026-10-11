@@ -40,9 +40,9 @@ class ProjectStory extends HTMLElement {
     const fitViews = () => {
       const mobile = matchMedia('(max-width:767px)').matches;
       const copy = this.querySelector<HTMLElement>('[data-scene-copy]');
-      const footer = this.querySelector<HTMLElement>('.story-footer');
-      const budget = stage.clientHeight - (copy?.offsetHeight || 0) - (footer?.offsetHeight || 0) - 164;
-      const mobileHeight = Math.max(140, Math.min(460, budget));
+      const heading = this.querySelector<HTMLElement>('.story-heading');
+      const budget = stage.clientHeight - (copy?.offsetHeight || 0) - (heading?.offsetHeight || 0) - 164;
+      const mobileHeight = Math.max(140, Math.min(520, budget));
       if (!mobile) gallery.style.removeProperty('--mobile-preview-height');
       const fits = scenes.map(scene => {
         const demo = scene.querySelector<HTMLElement>('[data-scene-demo]');
