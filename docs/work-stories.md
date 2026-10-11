@@ -274,3 +274,9 @@ Los tres enlaces del Hero usan la misma flecha hacia la derecha. Los marcos de n
 Behance queda dentro de la zona delimitada: el borde inferior pasa al final del pie, con 12 px de espacio alrededor del botón. El pie participa del swipe horizontal entre proyectos; las franjas externas de Servicios y Nosotros conservan los gestos de salida. Esto reemplaza la ubicación de Behance fuera de los divisores de la revisión anterior.
 
 Build y diff check correctos. Ocho proyectos verificados a 320, 393 y 1440 px: botón dentro de los bordes, texto completo, barras compactas y sin overflow ni errores de navegador. Gesto táctil sobre el pie de Kronos comprobado hacia West. Evidencia en `output/playwright/project-frame-refinements-check.json` y captura `project-frame-refinements-cafe.png`. Cambios locales.
+
+## Publicación de las revisiones móviles — 11 de octubre de 2026
+
+Las revisiones acumuladas se subieron a `origin/master` y se publicaron en el proyecto Vercel `neuraz-web`. Código publicado: `3d57a3a`; deployment `dpl_84AgxdwKH9DY1NsYy5HPC7sZ9JJB`, estado Ready. Se desplegó una copia de los archivos versionados de ese commit. Vercel confirma que `neuraz.ar` y `www.neuraz.ar` apuntan a esta versión; www redirige al dominio principal.
+
+Comprobación pública en navegador a 320×740, 393×852 y 1440×900: Hero con enlaces antes del render y flechas iguales, ocho proyectos con texto completo y Behance dentro de los divisores, barras de navegador compactas, y Contacto negro con el número actualizado y WhatsApp `543856260410`. En móvil se verificó el swipe horizontal entre proyectos, las flechas de las pantallas y los gestos de salida a Servicios y Nosotros. La página pública de capacitación conserva su ilustración. Sin overflow horizontal, errores de JavaScript ni recursos fallidos. Evidencia en `output/playwright/production-mobile-review-check.json` y capturas `production-mobile-review-*`.
