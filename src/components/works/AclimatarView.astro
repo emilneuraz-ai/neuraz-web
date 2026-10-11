@@ -7,7 +7,7 @@ const base='/images/works/aclimatar-tanzania/';
 const tabs=['Summary','Tips','Indicators','ENSO'];
 const routes=[{icon:'rain',title:'Seasonal forecast',text:'Precipitation probabilities and key variable forecasts.'},{icon:'leaf',title:'Tips and management',text:'Tactical guidance for each crop stage.'},{icon:'sun',title:'Long-term climate risk',text:'Future crop risks and recommended adaptation.'}];
 ---
-<DemoFrame mobile height={700} label={`Aclimatar Tanzania · ${view}`}>
+<DemoFrame mobile height={view === 'inicio' ? 580 : 700} label={`Aclimatar Tanzania · ${view}`}>
 <div class="ac-presentation">
   <div class="ac-halo" aria-hidden="true"></div>
   <aclimatar-demo class="ac-phone" data-ac-view={view}>
@@ -16,6 +16,7 @@ const routes=[{icon:'rain',title:'Seasonal forecast',text:'Precipitation probabi
     {view === 'inicio' ? <>
       <div class="ac-hero"><h5>Your integrated climate data center for coffee farming</h5><p>All the hard-to-get-hands on climate data, including seasonal forecasts and long term projections.</p><div class="ac-hero-progress" aria-hidden="true"><i></i><i></i><i></i><i></i></div></div>
       <div class="ac-location"><h5>Choose your location of interest</h5><details><summary><Icon name="pin"/><span><small>MY LOCATIONS</small><b>View and edit saved locations</b></span><span class="ac-open">⌄</span></summary><div class="ac-saved"><b>Dodoma Farm</b><span>Tanzania · Dodoma station</span></div></details><button type="button" class="ac-primary" data-ac-location aria-expanded="false">Add new location</button><div class="ac-location-note" hidden>Choose a location to explore climate information.</div></div>
+      <section class="ac-about"><p>ACLIMATAR+ is an off-spin of the renown ACLIMATAR climate projection platform which provides world-leading climate data for cocoa, coffee, and tea farming. For selected countries, this data has been fine-tuned to also include forecasts, i.e. shorter term predictions.</p><details><summary>Show more</summary><p>Thereby, a climate information system is build that is freely available and tailored to the needs of the national sector, integrating three-month and seasonal forecasts with mid-century climate projections. Additionally farm management advice that builds on the decade-long agronomic expertise of the partners involved enables users to move from analysis to action.</p></details><div><a href="https://aclimatar.org" target="_blank" rel="noopener noreferrer">↗ Read full story</a><a href="mailto:info@aclimatar.org">Get in touch</a></div></section>
     </> : <>
       <div class="ac-screen-header"><span aria-hidden="true">‹</span><h5>{view==='dashboard'?'Dashboard':'Seasonal forecast'}</h5><Icon name="calendar"/><span aria-hidden="true">⋮</span></div>
       {view==='dashboard' ? <>
@@ -47,9 +48,14 @@ const routes=[{icon:'rain',title:'Seasonal forecast',text:'Precipitation probabi
   @font-face { font-family:'Aclimatar Sans'; src:url('/images/works/aclimatar-tanzania/source-sans-pro-latin-400-normal.woff2') format('woff2'); font-weight:400; font-display:swap; }
   @font-face { font-family:'Aclimatar Sans'; src:url('/images/works/aclimatar-tanzania/source-sans-pro-latin-700-normal.woff2') format('woff2'); font-weight:700; font-display:swap; }
   @font-face { font-family:'Aclimatar Serif'; src:url('/images/works/aclimatar-tanzania/source-serif-pro-latin-600-normal.woff2') format('woff2'); font-weight:600; font-display:swap; }
+  .ac-phone[data-ac-view="inicio"] { min-height:560px; max-height:560px; }
+  .ac-about { padding:0 24px 24px; }
+  .ac-about p { font-size:12px; line-height:1.5; }
+  .ac-about summary { cursor:pointer; color:#073f31; text-decoration:underline; padding:10px 0; font-size:12px; }
+  .ac-about > div { display:flex; gap:20px; border-top:1px solid #ded8d0; padding-top:12px; font-size:11px; color:#073f31; }
   .ac-presentation { position:relative; display:flex; align-items:center; flex-direction:column; }
   .ac-halo { position:absolute; inset:8% 0; background:radial-gradient(ellipse,#719d7940,transparent 68%); pointer-events:none; }
-  .ac-phone { display:block; position:relative; width:360px; min-height:680px; max-width:100%; background:#fffefd; color:#14231f; font-family:'Aclimatar Sans',sans-serif; font-size:12px; line-height:1.4; border:1px solid #ead8c433; border-radius:24px; overflow:hidden; box-shadow:0 24px 60px #0002; }
+  .ac-phone { display:block; position:relative; width:360px; min-height:680px; max-height:680px; max-width:100%; background:#fffefd; color:#14231f; font-family:'Aclimatar Sans',sans-serif; font-size:12px; line-height:1.4; border:1px solid #ead8c433; border-radius:24px; overflow:auto; scrollbar-width:none; touch-action:pan-y pinch-zoom; box-shadow:0 24px 60px #0002; }
   .ac-phone h5,.ac-phone h6,.ac-phone p { margin:0; }.ac-phone h5 { font-family:'Aclimatar Serif',serif; font-weight:600; }.ac-phone h6 { font-family:'Aclimatar Sans',sans-serif; font-weight:700; line-height:1.2; font-size:14px; }.ac-phone p { font-size:11px; line-height:1.45; }.ac-phone small { font-size:9px; }.ac-phone strong,.ac-phone b { font-weight:700; }
   .ac-status,.ac-topbar { display:flex; align-items:center; justify-content:space-between; background:#b96743; color:white; }.ac-status { padding:10px 24px 8px; font-size:12px; }.ac-status>span { letter-spacing:3px; }.ac-topbar { height:48px; padding:0 14px; border-top:1px solid #78392425; }.ac-topbar img { width:188px; height:20px; }.ac-settings { border:1px solid #ffffff50; width:29px; height:29px; display:grid; place-items:center; border-radius:50%; font-size:19px; }
   .ac-hero { background:linear-gradient(180deg,#b9674357,#b96743c7),url('/images/works/aclimatar-tanzania/hero-bg.png') center/cover; background-color:#b96743; padding:29px 26px 25px; color:#fff; }.ac-hero h5 { font-size:29px; line-height:1.08; max-width:290px; }.ac-hero p { font-size:13px; margin:20px 0 16px; }.ac-hero-progress { display:flex; gap:4px; }.ac-hero-progress i { width:24px; height:3px; background:#ffffff70; }.ac-hero-progress i:first-child { width:42px; background:white; }

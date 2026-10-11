@@ -228,3 +228,19 @@ Validación local en el servidor activo 4321: escritorio 1440 × 900, móvil 390
 Publicado el 10 de octubre de 2026 en el proyecto Vercel `neuraz-web`, deployment `dpl_2BPXoDQ92jJJEqKw4ARh1JEhWu37`, estado Ready. El código publicado corresponde al commit `fe4218e`, subido a `origin/master`. Los dominios `neuraz.ar` y `www.neuraz.ar` apuntan a esta versión; www redirige al dominio principal.
 
 Comprobado directamente en `https://neuraz.ar/`: HTTP 200, ocho proyectos con líneas horizontales, fondo compartido y ausencia del filtro de desenfoque de movimiento. En 1440 × 900 y 390 × 844 se verificaron colores intermedios al deslizar, máscaras suaves en las uniones Servicios/Trabajos y Trabajos/Nosotros, y ausencia de overflow horizontal, excepciones JavaScript y recursos públicos fallidos. Evidencias locales en `output/playwright/production-release-*`, incluido `production-release-validation.json`.
+
+## Correcciones de revisión móvil y botones — 11 de octubre de 2026
+
+Se retiró la barra superior de cada proyecto (Proyectos / Behance / cerrar). El enlace a Behance pasa al pie, únicamente para proyectos con URL existente; el nombre visible mantiene la referencia accesible del proyecto. Arriba y abajo del carrusel hay zonas externas a las capturas para deslizar hacia Servicios o Nosotros, además de poder tocar sus enlaces.
+
+En móvil la galería reserva el alto de la pantalla realmente renderizada y su margen de sombra, con un límite calculado después de reservar el texto, los controles y el pie. La tipografía de proyectos baja a 24 px para títulos y 13 px para descripciones. Las capturas largas de Café usan una ventana de escritorio 16:10 desplazable, conservando los archivos originales, y llegan a 301 px de ancho en un viewport de 393 px. Las sombras móviles se ajustan al espacio disponible dentro de cada escena.
+
+Hero incorpora un degradado naranja y al final una fila de Servicios, Proyectos y El equipo. Se retira el enlace anterior sobre el logo. Según la referencia del usuario, los botones tienen forma de cápsula: Servicios negro pleno, Proyectos y Behance con contorno; El equipo permanece como enlace. Nosotros reduce su título móvil y “Algo nuevo.” en Contacto usa naranja.
+
+Se redibujaron los ocho SVG de servicios: flujo de tareas, conversaciones, fidelización, juegos, contenido, agentes, documentos y capacitación, con interfaces, conexiones, detalles y animaciones propias. Las ilustraciones compactas usan 120 px de alto y las animaciones de servicios inactivos se pausan; se respeta movimiento reducido.
+
+El inicio de Tanzania recupera el bloque informativo y el desplegable “Show more” de `src/views/Home.tsx` en el proyecto original `/Volumes/Emil/neuraz/projects/aclimatar/aclimatar-tanzania`. Esa versión no contiene preguntas de FAQ. Se compacta la pantalla inicial y el contenido ampliado puede desplazarse dentro del teléfono.
+
+En iOS el logo conserva la malla GLB cerrada con espesor real, evitando la superficie fluida animada; mantiene arrastre, cambios de material y una ligera inclinación inicial. Comprobado con user agent de iPhone en Chromium: canvas activo, poster oculto, estado `sculpted` y respuesta al arrastre. Esto no constituye una prueba en Safari ni en un iPhone físico.
+
+Validación: build de Astro y diff check; ocho proyectos a 320×740, 393×852 y 1440×900, más movimiento reducido. Textos y pies completos, referencias accesibles válidas, sin barra superior ni overflow horizontal. Comprobación adicional en el servidor activo 4321: gesto táctil de salida hacia ambas secciones, scroll interno de capturas sin desplazar la página, desplegable de Tanzania y el octavo SVG en la página de capacitación. Evidencias en `output/playwright/comments-responsive-check.json`, `comments-active-check.json` y capturas `comments-*`. Los cambios de esta revisión permanecen locales.

@@ -1,8 +1,8 @@
 ---
 import type { WorkStory } from '../../data/works/types';
 import ScrollAir from '../ScrollAir.astro';
-interface Props { project: WorkStory; index: number; projects: WorkStory[]; }
-const { project, index, projects } = Astro.props;
+interface Props { project: WorkStory; }
+const { project } = Astro.props;
 const maxScenes = project.format === 'presentation' && project.scenes.every(scene=>scene.image) ? 12 : project.scenes.every(scene=>scene.image) ? 6 : 4;
 if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Error(`A project story needs between 3 and ${maxScenes} scenes.`);
 ---
@@ -10,11 +10,6 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   <div class="story-stage">
     <div class="story-background" aria-hidden="true"><div class="story-wash"></div></div>
     <ScrollAir seed="services" direction="horizontal" color={project.accent} />
-    <header class="story-heading">
-      <div class="story-identity"><span class="story-section-title">Proyectos</span><span class="story-number">{String(index + 1).padStart(2, '0')}</span><h3 id={`title-${project.id}`}>{project.title}</h3><span class="story-category">{project.category}</span></div>
-      <div class="story-actions">{project.url && <a href={project.url} target="_blank" rel="noopener noreferrer" class="story-behance">Ver en Behance <span aria-hidden="true">↗</span></a>}<a class="story-close" href="#nosotros" aria-label="Cerrar proyectos e ir a Nosotros" title="Cerrar proyectos · Ir a Nosotros">×</a></div>
-    </header>
-
     <div class="story-body">
       <div class="story-gallery">
         <div class="story-window"><div class="story-track"><slot /></div></div>
@@ -30,7 +25,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
       <slot name="copy" />
     </div>
     <footer class="story-footer">
-      <span class="story-instruction"><span aria-hidden="true">↓</span> Scroll al siguiente proyecto</span>
+      {project.url && <a href={project.url} target="_blank" rel="noopener noreferrer" class="story-behance">Ver proyecto en Behance <span aria-hidden="true">↗</span></a>}
     </footer>
     <p class="story-announcement sr-only" aria-live="polite" aria-atomic="true"></p>
   </div>
@@ -52,16 +47,9 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   }
   .story-stage:has([data-air-direction="horizontal"][data-visible="true"]) .story-wash { animation-play-state: running; }
   @keyframes story-wash-drift { from { transform: translate3d(-2%, 1%, 0) scale(1); } to { transform: translate3d(3%, -3%, 0) scale(1.1); } }
-  .story-heading, .story-body, .story-footer { position: relative; z-index: 1; }
+  .story-body, .story-footer { position: relative; z-index: 1; }
   .story-stage::before { position: absolute; inset: 0; z-index: -1; content: ''; pointer-events: none; background:none; }
-  .story-identity h3,.story-number,.story-category {display:none}.story-stage {will-change:opacity}.story-identity .story-section-title {border:0;padding:0}
-  .story-heading { display: flex; justify-content: space-between; align-items: center; gap: 24px; padding: 16px clamp(24px, 4vw, 72px); border-bottom: 1px solid var(--work-line); }
-  .story-actions { display:flex; align-items:center; gap:20px; }.story-close { display:grid; place-items:center; width:36px; height:36px; border:1px solid var(--work-line); border-radius:50%; font-size:24px; }.story-section-title { font-size:10px; text-transform:uppercase; letter-spacing:.12em; padding-right:16px; border-right:1px solid var(--work-line); color:var(--work-muted); }
-  .story-identity { display: flex; gap: 18px; align-items: baseline; }
-  .story-number { font-size: 11px; color: var(--work-ink); font-variant-numeric: tabular-nums; }
-  .story-identity h3 { font-size: 18px; font-weight: 500; letter-spacing: -.04em; }
-  .story-category { font-size: 10px; color: var(--work-muted); }
-  .story-behance { display: flex; align-items: center; gap: 18px; font-size: 11px; white-space: nowrap; }
+  .story-behance { display:inline-flex; align-items:center; justify-content:center; gap:14px; min-height:44px; padding:0 20px; border:1px solid var(--work-line); border-radius:999px; font-size:12px; white-space:nowrap; }
   .story-behance span { font-size: 22px; }
   .story-behance:hover { color: var(--work-ink); }
   .story-body { display:flex; flex-direction:column; align-items:center; justify-content:center; gap:22px; padding:18px 36px 12px; min-height:0; min-width:0; }
@@ -74,9 +62,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .scene-arrow:focus-visible { outline:1px solid currentColor; outline-offset:2px; }
   .story-window { overflow: clip; min-width: 0; }
   .story-track { display: grid; width: 100%; min-width: 0; }
-  .story-footer { padding: 0 clamp(24px, 4vw, 72px) 12px; display: flex; align-items: center; gap: clamp(20px, 4vw, 60px); border-top: 1px solid var(--work-line); }
-  .story-instruction { font-size: 10px; color: var(--work-muted); white-space: nowrap; }
-  .story-instruction > span { color: var(--work-ink); margin-right: 8px; font-size: 16px; }
+  .story-footer { padding: 0 clamp(24px, 4vw, 72px) 12px; display: flex; align-items: center; gap: clamp(20px, 4vw, 60px); justify-content:center; }
   .story-chapters { display: flex; flex: 1; gap: 14px; }
   .story-chapters button { min-height: 44px; flex: 1; min-width: 0; text-align: left; cursor: pointer; color: var(--work-muted); }
   .chapter-line { display: block; height: 2px; background: var(--work-soft); margin-bottom: 12px; position: relative; }
@@ -88,9 +74,9 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .story-playback {width:32px;height:32px;cursor:pointer;color:var(--work-ink);font-size:15px;background:none;border:0}.story-playback:focus-visible{outline:1px solid currentColor;outline-offset:3px}
   .story-count { font-size: 11px; font-variant-numeric: tabular-nums; color: var(--work-muted); white-space: nowrap; }
   .story-count > span { color: var(--work-ink); }
-  .story-heading a:focus-visible, .story-chapters button:focus-visible { outline: 2px solid var(--work-ink); outline-offset: 5px; }
+  .story-behance:focus-visible, .story-chapters button:focus-visible { outline: 2px solid var(--work-ink); outline-offset: 5px; }
   .project-story[data-enhanced] { height: var(--story-height); }
-  [data-enhanced] .story-stage { position: relative; height: var(--story-height); min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr) auto; }
+  [data-enhanced] .story-stage { position: relative; height: var(--story-height); min-height: 0; display: grid; grid-template-columns: minmax(0, 1fr); grid-template-rows: minmax(0, 1fr) auto; }
   [data-enhanced] .story-window, [data-enhanced] .story-track { height: 100%; }
   [data-enhanced] .story-track { display: flex; transition: transform 450ms cubic-bezier(.22,.8,.22,1); }
   .story-track :global(.work-scene) { width: 100%; flex: 0 0 100%; min-width: 0; }
@@ -105,7 +91,7 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
     .project-story[data-layout="phone"] .story-gallery { width:440px; flex:0 1 440px; max-width:440px; }
     .project-story[data-layout="phone"] .story-body :global(.scene-copy) { width:430px; flex:0 1 430px; }
     .project-story[data-layout="phone"] .story-track :global(.work-scene) { padding-inline:0; }
-    .story-heading{display:none}[data-enhanced] .story-stage{grid-template-rows:minmax(0,1fr) auto}.story-footer{border-top:0;padding-bottom:18px}}
+    [data-enhanced] .story-stage{grid-template-rows:minmax(0,1fr) auto}.story-footer{border-top:0;padding-bottom:18px}}
   @media (max-width: 767px) {
     .scene-arrow { width:28px; }
     .scene-arrow svg { width:18px; }
@@ -115,14 +101,8 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
     .project-story[data-format="presentation"] .story-carousel-controls { min-width:0; }
     .project-story[data-format="presentation"] .story-chapters { gap:0; flex:1; }
     .project-story[data-format="presentation"] .story-chapters button { width:auto; flex:1; }
-    .story-section-title { padding:0; border:0; font-size:8px; }.story-identity { flex-wrap:wrap; column-gap:8px; row-gap:3px; }.story-section-title { width:100%; }.story-close { width:30px; height:30px; }.story-actions { gap:8px; }.project-positions { right:0; }.project-positions a { width:24px; height:24px; }.position-label { display:none; }
-    .story-heading { padding: 10px 24px 10px 16px; gap: 12px; }
-    .story-identity { gap: 10px; }
-    .story-identity h3 { font-size: 16px; }
-    .story-category { display: none; }
     .story-behance { font-size: 10px; gap: 8px; }
     .story-footer { padding: 10px 20px 14px; gap: 15px; }
-    .story-instruction { display: none; }
     .story-chapters { gap: 8px; }
     .chapter-label { justify-content: center; font-size: 8px; }
     .chapter-label small { display: none; }
@@ -141,7 +121,16 @@ if (project.scenes.length < 3 || project.scenes.length > maxScenes) throw new Er
   .story-carousel-controls .story-playback,.story-carousel-controls .story-count { flex:none; }
   @media(max-width:767px) {
     .story-gallery > .story-carousel-controls { gap:6px; }
-    .story-footer { display:none; }
+    .story-footer { display:flex; justify-content:center; border:0; margin-bottom:40px; padding:0 24px; min-height:44px; }
+  }
+  @media(max-width:767px) {
+    .story-body { justify-content:center; gap:12px; padding:48px 28px 8px 16px; }
+    [data-enhanced] .story-gallery { flex:none; padding:0; display:grid; grid-template-rows:var(--mobile-preview-height,320px) 44px; }
+    [data-enhanced] .story-gallery > .story-carousel-controls { position:static; transform:none; width:100%; }
+    .scene-arrow { top:calc(var(--mobile-preview-height,320px) / 2); }
+    .scene-arrow-prev { left:-10px; right:auto; }
+    .scene-arrow-next { right:-10px; left:auto; }
+    .story-behance { min-height:44px; font-size:12px; gap:10px; }
   }
 </style>
 <script>

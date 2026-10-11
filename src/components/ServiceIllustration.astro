@@ -11,56 +11,56 @@ const kind = ({
   'documentacion-inteligente': 'documents',
   'capacitaciones-en-ia-y-automatizacion': 'learning',
 } as Record<string, string>)[slug] || 'workflow';
+const uid = `diagram-${crypto.randomUUID()}`;
 ---
 <figure class:list={['service-illustration', { compact }]} data-illustration={kind} aria-label={steps.join(' → ')}>
-  <svg class="illustration-canvas" viewBox="0 0 320 140" fill="none" aria-hidden="true">
+  <svg class="illustration-canvas" viewBox="0 0 360 170" fill="none" aria-hidden="true">
+    <defs>
+      <linearGradient id={`${uid}-surface`} x1="0" y1="0" x2="1" y2="1"><stop stop-color="white"/><stop offset="1" stop-color="var(--service-accent)" stop-opacity=".12"/></linearGradient>
+      <radialGradient id={`${uid}-halo`}><stop stop-color="var(--service-accent)" stop-opacity=".2"/><stop offset="1" stop-color="var(--service-accent)" stop-opacity="0"/></radialGradient>
+      <filter id={`${uid}-shadow`} x="-30%" y="-30%" width="160%" height="180%"><feDropShadow dx="0" dy="5" stdDeviation="5" flood-color="var(--service-accent)" flood-opacity=".12"/></filter>
+    </defs>
+    <ellipse cx="180" cy="88" rx="176" ry="78" fill={`url(#${uid}-halo)`}/>
+    <path class="track" d="M95 86h168"/><path class="ink connector-arrow" d="m111 82 5 4-5 4m133-8 5 4-5 4"/>
     {kind === 'workflow' && <>
-      <path class="track" d="M62 70h196" />
-      <rect class="paper" x="16" y="42" width="66" height="56" rx="12" /><path class="ink" d="M32 58h34M32 68h24M32 78h17" />
-      <rect class="tint" x="126" y="36" width="68" height="68" rx="18" /><path class="ink" d="m166 50-19 24h14l-6 16 20-25h-14l5-15Z" />
-      <rect class="paper" x="238" y="42" width="66" height="56" rx="12" /><path class="ink reveal" d="m255 70 10 10 21-23" pathLength="1" />
-      <circle class="traveler" cx="91" cy="70" r="4" />
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="10" y="30" width="90" height="112" rx="10"/><path class="tint" d="M20 30h70a10 10 0 0 1 10 10v14H10V40a10 10 0 0 1 10-10Z"/><g class="chrome"><circle cx="22" cy="42" r="2"/><circle cx="29" cy="42" r="2"/><circle cx="36" cy="42" r="2"/></g><path class="ink" d="M23 66h38m-38 8h59"/>{[0,1,2].map(i=><g><rect class="tint" x="23" y={86+i*16} width="9" height="9" rx="2"/><path class="ink fine" d={`M40 ${90+i*16}h39`}/></g>)}</g>
+      <g class="thinking"><rect class="paper" x="137" y="40" width="87" height="97" rx="14"/><path class="ink fine" d="M180 63v14m0 14v19m0-19h-22v19m22-19h22v19"/><rect class="solid" x="167" y="55" width="26" height="18" rx="5"/>{[150,172,194].map(x=><rect class="tint" x={x} y="108" width="17" height="16" rx="4"/>)}<circle class="solid signal" cx="180" cy="90" r="4"/></g>
+      <g class="publish" filter={`url(#${uid}-shadow)`}><rect class="paper" x="263" y="39" width="87" height="102" rx="10"/><rect class="tint" x="274" y="51" width="65" height="22" rx="5"/><path class="ink reveal" d="m289 62 5 5 13-12" pathLength="1"/>{[0,1,2].map(i=><g><circle class="solid" cx="278" cy={88+i*16} r="2"/><path class="ink fine" d={`M287 ${88+i*16}h40`}/></g>)}</g>
     </>}
     {kind === 'conversation' && <>
-      <rect class="paper bubble-in" x="26" y="18" width="198" height="48" rx="16" />
-      <g class="ink bubble-in"><path d="M44 36h86M44 47h54" /><circle cx="198" cy="42" r="4" /></g>
-      <rect class="tint bubble-out" x="96" y="80" width="198" height="48" rx="16" />
-      <g class="ink bubble-out"><path d="M114 98h100M114 110h67m71-10 5 5 9-10m-6 10 9-10" /></g>
-      <g class="typing"><circle cx="243" cy="61" r="3" /><circle cx="253" cy="61" r="3" /><circle cx="263" cy="61" r="3" /></g>
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="10" y="22" width="105" height="128" rx="17"/><rect class="tint" x="18" y="30" width="89" height="24" rx="9"/><circle class="solid" cx="33" cy="42" r="6"/><path class="ink fine" d="M47 39h42m-42 7h25"/><g class="bubble-in"><rect class="tint" x="23" y="66" width="66" height="25" rx="8"/><path class="ink fine" d="M32 75h43m-43 7h30"/></g><g class="bubble-out"><rect class="paper" x="36" y="103" width="66" height="25" rx="8"/><path class="ink fine" d="M45 112h42m-42 7h28"/></g><path class="ink fine" d="M44 140h37"/></g>
+      <g class="thinking"><circle class="paper" cx="180" cy="86" r="32"/><circle class="tint" cx="180" cy="86" r="23"/><path class="ink" d="M165 90V79a15 15 0 0 1 30 0v11m-30-7h-4v12h7V83Zm30 0h4v12h-7V83Zm0 12-8 6h-8"/><circle class="solid" cx="174" cy="85" r="2"/><circle class="solid" cx="186" cy="85" r="2"/></g>
+      <g class="publish" filter={`url(#${uid}-shadow)`}><rect class="paper" x="251" y="30" width="99" height="113" rx="10"/><path class="ink fine" d="M263 44h43"/><path class="tint" d="M262 56h77v1h-77Z"/>{[0,1,2].map(i=><g><circle class="tint" cx="273" cy={74+i*22} r="7"/><path class="ink fine" d={`M288 ${71+i*22}h36m-36 6h22`}/></g>)}<circle class="solid signal" cx="333" cy="44" r="3"/></g>
     </>}
     {kind === 'rewards' && <>
-      <path class="track" d="M45 70h230" />
-      {[0,1,2].map(i=><g class="stamp" style={`--step:${i}`}><circle class="paper" cx={40+i*66} cy="70" r="23" /><path class="ink" d={`m${31+i*66} 70 6 6 12-13`} /></g>)}
-      <g class="reward"><rect class="tint" x="230" y="36" width="72" height="68" rx="18" /><path class="ink" d="m266 49 6 12 13 2-10 10 2 14-11-7-12 7 3-14-10-10 13-2 6-12Z" /></g>
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="10" y="32" width="105" height="111" rx="12"/><rect class="tint" x="21" y="44" width="83" height="47" rx="8"/><path class="ink" d="m36 74 8-19 8 19m-13-6h10"/><path class="ink fine" d="M64 57h27m-27 8h19m-40 38h65"/>{[0,1,2,3].map(i=><circle class="stamp" style={`--step:${i}`} cx={30+i*22} cy="121" r="6" fill="var(--service-accent)" fill-opacity=".6"/>)}</g>
+      <g class="thinking"><circle class="paper" cx="180" cy="86" r="33"/><circle class="tint" cx="180" cy="86" r="25"/><path class="ink" d="m180 68 5 11 12 2-9 9 2 12-10-6-11 6 3-12-9-9 12-2 5-11Z"/></g>
+      <g class="reward" filter={`url(#${uid}-shadow)`}><path class="paper" d="M263 39h74a10 10 0 0 1 10 10v30a8 8 0 0 0 0 16v32a10 10 0 0 1-10 10h-74a10 10 0 0 1-10-10V95a8 8 0 0 0 0-16V49a10 10 0 0 1 10-10Z"/><path class="track" d="M315 46v84"/><path class="ink" d="M276 78h23v24h-23Zm-3-7h29v8h-29Zm14 0v31m0-31c-18-14-17 2 0 0 17-14 17 2 0 0"/><path class="ink fine" d="M268 118h31m23-53h14m-14 8h10"/></g>
     </>}
     {kind === 'play' && <>
-      <g class="wheel"><circle class="paper" cx="102" cy="72" r="51" /><path class="tint" d="M102 72V21a51 51 0 0 1 44 76Z" /><path class="ink" d="M102 21v102M58 47l88 50M58 97l88-50" /><circle class="paper" cx="102" cy="72" r="12" /></g>
-      <path class="solid" d="m92 13 10 18 10-18Z" />
-      <path class="track" d="M170 72h33" />
-      <g class="reward"><rect class="tint" x="212" y="44" width="84" height="57" rx="10" /><path class="ink" d="M228 61h52m-52 12h27m-27 12h35" /></g>
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="14" y="23" width="84" height="128" rx="15"/><rect class="tint" x="22" y="43" width="68" height="78" rx="5"/><path class="ink" d="M36 57h15v15H36Zm26 0h15v15H62ZM36 83h15v15H36Z"/><path class="ink fine" d="M63 84h6v7h8v8h-8m-6-4v7m14-24v4m-22-7h4m-3 28h7m-14 33h23"/><path class="scan" d="M27 51h58"/></g>
+      <g class="wheel"><circle class="paper" cx="180" cy="88" r="47"/><path class="tint" d="M180 88V41a47 47 0 0 1 41 70Z"/><path class="ink fine" d="M180 41v94m-41-70 82 47m-82 0 82-47"/>{[0,1,2,3,4,5].map(i=><circle class="solid" cx={180+Math.cos(i*Math.PI/3)*32} cy={88+Math.sin(i*Math.PI/3)*32} r="3"/>)}<circle class="paper" cx="180" cy="88" r="12"/><path class="ink" d="m176 82 10 6-10 6Z"/></g><path class="solid" d="m174 32 6 13 6-13Z"/>
+      <g class="reward" filter={`url(#${uid}-shadow)`}><rect class="paper" x="262" y="48" width="85" height="80" rx="10"/><rect class="tint" x="270" y="56" width="69" height="36" rx="5"/><path class="ink" d="m304 61 4 8 9 1-7 7 2 8-8-4-8 4 2-8-7-7 9-1 4-8Z"/><path class="ink fine" d="M276 105h56m-56 9h34"/><path class="track" d="M263 96h83"/></g>
     </>}
     {kind === 'content' && <>
-      <rect class="paper" x="37" y="18" width="123" height="109" rx="12" /><path class="ink write" d="M54 39h75M54 53h87M54 67h71M54 81h50M54 95h75" pathLength="1" />
-      <g class="publish"><rect class="tint" x="183" y="31" width="99" height="88" rx="12" /><circle class="solid" cx="252" cy="52" r="7" /><path class="ink" d="m197 92 22-28 18 19 12-12 20 21H197Z" /></g>
+      <g filter={`url(#${uid}-shadow)`}><path class="paper" d="M20 26h58l20 20v93a9 9 0 0 1-9 9H20a9 9 0 0 1-9-9V35a9 9 0 0 1 9-9Z"/><path class="tint" d="M78 26v20h20"/><path class="ink write" d="M25 57h53m-53 13h58m-58 13h43m-43 13h58" pathLength="1"/><rect class="tint" x="25" y="111" width="22" height="23" rx="4"/><path class="ink fine" d="M55 116h22m-22 9h15"/></g>
+      <g class="thinking"><rect class="paper" x="145" y="53" width="70" height="70" rx="19"/><rect class="tint" x="152" y="60" width="56" height="56" rx="15"/><path class="ink" d="m180 70 5 13 13 5-13 5-5 13-5-13-13-5 13-5 5-13Zm22-26 2 6 6 2-6 2-2 6-2-6-6-2 6-2 2-6Z"/><path class="track" d="M161 45v-8h38v8m-38 86v8h38v-8"/></g>
+      <g class="publish" filter={`url(#${uid}-shadow)`}><rect class="paper" x="260" y="22" width="89" height="129" rx="12"/><circle class="solid" cx="277" cy="37" r="5"/><path class="ink fine" d="M289 35h43m-43 6h24"/><rect x="267" y="52" width="75" height="56" rx="5" fill={`url(#${uid}-surface)`}/><circle class="solid" cx="324" cy="66" r="6"/><path class="ink" d="m273 99 21-27 18 19 10-11 14 19"/><path class="ink fine" d="M272 119h57m-57 8h42m-42 12h7m6 0h7m6 0h7"/></g>
     </>}
     {kind === 'agent' && <>
-      <path class="track" d="M52 70h73m68 0h32l28-34m-28 34 28 34" />
-      <circle class="paper" cx="38" cy="70" r="20" /><path class="ink" d="M30 66h16m-16 8h10" />
-      <g class="thinking"><rect class="tint" x="124" y="37" width="68" height="66" rx="22" /><path class="ink" d="m158 50 6 14 14 6-14 6-6 14-6-14-14-6 14-6 6-14Z" /></g>
-      <circle class="paper" cx="272" cy="33" r="20" /><path class="ink" d="M264 33h16m-8-8v16" />
-      <g class="reward"><circle class="tint" cx="272" cy="107" r="20" /><path class="ink" d="m263 107 6 6 12-13" /></g>
-      <circle class="traveler agent-traveler" cx="68" cy="70" r="4" />
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="11" y="48" width="90" height="82" rx="12"/><circle class="tint" cx="34" cy="69" r="10"/><path class="ink fine" d="M51 64h36m-36 9h22M25 94h60m-60 10h46m-46 10h32"/></g>
+      <g class="thinking"><circle class="paper" cx="180" cy="86" r="33"/><path class="ink fine" d="m162 74 18-9 18 9v24l-18 9-18-9V74Zm0 0 18 12 18-12m-18 12v21m-18-9 36-24m-36 0 36 24"/>{[[162,74],[180,65],[198,74],[162,98],[180,107],[198,98],[180,86]].map(([x,y])=><circle class="solid signal" cx={x} cy={y} r="3"/>)}<circle class="track" cx="180" cy="86" r="42"/></g>
+      <path class="track" d="M223 86h13V47h25m-25 39v39h25"/>{[0,1].map(i=><g class={i?'reward':'publish'} filter={`url(#${uid}-shadow)`}><rect class="paper" x="262" y={25+i*80} width="86" height="45" rx="9"/><rect class="tint" x="271" y={36+i*80} width="22" height="22" rx="6"/><path class="ink" d={i?'m277 128 4 4 7-9':'M277 42h10m-5-5v10'}/><path class="ink fine" d={`M301 ${41+i*80}h35m-35 10h22`}/></g>)}
     </>}
     {kind === 'documents' && <>
-      <rect class="paper" x="32" y="20" width="86" height="102" rx="10" /><path class="ink" d="M48 41h52M48 55h38M48 69h52M48 83h27M48 97h42" />
-      <path class="scan" d="M22 28h106" />
-      <path class="track" d="M134 70h43" />
-      <g class="publish"><rect class="tint" x="192" y="31" width="103" height="78" rx="12" /><path class="ink" d="M207 50h73m-73 19h73m-73 20h73M228 43v53" /></g>
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="13" y="23" width="87" height="127" rx="9"/><path class="ink fine" d="M26 40h40m-40 9h60M26 68h13m8 0h38m-59 18h20m7 0h32m-59 18h12m8 0h39M26 127h35"/>{[63,81,99].map(y=><rect class="field" x="46" y={y} width="41" height="12" rx="2"/>)}<path class="scan" d="M7 42h99"/><path class="ink fine" d="M23 137h3m3 0h2m4 0h4m3 0h2m4 0h3m4 0h2"/></g>
+      <g class="thinking"><rect class="paper" x="147" y="54" width="66" height="66" rx="16"/><path class="ink" d="M159 75v-9h9m24 0h9v9m0 24v9h-9m-24 0h-9v-9m8-9 8 8 16-19"/></g>
+      <g class="publish" filter={`url(#${uid}-shadow)`}><rect class="paper" x="259" y="36" width="90" height="109" rx="9"/><path class="tint" d="M268 36h72a9 9 0 0 1 9 9v16h-90V45a9 9 0 0 1 9-9Z"/><path class="ink fine" d="M271 49h44M269 79h70m-70 20h70m-70 20h70m-49-50v62"/>{[0,1,2].map(i=><g><rect class="tint" x="269" y={68+i*20} width="15" height="7" rx="2"/><path class="ink fine" d={`M297 ${72+i*20}h32`}/></g>)}<path class="ink" d="m329 134 4 4 8-9"/></g>
     </>}
     {kind === 'learning' && <>
-      <rect class="paper" x="23" y="27" width="115" height="79" rx="10" /><path class="ink" d="m69 48 25 18-25 18V48ZM51 117h60M81 106v11" />
-      <path class="track" d="M153 70h29" />
-      <g class="reward"><rect class="tint" x="202" y="29" width="91" height="83" rx="15" /><path class="ink" d="m224 71 15 15 27-30" /></g>
+      <g filter={`url(#${uid}-shadow)`}><rect class="paper" x="8" y="35" width="110" height="87" rx="8"/><rect x="15" y="43" width="96" height="62" rx="4" fill={`url(#${uid}-surface)`}/><path class="ink fine" d="M23 51h28m-28 7h19m31 47v-8h16v8m-51 0V82h16v23m4 0V71h16v34"/><circle class="paper" cx="63" cy="72" r="14"/><path class="solid" d="m59 65 11 7-11 7Z"/><path class="ink fine" d="M21 114h84m-42 8v14m-24 0h48"/></g>
+      <g class="thinking"><circle class="paper" cx="180" cy="86" r="30"/><path class="ink" d="M159 72c9-4 14-4 21 0 7-4 12-4 21 0v28c-9-4-14-4-21 0-7-4-12-4-21 0V72Zm21 0v28"/><path class="ink fine" d="M165 81h9m-9 8h9m12-8h9m-9 8h9"/></g>
+      <g class="reward" filter={`url(#${uid}-shadow)`}><rect class="paper" x="261" y="28" width="88" height="118" rx="10"/><rect class="tint" x="272" y="39" width="66" height="22" rx="4"/><path class="ink fine" d="M281 50h43"/>{[0,1,2].map(i=><g class="stamp" style={`--step:${i}`}><circle class="tint" cx="281" cy={79+i*21} r="7"/><path class="ink fine" d={`m277 ${79+i*21} 3 3 5-6m12 3h32`}/></g>)}</g>
     </>}
   </svg>
   <figcaption><ol>{steps.map((step,i)=><li><span class="step-number">0{i+1}</span>{step}</li>)}</ol></figcaption>
@@ -69,6 +69,11 @@ const kind = ({
 <style>
   .service-illustration { margin: 0; width: 100%; --ink: color-mix(in srgb, var(--service-accent) 38%, #222); }
   .illustration-canvas { display: block; width: 100%; height: auto; }
+  .fine { stroke-width:1.2; }
+  .chrome { fill:var(--service-accent); opacity:.5; }
+  .field { fill:var(--service-accent); fill-opacity:.12; stroke:var(--service-accent); stroke-opacity:.5; }
+  .signal { animation:typing 4.8s ease infinite; }
+  .connector-arrow { opacity:.5; stroke-width:1; }
   .paper { fill: #fff; stroke: color-mix(in srgb, var(--service-accent) 20%, #ddd); stroke-width: 1.3; }
   .tint { fill: color-mix(in srgb, var(--service-accent) 18%, #fff); stroke: color-mix(in srgb, var(--service-accent) 45%, #fff); stroke-width: 1.3; }
   .ink { stroke: var(--ink); stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
@@ -83,7 +88,7 @@ const kind = ({
   .typing { animation: typing 4.8s ease infinite; }
   .stamp { animation: stamp 4.8s ease infinite; animation-delay: calc(var(--step) * .4s); }
   .reward { transform-box: fill-box; transform-origin: center; animation: reward 4.8s ease infinite; }
-  .wheel { transform-origin: 102px 72px; animation: wheel 4.8s cubic-bezier(.18,.7,.2,1) infinite; }
+  .wheel { transform-origin: 180px 88px; animation: wheel 4.8s cubic-bezier(.18,.7,.2,1) infinite; }
   .publish { animation: publish 4.8s ease infinite; }
   .thinking { transform-box: fill-box; transform-origin: center; animation: think 4.8s ease infinite; }
   ol { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 12px; list-style: none; padding: 12px 0 0; margin: 0; border-top: 1px solid rgb(0 0 0 / .07); }
@@ -91,7 +96,7 @@ const kind = ({
   .step-number { display: block; color: var(--ink); font-size: 9px; font-weight: 600; letter-spacing: .06em; margin-bottom: 4px; }
   .compact ol { gap: 8px; padding-top: 9px; }
   .compact li { font-size: 10px; }
-  @media (max-width: 1023px) { .compact .illustration-canvas { height: 80px; } }
+  @media (max-width: 1023px) { .compact .illustration-canvas { height: 120px; } }
   @keyframes travel { 0%,10% { transform: translateX(0); opacity: 0; } 20% { opacity: 1; } 78% { opacity: 1; } 90%,100% { transform: translateX(138px); opacity: 0; } }
   @keyframes agent-travel { 0%,10% { transform: translateX(0); opacity: 0; } 20%,65% { opacity: 1; } 90%,100% { transform: translateX(157px); opacity: 0; } }
   @keyframes write { 0%,15% { stroke-dashoffset: 1; } 65%,100% { stroke-dashoffset: 0; } }
@@ -103,6 +108,7 @@ const kind = ({
   @keyframes wheel { 0%,10% { transform: rotate(0); } 75%,100% { transform: rotate(300deg); } }
   @keyframes publish { 0%,35% { opacity: .15; transform: translateX(-8px); } 70%,100% { opacity: 1; transform: none; } }
   @keyframes think { 0%,15%,85%,100% { transform: scale(1); } 45% { transform: scale(1.06); } }
-  @keyframes scan { 0%,10% { transform: translateY(0); opacity: 0; } 20%,75% { opacity: 1; } 90%,100% { transform: translateY(85px); opacity: 0; } }
+  @keyframes scan { 0%,10% { transform: translateY(0); opacity: 0; } 20%,75% { opacity: 1; } 90%,100% { transform: translateY(60px); opacity: 0; } }
+  :global(.service-item[data-expanded="false"]) .service-illustration *, :global(.service-preview[hidden]) .service-illustration * { animation-play-state:paused; }
   @media (prefers-reduced-motion: reduce) { .service-illustration * { animation: none !important; } .traveler, .scan, .typing { display: none; } }
 </style>

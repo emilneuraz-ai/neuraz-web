@@ -547,6 +547,9 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
   const interactive = root.dataset.interactive !== 'false';
   const isometric = root.dataset.view === 'isometric';
   const resin = root.dataset.finish === 'resin';
+  // iOS uses the closed sculpted mesh: it avoids the animated float-texture
+  // surface on mobile GPUs and preserves actual depth while dragging.
+  const ios = /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   const heroFront = !isometric && !!root.closest('[data-hero-logo]');
   const maxDpr = numberOption(root.dataset.maxDpr, 1.75, 1, 1.75);
   const framing = numberOption(root.dataset.framing, 1.05, 1, 2);
@@ -842,8 +845,8 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
       if (autoMotion()) elapsed += delta;
       // Keep the hero's chosen angle stable while the material keeps flowing.
       const phase = reducedMotion || (heroFront && !resin) ? 0 : elapsed;
-      const targetX = serviceAngle.x + manual.x - hover.y * 0.075 + Math.sin(phase * 0.53) * 0.018;
-      const targetY = serviceAngle.y + manual.y + hover.x * 0.11 + Math.sin(phase * 0.37) * 0.035;
+      const targetX = (ios && heroFront ? .12 : 0) + serviceAngle.x + manual.x - hover.y * 0.075 + Math.sin(phase * 0.53) * 0.018;
+      const targetY = (ios && heroFront ? -.18 : 0) + serviceAngle.y + manual.y + hover.x * 0.11 + Math.sin(phase * 0.37) * 0.035;
       const targetZ = restRotationZ + serviceAngle.z + Math.sin(phase * 0.29) * 0.007;
       const damping = reducedMotion ? 1 : 1 - Math.exp(-dampingDelta * 10);
       pivot.rotation.x = THREE.MathUtils.lerp(pivot.rotation.x, targetX, damping);
@@ -1028,7 +1031,7 @@ export async function initMercuryLogo(root: HTMLElement, { signal }: InitOptions
     } else visible = true;
     updateControls();
     measure();
-    if (root.dataset.fluid !== 'false' && !reducedMotion) {
+    if (root.dataset.fluid !== 'false' && !reducedMotion && !ios) {
       root.dataset.fluidState = 'loading';
       void loadFluidCache(root, loading.signal).then(({ metadata, buffer }) => {
         if (disposed || reducedMotion || loading.signal.aborted || !root.isConnected) return;

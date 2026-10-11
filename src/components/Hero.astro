@@ -16,23 +16,28 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
           Conectamos tus herramientas y automatizamos lo repetitivo.
           Más tiempo para lo que hacés mejor.
         </p>
-        <a href="#servicios" class="hero-link">
-          <span class="hero-link-icon" aria-hidden="true">
-            <svg viewBox="0 0 24 24" fill="none">
-              <path d="M12 4v15m-6-6 6 6 6-6" stroke="currentColor" stroke-width="1.5" />
-            </svg>
-          </span>
-          Ver servicios
-        </a>
       </div>
       <div class="hero-visual">
         <div class="hero-logo-slot" data-hero-logo-slot><img src="/images/isotipo.svg" alt="Neuraz" width="440" height="440" /></div>
       </div>
     </div>
+    <nav class="hero-actions" aria-label="Explorar Neuraz">
+      <a class="hero-button" href="#servicios">Servicios <span aria-hidden="true">↗</span></a>
+      <a class="hero-button hero-button-outline" href="#trabajos">Proyectos <span aria-hidden="true">↗</span></a>
+      <a class="hero-team-link" href="#equipo">El equipo <span aria-hidden="true">↗</span></a>
+    </nav>
   </div>
 </section>
 
 <style>
+  .hero-actions { position:relative; z-index:201; display:flex; align-items:center; gap:12px; padding-bottom:28px; }
+  .hero-actions a { display:inline-flex; align-items:center; justify-content:center; gap:12px; min-height:44px; font-size:13px; white-space:nowrap; }
+  .hero-button { border:1px solid #111; background:#111; color:#fafafa; padding:0 20px; border-radius:999px; }
+  .hero-button-outline { background:transparent; color:#111; }
+  .hero-team-link { padding-inline:8px; text-decoration:underline; text-underline-offset:4px; }
+  @media(max-width:767px){.hero-actions{gap:8px;justify-content:space-between}.hero-actions a{font-size:11px;gap:6px}.hero-button{padding:0 12px}.hero-team-link{padding-inline:0}}
+  @media(max-width:359px){.hero-actions{gap:6px}.hero-actions a{font-size:10px}.hero-button{padding:0 9px}}
+
   .hero {
     --hero-gutter: clamp(2rem, 6vw, 7.5rem);
     padding: 6.5rem var(--hero-gutter) 0;
@@ -92,26 +97,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     line-height: 1.7;
     text-wrap: pretty;
   }
-  .hero-link {
-    display: inline-flex;
-    align-items: center;
-    gap: 1rem;
-    font-size: 13px;
-    font-weight: 500;
-  }
-  .hero-link-icon {
-    width: 46px;
-    height: 46px;
-    border-radius: 50%;
-    display: grid;
-    place-items: center;
-    background: #111;
-    color: #fafafa;
-    transition: background 180ms;
-  }
-  .hero-link-icon svg { width: 20px; height: 20px; transition: transform 180ms; }
-  .hero-link:hover .hero-link-icon { background: #e63946; }
-  .hero-link:hover svg { transform: translateY(2px); }
   .hero a:focus-visible { outline: 2px solid #e63946; outline-offset: 6px; }
   .hero-visual {
     grid-column: 6 / -1;
@@ -156,8 +141,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     }
     .hero-outline { -webkit-text-stroke-width: 1.5px; }
     .hero-description { margin-top: 1.5rem; max-width: 330px; }
-    .hero-link { gap: 0; text-decoration: underline; text-decoration-color: #aaa; text-underline-offset: 5px; }
-    .hero-link-icon { display: none; }
     .hero-visual {
       grid-column: 1;
       grid-row: 2;
@@ -166,10 +149,6 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
       margin: -1rem 0 0;
       justify-self: center;
     }
-  }
-  @media (prefers-reduced-motion: reduce) {
-    .hero-link-icon, .hero-link-icon svg { transition: none; }
-    .hero-link:hover svg { transform: none; }
   }
   @media (forced-colors: active) {
     .hero-outline { color: CanvasText; -webkit-text-fill-color: CanvasText; -webkit-text-stroke-width: 0; }

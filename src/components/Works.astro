@@ -18,20 +18,22 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
   <div class="works-viewport" style={`--works-wash:${stories[0].project.accent}`}>
   <div class="works-background" aria-hidden="true"><div class="works-wash"></div></div>
   <div class="works-track">
-  {stories.map(({ project, View }, projectIndex) => <ProjectStory project={project} index={projectIndex} projects={stories.map(item=>item.project)}>
+  {stories.map(({ project, View }) => <ProjectStory project={project}>
     <div slot="copy" class="scene-copy" data-scene-copy>
-      <p class="scene-eyebrow">{project.category}</p><h4>{project.title}</h4>
+      <p class="scene-eyebrow">{project.category}</p><h4 id={`title-${project.id}`}>{project.title}</h4>
       <p class="scene-description">{project.scenes[0].description}</p>
-      {project.url && <a class="scene-project-link" href={project.url} target="_blank" rel="noopener noreferrer">Ver proyecto en Behance <span aria-hidden="true">↗</span></a>}
     </div>
     {project.scenes.map(scene => <section class:list={['work-scene',{'work-presentation':project.format==='presentation'}]} data-work-scene={scene.id} aria-labelledby={`scene-${project.id}-${scene.id}`}>
       <div class="scene-visual">
-        <div class="scene-demo" data-scene-demo>{project.format==='presentation' && scene.image ? <ScreenCapture image={scene.image} /> : <DeviceFrame phone={scene.device==='mobile'||project.format==='mobile'} capturedStatus={scene.device==='mobile'} responsive={project.format!=='mobile'&&!scene.image} label={project.title} theme={project.theme || 'dark'}>{scene.image ? <ScreenCapture image={scene.image} scrollable={!!scene.device||project.format==='mobile'} viewport={scene.device || 'mobile'} /> : <View view={scene.id} projectId={project.id} />}</DeviceFrame>}</div>
+        <div class="scene-demo" data-scene-demo>{project.format==='presentation' && scene.image ? <ScreenCapture image={scene.image} /> : <DeviceFrame phone={scene.device==='mobile'||project.format==='mobile'} capturedStatus={scene.device==='mobile'} responsive={project.format!=='mobile'&&!scene.image} label={project.title} theme={project.theme || 'dark'}>{scene.image ? <ScreenCapture image={scene.image} scrollable={true} viewport={scene.device || (project.format==='mobile' ? 'mobile' : 'desktop')} /> : <View view={scene.id} projectId={project.id} />}</DeviceFrame>}</div>
       </div>
       <h4 class="sr-only" id={`scene-${project.id}-${scene.id}`}>{project.title} · {scene.label}</h4>
     </section>)}
   </ProjectStory>)}
-  </div></div>
+  </div>
+  <a class="works-exit works-exit-before" href="#servicios" data-works-exit aria-label="Volver a Servicios. También podés deslizar hacia abajo aquí."><span aria-hidden="true">↓</span> Volver a Servicios</a>
+  <a class="works-exit works-exit-after" href="#nosotros" data-works-exit aria-label="Continuar a Nosotros. También podés deslizar hacia arriba aquí.">Continuar a Nosotros <span aria-hidden="true">↑</span></a>
+  </div>
   <nav class="work-positions" aria-label="Posición entre proyectos" hidden>{stories.map(({project},i)=><a href={`#trabajo-${project.id}`} data-project-jump aria-label={`Proyecto ${i+1}: ${project.title}`}><span></span><span class="work-position-label">{project.title}</span></a>)}</nav>
 
 </section>
@@ -49,9 +51,12 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
 .scene-project-link{color:var(--work-ink)}
 .work-scene{padding:40px 40px 64px}
 .work-scene.work-presentation{justify-content:center;gap:0;padding:0}.work-presentation .scene-visual{width:min(100%,446px);max-width:446px;flex:none}
-@media(max-width:767px){.scene-copy{width:100%}.scene-copy h4{font-size:28px}.scene-description{font-size:14px;line-height:1.5;margin-top:12px}.scene-eyebrow{font-size:10px}.scene-project-link{display:none}.scene-title-row{gap:10px}.work-positions{right:2px}.work-positions a{width:24px;height:23px}.work-position-label{display:none}}
+@media(max-width:767px){.scene-copy{width:100%}.scene-copy h4{font-size:24px}.scene-description{font-size:13px;line-height:1.5;margin-top:10px}.scene-eyebrow{font-size:10px}.scene-project-link{display:none}.scene-title-row{gap:10px}.work-positions{right:2px}.work-positions a{width:24px;height:23px}.work-position-label{display:none}}
 @media(prefers-reduced-motion:reduce){.work-positions{transition:none}}
-@media(max-width:767px){.work-scene{padding:24px 20px 44px}}
+@media(max-width:767px){.work-scene{padding:24px 24px 28px}}
+
+.works-exit{display:none}
+@media(max-width:767px){.works-exit{position:absolute;left:16px;right:28px;z-index:3;display:flex;align-items:center;justify-content:center;gap:10px;min-height:40px;color:#111;font-size:10px;letter-spacing:.04em;touch-action:none}.works-exit-before{top:0}.works-exit-after{bottom:0}.works-exit:focus-visible{outline:2px solid currentColor;outline-offset:-3px}}
 </style>
 
 <script>
@@ -93,7 +98,7 @@ function projectTop(index:number){
  return reduced.matches?projects[index].getBoundingClientRect().top+scrollY-80:works.getBoundingClientRect().top+scrollY-80+index*step;
 }
 works.addEventListener('click',event=>{
- const link=(event.target as Element).closest<HTMLAnchorElement>('[data-project-jump],.story-close');
+ const link=(event.target as Element).closest<HTMLAnchorElement>('[data-project-jump],[data-works-exit]');
  if(!link)return;const target=document.getElementById(link.hash.slice(1));if(!target)return;
  event.preventDefault();history.replaceState(null,'',link.hash);
  clearTimeout(settleTimer);programmaticUntil=performance.now()+1200;
@@ -101,6 +106,18 @@ works.addEventListener('click',event=>{
  // Focus the persistent navigation while travelling; offscreen project content stays inert.
  if(index<0){target.setAttribute('tabindex','-1');target.focus({preventScroll:true});}
  window.scrollTo({top:index<0?target.getBoundingClientRect().top+scrollY-80:projectTop(index),behavior:reduced.matches?'instant':'smooth'});
+});
+// The outer strips remain available even while a screenshot is scrolling.
+works.querySelectorAll<HTMLElement>('[data-works-exit]').forEach(zone=>{
+ let startY:number|undefined;
+ zone.addEventListener('touchstart',event=>{startY=event.touches[0]?.clientY;},{passive:true});
+ zone.addEventListener('touchmove',event=>{if(startY!==undefined)event.preventDefault();},{passive:false});
+ zone.addEventListener('touchend',event=>{
+  const delta=(event.changedTouches[0]?.clientY??startY??0)-(startY??0);startY=undefined;
+  if(Math.abs(delta)<24)return;
+  const link=works.querySelector<HTMLAnchorElement>(delta>0?'.works-exit-before':'.works-exit-after');link?.click();
+ });
+ zone.addEventListener('touchcancel',()=>{startY=undefined;},{passive:true});
 });
 function updatePosition(){
  pending=0;

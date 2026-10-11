@@ -40,12 +40,18 @@ class ProjectStory extends HTMLElement {
       gallery.style.setProperty('--visual-bottom', `${bottom + 12}px`);
     };
     const fitViews = () => {
+      const mobile = matchMedia('(max-width:767px)').matches;
+      const copy = this.querySelector<HTMLElement>('[data-scene-copy]');
+      const footer = this.querySelector<HTMLElement>('.story-footer');
+      const budget = stage.clientHeight - (copy?.offsetHeight || 0) - (footer?.offsetHeight || 0) - 140;
+      const mobileHeight = Math.max(140, Math.min(460, budget));
+      if (!mobile) gallery.style.removeProperty('--mobile-preview-height');
       const fits = scenes.map(scene => {
         const demo = scene.querySelector<HTMLElement>('[data-scene-demo]');
         if (!demo) return 1;
         const styles = getComputedStyle(scene);
         const caption = scene.querySelector<HTMLElement>('[data-scene-caption]');
-        const available = scene.clientHeight - parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom)
+        const available = mobile ? mobileHeight - 52 : scene.clientHeight - parseFloat(styles.paddingTop) - parseFloat(styles.paddingBottom)
           - (caption?.offsetHeight || 0) - 18;
         const natural = demo.offsetHeight;
         scene.style.setProperty('--demo-natural-height', `${natural}px`);
@@ -61,6 +67,12 @@ class ProjectStory extends HTMLElement {
         if(surface instanceof HTMLImageElement)width=Math.min(width,surface.offsetHeight*Number(surface.getAttribute('width'))/Number(surface.getAttribute('height')));
         return width*scale/2;
       });
+      if (mobile) {
+        const demo = scenes[active].querySelector<HTMLElement>('[data-scene-demo]')!;
+        const scale = scenes[active].querySelector('[data-screen-image]') ? fits[active] : sharedScale;
+        // Reserve the rendered screen height, including its shadow gutter.
+        gallery.style.setProperty('--mobile-preview-height', `${demo.offsetHeight * scale + 52}px`);
+      }
       // Controls stay in place while only the screen track moves.
       gallery.style.setProperty('--visual-half-width',`${Math.max(...halfWidths)}px`);
       positionControls();
@@ -72,7 +84,7 @@ class ProjectStory extends HTMLElement {
       buttons.forEach((button,i)=>{if(i===active)button.setAttribute('aria-current','step');else button.removeAttribute('aria-current');});
       previous.forEach(button=>button.disabled=false);next.forEach(button=>button.disabled=false);
       counter.textContent=String(active+1).padStart(2,'0');
-      positionControls();
+      fitViews();
       if(announce)announcement.textContent=buttons[active].getAttribute('aria-label')||'';
     };
     const goTo=(index:number)=>{
@@ -130,7 +142,7 @@ class ProjectStory extends HTMLElement {
     windowEl.addEventListener('lostpointercapture',event=>finishSwipe(event,true),{signal:abort.signal});
     windowEl.addEventListener('dragstart',event=>event.preventDefault(),{signal:abort.signal});
     windowEl.addEventListener('click',event=>{if(suppressClick){event.preventDefault();event.stopPropagation();}},{capture:true,signal:abort.signal});
-    const sync=()=>{render();fitViews();};
+    const sync=()=>{render();};
     const resize=new ResizeObserver(sync);resize.observe(stage);resize.observe(windowEl);
     scenes.forEach(scene=>{const demo=scene.querySelector('[data-scene-demo]');if(demo)resize.observe(demo);});
     document.fonts.ready.then(()=>{if(!abort.signal.aborted)sync();});
