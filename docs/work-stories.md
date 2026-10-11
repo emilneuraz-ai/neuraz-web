@@ -246,3 +246,11 @@ En iOS el logo conserva la malla GLB cerrada con espesor real, evitando la super
 Validación: build de Astro y diff check; ocho proyectos a 320×740, 393×852 y 1440×900, más movimiento reducido. Textos y pies completos, referencias accesibles válidas, sin barra superior ni overflow horizontal. Comprobación adicional en el servidor activo 4321: gesto táctil de salida hacia ambas secciones, scroll interno de capturas sin desplazar la página, desplegable de Tanzania y el octavo SVG en la página de capacitación. Evidencias en `output/playwright/comments-responsive-check.json`, `comments-active-check.json` y capturas `comments-*`. Los cambios de esta revisión permanecen locales.
 
 La barra opcional de desarrollo de Astro devolvía `504 Outdated Optimize Dep` en 4321 incluso después de reiniciar y regenerar la caché de Vite. Se desactivó para el usuario en este proyecto mediante `npm run astro -- preferences disable devToolbar`; es una preferencia local y no cambia la compilación pública ni los controles del sitio. La caché anterior de Vite quedó respaldada en `/tmp/neuraz-vite-cache-20261011-0945`.
+
+### Ajustes de espaciado y contraste — 11 de octubre de 2026
+
+Los botones del Hero se agrupan al inicio de la fila móvil con 6–8 px entre ellos y menos espacio inferior. Las zonas de salida del carrusel tienen una línea divisora hacia el área de proyectos, arriba y abajo. Los antetítulos de los ocho proyectos se ocultan únicamente en móvil.
+
+Todo el texto de Contacto pasa a negro, incluido “Algo nuevo.”, reemplazando el naranja de la revisión anterior. Contacto deja de recibir el desvanecimiento de contenido al entrar en pantalla en móvil para que su texto conserve el negro durante la transición.
+
+Build y diff check correctos. Verificado en localhost:4321 a 320×740, 393×852 y 1440×900: tres enlaces en una fila sin overflow, divisores móviles visibles, antetítulos ocultos en móvil y conservados en escritorio, y Contacto con texto negro y opacidad completa. Sin errores de navegador. Evidencia en `output/playwright/spacing-review-check.json` y capturas `spacing-review-*`. Cambios locales.
