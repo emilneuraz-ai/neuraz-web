@@ -16,26 +16,26 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
           Conectamos tus herramientas y automatizamos lo repetitivo.
           Más tiempo para lo que hacés mejor.
         </p>
+        <nav class="hero-actions" aria-label="Explorar Neuraz">
+          <a class="hero-button" href="#servicios">Servicios <span aria-hidden="true">→</span></a>
+          <a class="hero-button hero-button-outline" href="#trabajos">Proyectos <span aria-hidden="true">↗</span></a>
+          <a class="hero-team-link" href="#equipo">El equipo <span aria-hidden="true">↗</span></a>
+        </nav>
       </div>
       <div class="hero-visual">
         <div class="hero-logo-slot" data-hero-logo-slot><img src="/images/isotipo.svg" alt="Neuraz" width="440" height="440" /></div>
       </div>
     </div>
-    <nav class="hero-actions" aria-label="Explorar Neuraz">
-      <a class="hero-button" href="#servicios">Servicios <span aria-hidden="true">↗</span></a>
-      <a class="hero-button hero-button-outline" href="#trabajos">Proyectos <span aria-hidden="true">↗</span></a>
-      <a class="hero-team-link" href="#equipo">El equipo <span aria-hidden="true">↗</span></a>
-    </nav>
   </div>
 </section>
 
 <style>
-  .hero-actions { position:relative; z-index:201; display:flex; align-items:center; gap:12px; padding-bottom:28px; }
+  .hero-actions { position:relative; z-index:201; display:flex; align-items:center; gap:12px; }
   .hero-actions a { display:inline-flex; align-items:center; justify-content:center; gap:12px; min-height:44px; font-size:13px; white-space:nowrap; }
   .hero-button { border:1px solid #111; background:#111; color:#fafafa; padding:0 20px; border-radius:999px; }
   .hero-button-outline { background:transparent; color:#111; }
   .hero-team-link { padding-inline:8px; text-decoration:underline; text-underline-offset:4px; }
-  @media(max-width:767px){.hero-actions{gap:8px;justify-content:flex-start;padding-bottom:20px}.hero-actions a{font-size:11px;gap:6px}.hero-button{padding:0 12px}.hero-team-link{padding-inline:0}}
+  @media(max-width:767px){.hero-actions{gap:8px;justify-content:flex-start}.hero-actions a{font-size:11px;gap:6px}.hero-button{padding:0 12px}.hero-team-link{padding-inline:0}}
   @media(max-width:359px){.hero-actions{gap:6px}.hero-actions a{font-size:10px}.hero-button{padding:0 9px}}
 
   .hero {
@@ -126,7 +126,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
     .hero { padding-top: 6.5rem; }
     .hero-grid { grid-template-columns: minmax(0, 1fr); }
     .hero-copy { grid-column: 1; grid-row: 1; }
-    .hero-visual { grid-column: 1; grid-row: 2; margin-top: -1rem; }
+    .hero-visual { grid-column: 1; grid-row: 2; margin-top: 12px; }
     h1 { font-size: clamp(3rem, 7.7vw, 5rem); }
     .hero-description { font-size: 13px; max-width: 310px; }
   }
@@ -146,7 +146,7 @@ import SectionAtmosphere from './SectionAtmosphere.astro';
       grid-row: 2;
       width: calc((100% + 2 * var(--hero-gutter) - 24px) * .9);
       max-width: 648px;
-      margin: -1rem 0 0;
+      margin: 12px 0 0;
       justify-self: center;
     }
   }
