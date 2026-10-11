@@ -32,7 +32,7 @@ const stories = [{project:eurotech,View:EurotechView},{project:gestor,View:Gesto
   </ProjectStory>)}
   </div>
   <a class="works-exit works-exit-before" href="#servicios" data-works-exit aria-label="Volver a Servicios. También podés deslizar hacia abajo aquí."><span class="works-exit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 14 7-7 7 7" /></svg></span></a>
-  <a class="works-exit works-exit-after" href="#nosotros" data-works-exit aria-label="Continuar a Nosotros. También podés deslizar hacia arriba aquí."><span class="works-exit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 10 7 7 7-7" /></svg></span></a>
+  <a class="works-exit works-exit-after" href="#equipo" data-works-exit aria-label="Continuar a la sección El equipo. También podés deslizar hacia arriba aquí."><span class="works-exit-icon" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="m5 10 7 7 7-7" /></svg></span></a>
   </div>
   <nav class="work-positions" aria-label="Posición entre proyectos" hidden>{stories.map(({project},i)=><a href={`#trabajo-${project.id}`} data-project-jump aria-label={`Proyecto ${i+1}: ${project.title}`}><span></span><span class="work-position-label">{project.title}</span></a>)}</nav>
 

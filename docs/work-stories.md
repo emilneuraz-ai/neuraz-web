@@ -302,3 +302,9 @@ Build y diff check correctos. Comprobado en 320, 393 y 1440 px: navbar según la
 Los commits `e736b5f` y `e0bff28` se subieron a `origin/master`. Se desplegó una copia limpia de los archivos versionados de `e0bff2838b58f53a75503f4dc67617f0c4ffd5f9` en Vercel: deployment `dpl_G7rRWc2akfUfhy6ncNFVUpYS1nnM`, producción, estado Ready. Los alias `neuraz.ar` y `www.neuraz.ar` apuntan a esta versión.
 
 Verificación pública en navegador a 320×740, 393×852 y 1440×900: navbar móvil oculto al bajar y visible al subir, menú operativo y navbar de escritorio visible. En 393 px, Proyectos ocupa los 852 px completos desde el borde superior; “Ver en Behance” aparece arriba a la derecha y no existe el pie anterior. Ambos chevrones navegan por toque y gesto a Servicios y Nosotros. Los enlaces del equipo conservan sus etiquetas accesibles con círculos e iconos reducidos. Sin overflow horizontal, errores de JavaScript ni recursos fallidos. Evidencia en `output/playwright/production-chevron-header-check.json` y capturas `production-chevron-project.png` y `production-chevron-team.png`.
+
+## Unificación de Nosotros y El equipo — 11 de octubre de 2026
+
+La presentación y los integrantes quedan reunidos bajo “El equipo”, con un único destino `#equipo` en el inicio de la sección. Se elimina Nosotros de los menús de escritorio y móvil, se actualiza el antetítulo y la salida inferior de Proyectos apunta a la misma sección con su etiqueta accesible. El enlace existente del Hero usa también ese destino.
+
+Build y diff check correctos. Validación del build local en navegador a 1440×900, 393×852 y 320×740: menú con Servicios, Trabajos, El equipo y Contacto; un único ID equipo, dos integrantes, título visible al navegar, menú móvil cerrado tras seleccionar y ausencia de enlaces a Nosotros y overflow horizontal. La salida inferior de Proyectos llega a El equipo en ambos anchos móviles. Sin excepciones JavaScript. Capturas en `output/playwright/team-unify-local-*`.
